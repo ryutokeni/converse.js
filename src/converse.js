@@ -53,6 +53,8 @@ const WHITELISTED_PLUGINS = [
 ];
 
 const initialize = converse.initialize;
+const updateContacts = converse.updateContacts;
+const onLogOut = converse.onLogOut;
 
 converse.initialize = function (settings, callback) {
     if (converse.env._.isArray(settings.whitelisted_plugins)) {
@@ -61,6 +63,14 @@ converse.initialize = function (settings, callback) {
         settings.whitelisted_plugins = WHITELISTED_PLUGINS;
     }
     return initialize(settings, callback);
+}
+
+converse.updateContacts = function (contacts, group) {
+    return updateContacts(contacts, group);
+}
+
+converse.onLogOut = function (callback) {
+    return onLogOut(callback);
 }
 
 export default converse;

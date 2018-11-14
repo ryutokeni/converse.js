@@ -19,6 +19,10 @@ converse.plugins.add('converse-roster', {
          */
         const { _converse } = this,
               { __ } = _converse;
+        var importedContacts = _converse.user_settings.imported_contacts;
+        var organizationContacts = _converse.user_settings.my_organization;
+        var currentItems = [];
+        const domain = _converse.user_settings.domain;
 
         _converse.api.settings.update({
             'allow_contact_requests': true,
@@ -597,40 +601,77 @@ converse.plugins.add('converse-roster', {
                 const query = sizzle(`query[xmlns="${Strophe.NS.ROSTER}"]`, iq).pop();
                 if (query) {
                     const items = sizzle(`item`, query);
-                    _.each(items, (item) => this.updateContact(item));
+                    currentItems = items;
+                    this.compareContacts(importedContacts, 'Contacts');
+                    this.compareContacts(organizationContacts, 'Organization');
                     this.data.save('version', query.getAttribute('ver'));
                     _converse.session.save('roster_fetched', true);
                 }
                 _converse.emit('roster', iq);
             },
 
-            updateContact (item) {
+            compareContacts(contacts, group, sync) {
+              if (sync) {
+                if (group === 'Organization') {
+                  organizationContacts = contacts;
+                } else {
+                  importedContacts = contacts;
+                }
+              }
+              _.each(currentItems, (item) => {
+                let matched = this.isExistedInImportedContacts(item, contacts);
+                if (matched) {
+                  if (
+                    (group === 'Contacts' && this.isExistedInImportedContacts(item, organizationContacts)) ||
+                    (group === 'Organization' && this.isExistedInImportedContacts(item, importedContacts))
+                  ) {
+                    this.updateContact(item, ['Contacts', 'Organization']);
+                  } else {
+                    this.updateContact(item, [group]);                    
+                  }
+
+                } else {
+                  try {
+                    item.destroy();
+                  } catch (e) { }
+                }
+              });
+            },
+
+            isExistedInImportedContacts(item, contacts) {
+              const jid = item.getAttribute('jid');
+              const foundContactIndex = _.findIndex(contacts, contact => {
+                if (!contact.userName) {
+                  return false;
+                }
+                return (jid === contact.userName +  domain);
+              });
+              return foundContactIndex > -1;
+            },
+
+            updateContact (item, groups) {
                 /* Update or create RosterContact models based on items
                  * received in the IQ from the server.
                  */
                 const jid = item.getAttribute('jid');
                 if (this.isSelf(jid)) { return; }
-
                 const contact = this.get(jid),
-                    subscription = item.getAttribute("subscription"),
-                    ask = item.getAttribute("ask"),
-                    groups = _.map(item.getElementsByTagName('group'), Strophe.getText);
+                    subscription = 'both',
+                    ask = item.getAttribute("ask");
+                    // groups = _.map(item.getElementsByTagName('group'), Strophe.getText);
 
                 if (!contact) {
-                    if ((subscription === "none" && ask === null) || (subscription === "remove")) {
-                        return; // We're lazy when adding contacts.
-                    }
+                    // if ((subscription === "none" && ask === null) || (subscription === "remove")) {
+                    //     return; // We're lazy when adding contacts.
+                    // }
                     this.create({
                         'ask': ask,
                         'nickname': item.getAttribute("name"),
                         'groups': groups,
                         'jid': jid,
                         'subscription': subscription
-                    }, {sort: false});
+                    }, {sort: true});
                 } else {
-                    if (subscription === "remove") {
-                        return contact.destroy();
-                    }
                     // We only find out about requesting contacts via the
                     // presence handler, so if we receive a contact
                     // here, we know they aren't requesting anymore.
@@ -639,7 +680,7 @@ converse.plugins.add('converse-roster', {
                         'subscription': subscription,
                         'ask': ask,
                         'requesting': null,
-                        'groups': groups
+                        'groups': groups,
                     });
                 }
             },
@@ -682,7 +723,7 @@ converse.plugins.add('converse-roster', {
                             contact.authorize();
                         }
                     } else {
-                        this.createRequestingContact(presence);
+                        // this.createRequestingContact(presence);
                     }
                 }
             },
@@ -834,7 +875,7 @@ converse.plugins.add('converse-roster', {
         _converse.api.listen.on('statusInitialized', (reconnecting) => {
             if (!reconnecting) {
                 _converse.presences = new _converse.Presences();
-                _converse.presences.browserStorage = 
+                _converse.presences.browserStorage =
                     new Backbone.BrowserStorage.session(b64_sha1(`converse.presences-${_converse.bare_jid}`));
                 _converse.presences.fetch();
             }
@@ -853,7 +894,7 @@ converse.plugins.add('converse-roster', {
                 _converse.initRoster();
             }
             _converse.roster.onConnected();
-            _converse.populateRoster(reconnecting);
+            _converse.populateRoster(true);
             _converse.registerPresenceHandler();
         });
 
@@ -869,7 +910,7 @@ converse.plugins.add('converse-roster', {
             'contacts': {
                 /**
                  * This method is used to retrieve roster contacts.
-                 * 
+                 *
                  * @method _converse.api.contacts.get
                  * @params {(string[]|string)} jid|jids The JID or JIDs of
                  *      the contacts to be returned.
@@ -882,7 +923,7 @@ converse.plugins.add('converse-roster', {
                  *     const contact = _converse.api.contacts.get('buddy@example.com')
                  *     // ...
                  * });
-                 * 
+                 *
                  * @example
                  * // To get multiple contacts, pass in an array of JIDs:
                  * _converse.api.listen.on('rosterContactsFetched', function () {
@@ -891,7 +932,7 @@ converse.plugins.add('converse-roster', {
                  *     )
                  *     // ...
                  * });
-                 * 
+                 *
                  * @example
                  * // To return all contacts, simply call ``get`` without any parameters:
                  * _converse.api.listen.on('rosterContactsFetched', function () {
@@ -912,7 +953,7 @@ converse.plugins.add('converse-roster', {
                 },
                 /**
                  * Add a contact.
-                 * 
+                 *
                  * @method _converse.api.contacts.add
                  * @param {string} jid The JID of the contact to be added
                  * @param {string} [name] A custom name to show the user by
@@ -932,4 +973,3 @@ converse.plugins.add('converse-roster', {
         });
     }
 });
-

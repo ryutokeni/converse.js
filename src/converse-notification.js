@@ -104,19 +104,19 @@ converse.plugins.add('converse-notification', {
         };
 
 
-        _converse.playSoundNotification = function () {
+        _converse.playSoundNotification = function (fileName) {
             /* Plays a sound to notify that a new message was recieved.
              */
             // XXX Eventually this can be refactored to use Notification's sound
             // feature, but no browser currently supports it.
             // https://developer.mozilla.org/en-US/docs/Web/API/notification/sound
             if (_converse.play_sounds && !_.isUndefined(window.Audio)) {
-                const audioOgg = new Audio(_converse.sounds_path+"msg_received.ogg");
+                const audioOgg = new Audio(_converse.sounds_path+fileName+".ogg");
                 const canPlayOgg = audioOgg.canPlayType('audio/ogg');
                 if (canPlayOgg === 'probably') {
                     return audioOgg.play();
                 }
-                const audioMp3 = new Audio(_converse.sounds_path+"msg_received.mp3");
+                const audioMp3 = new Audio(_converse.sounds_path+fileName+".mp3");
                 const canPlayMp3 = audioMp3.canPlayType('audio/mp3');
                 if (canPlayMp3 === 'probably') {
                     audioMp3.play();
@@ -183,6 +183,7 @@ converse.plugins.add('converse-notification', {
                 'lang': _converse.locale,
                 'icon': _converse.notification_icon,
                 'requireInteraction': !_converse.notification_delay
+                'silent': true
             });
             if (_converse.notification_delay) {
                 setTimeout(n.close.bind(n), _converse.notification_delay);
@@ -258,8 +259,13 @@ converse.plugins.add('converse-notification', {
             if (!_converse.shouldNotifyOfMessage(message)) {
                 return false;
             }
-            _converse.playSoundNotification();
-            if (_converse.areDesktopNotificationsEnabled()) {
+            if (document.visibilityState == "hidden") {
+              _converse.playSoundNotification('blastwave');
+            } else {
+              _converse.playSoundNotification('chimenotification');
+            }
+
+            if (_converse.areDesktopNotificationsEnabled() && (document.visibilityState == "hidden")) {
                 _converse.showMessageNotification(message);
             }
         };
@@ -296,4 +302,3 @@ converse.plugins.add('converse-notification', {
         });
     }
 });
-

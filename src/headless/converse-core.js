@@ -391,7 +391,7 @@ _converse.initialize = function (settings, callback) {
     // Module-level functions
     // ----------------------
 
-    this.generateResource = () => `/converse.js-${Math.floor(Math.random()*139749528).toString()}`;
+    this.generateResource = () => `/pageme`;
 
     this.sendCSI = function (stat) {
         /* Send out a Chat Status Notification (XEP-0352)
@@ -1699,6 +1699,16 @@ const converse = {
      */
     'initialize' (settings, callback) {
         return _converse.initialize(settings, callback);
+    },
+    'updateContacts' (contacts, group) {
+      return _converse.api.listen.on('roster', () => {
+        _converse.roster.compareContacts(contacts, group, true);
+      });
+    },
+    'onLogOut' (callback) {
+      return _converse.api.listen.on('logout', () => {
+        callback();
+      });
     },
     /**
      * Exposes methods for adding and removing plugins. You'll need to write a plugin
