@@ -209,6 +209,10 @@ converse.plugins.add('converse-chatboxes', {
                 xhr.open('PUT', this.get('put'), true);
                 xhr.setRequestHeader("Content-type", this.file.type);
                 xhr.send(this.file);
+            },
+
+            findWhere(option) {
+              return findWhere(option)
             }
         });
 
@@ -246,7 +250,7 @@ converse.plugins.add('converse-chatboxes', {
 
                 this.messages.on('change:upload', (message) => {
                     if (message.get('upload') === _converse.SUCCESS) {
-                        this.sendMessageStanza(this.createMessageStanza(message));
+                        this.sendMessageStanza(this.createMessageStanza(message, message.get('message')));
                     }
                 });
 
@@ -316,7 +320,7 @@ converse.plugins.add('converse-chatboxes', {
                 return false;
             },
 
-            createMessageStanza (message) {
+            createMessageStanza (message, body) {
                 /* Given a _converse.Message Backbone.Model, return the XML
                  * stanza that represents it.
                  *
@@ -328,7 +332,7 @@ converse.plugins.add('converse-chatboxes', {
                         'to': this.get('jid'),
                         'type': this.get('message_type'),
                         'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid'),
-                    }).c('body').t(message.get('message')).up()
+                    }).c('body').t(body).up()
                       .c(_converse.ACTIVE, {'xmlns': Strophe.NS.CHATSTATES}).up()
                       .c('data', {'xmlns': 'pageMe.message.data'})
                       .c('sentDate').t((new Date()).getTime() / 1000).up()
@@ -408,6 +412,7 @@ converse.plugins.add('converse-chatboxes', {
                  *    (Message) message - The chat message
                  */
                 attrs.sent = moment().format();
+                const body = attrs.message;
                 let message = this.messages.findWhere('correcting')
                 if (message) {
                     const older_versions = message.get('older_versions') || [];
@@ -420,9 +425,10 @@ converse.plugins.add('converse-chatboxes', {
                         'references': attrs.references
                     });
                 } else {
+                    delete attrs.message;
                     message = this.messages.create(attrs);
                 }
-                return this.sendMessageStanza(this.createMessageStanza(message));
+                return this.sendMessageStanza(this.createMessageStanza(message, body));
             },
 
             sendChatState () {
@@ -574,6 +580,7 @@ converse.plugins.add('converse-chatboxes', {
                         // TODO: handle <subject> messages (currently being done by ChatRoom)
                         return;
                     } else {
+                        delete attrs.message;
                         return that.messages.create(attrs);
                     }
                 }
