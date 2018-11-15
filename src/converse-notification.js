@@ -182,7 +182,7 @@ converse.plugins.add('converse-notification', {
                 'body': body,
                 'lang': _converse.locale,
                 'icon': _converse.notification_icon,
-                'requireInteraction': !_converse.notification_delay
+                'requireInteraction': !_converse.notification_delay,
                 'silent': true
             });
             if (_converse.notification_delay) {

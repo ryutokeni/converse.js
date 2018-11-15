@@ -330,6 +330,10 @@ converse.plugins.add('converse-chatboxes', {
                         'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid'),
                     }).c('body').t(message.get('message')).up()
                       .c(_converse.ACTIVE, {'xmlns': Strophe.NS.CHATSTATES}).up()
+                      .c('data', {'xmlns': 'pageMe.message.data'})
+                      .c('sentDate').t((new Date()).getTime()).up()
+                      .c('timeToRead').t('86400').up()
+                      .c('encrypted').t('0').up().up()
                       .c('request', {'xmlns': Strophe.NS.RECEIPTS}).up();
 
                 if (message.get('is_spoiler')) {
@@ -688,7 +692,12 @@ converse.plugins.add('converse-chatboxes', {
                     'from': _converse.connection.jid,
                     'id': _converse.connection.getUniqueId(),
                     'to': to_jid,
-                }).c('received', {'xmlns': Strophe.NS.RECEIPTS, 'id': id}).up();
+                }).c(
+                    'received', {
+                      'xmlns': Strophe.NS.RECEIPTS,
+                      'id': id
+                    }
+                ).up();
                 _converse.api.send(receipt_stanza);
             },
 
@@ -699,6 +708,7 @@ converse.plugins.add('converse-chatboxes', {
                  * Parameters:
                  *    (XMLElement) stanza - The incoming message stanza
                  */
+                 console.log(stanza);
                 let to_jid = stanza.getAttribute('to');
                 const to_resource = Strophe.getResourceFromJid(to_jid);
 
