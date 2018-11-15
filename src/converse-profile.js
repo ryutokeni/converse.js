@@ -204,7 +204,7 @@ converse.plugins.add('converse-profile', {
                     this.model.toJSON(),
                     this.model.vcard.toJSON(), {
                     '__': __,
-                    'fullname': this.model.vcard.get('fullname') || _converse.bare_jid,
+                    'fullname': this.model.vcard.get('fullname') || 'Loading...',
                     'status_message': this.model.get('status_message') ||
                                         __("I am %1$s", this.getPrettyStatus(chat_status)),
                     'chat_status': chat_status,
@@ -260,4 +260,3 @@ converse.plugins.add('converse-profile', {
         });
     }
 });
-

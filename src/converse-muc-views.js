@@ -1990,7 +1990,7 @@ converse.plugins.add('converse-muc-views', {
                 form.addEventListener('submit', this.inviteFormSubmitted.bind(this), false);
                 const el = this.el.querySelector('input.invited-contact');
                 const list = _converse.roster.map(function (item) {
-                        const label = item.get('fullname') || item.get('jid');
+                        const label = item.get('fullname') || 'Loading...';
                         return {'label': label, 'value':item.get('jid')};
                     });
                 const awesomplete = new Awesomplete(el, {
@@ -2125,4 +2125,3 @@ converse.plugins.add('converse-muc-views', {
         });
     }
 });
-

@@ -1,10 +1,10 @@
 <div class="chatbox-navback"><i class="fa fa-arrow-left"></i></div>
 <div class="chatbox-title">
-    <div class="chat-title" title="{{{o.jid}}}">
+    <div class="chat-title" title="{{{o.nickname || o.fullname || 'Loading...'}}}">
         {[ if (o.name && o.name !== o.Strophe.getNodeFromJid(o.jid)) { ]}
             {{{ o.name }}}
         {[ } else { ]}
-            {{{ o.Strophe.getNodeFromJid(o.jid) }}}@{{{ o.Strophe.getDomainFromJid(o.jid) }}}
+            Loading...
         {[ } ]}
     </div>
     <!-- Sanitized in converse-muc-views. We want to render links. -->

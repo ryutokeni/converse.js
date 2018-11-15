@@ -120,7 +120,7 @@ converse.plugins.add('converse-chatboxes', {
                 if (this.get('type') === 'groupchat') {
                     return this.get('nick');
                 } else {
-                    return this.vcard.get('fullname') || this.get('from');
+                    return this.vcard.get('fullname') || 'Loading...';
                 }
             },
 
@@ -269,7 +269,7 @@ converse.plugins.add('converse-chatboxes', {
             },
 
             getDisplayName () {
-                return this.vcard.get('fullname') || this.get('jid');
+                return this.vcard.get('fullname') || 'Loading...';
             },
 
             handleMessageCorrection (stanza) {
@@ -331,7 +331,7 @@ converse.plugins.add('converse-chatboxes', {
                     }).c('body').t(message.get('message')).up()
                       .c(_converse.ACTIVE, {'xmlns': Strophe.NS.CHATSTATES}).up()
                       .c('data', {'xmlns': 'pageMe.message.data'})
-                      .c('sentDate').t((new Date()).getTime()).up()
+                      .c('sentDate').t((new Date()).getTime() / 1000).up()
                       .c('timeToRead').t('86400').up()
                       .c('encrypted').t('0').up().up()
                       .c('request', {'xmlns': Strophe.NS.RECEIPTS}).up();
@@ -407,6 +407,7 @@ converse.plugins.add('converse-chatboxes', {
                  *  Parameters:
                  *    (Message) message - The chat message
                  */
+                attrs.sent = moment().format();
                 let message = this.messages.findWhere('correcting')
                 if (message) {
                     const older_versions = message.get('older_versions') || [];
@@ -689,9 +690,10 @@ converse.plugins.add('converse-chatboxes', {
 
             sendReceiptStanza (to_jid, id) {
                 const receipt_stanza = $msg({
-                    'from': _converse.connection.jid,
+                    'from': !_converse.connection.jid.indexOf('/pageme') ? _converse.connection.jid + '/pageme' : _converse.connection.jid,
                     'id': _converse.connection.getUniqueId(),
-                    'to': to_jid,
+                    'to': to_jid.replace('/pageme', ''),
+                    'type': 'chat'
                 }).c(
                     'received', {
                       'xmlns': Strophe.NS.RECEIPTS,
@@ -708,7 +710,6 @@ converse.plugins.add('converse-chatboxes', {
                  * Parameters:
                  *    (XMLElement) stanza - The incoming message stanza
                  */
-                 console.log(stanza);
                 let to_jid = stanza.getAttribute('to');
                 const to_resource = Strophe.getResourceFromJid(to_jid);
 

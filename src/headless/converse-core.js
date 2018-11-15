@@ -1643,7 +1643,7 @@ _converse.api = {
      */
     'send' (stanza) {
         _converse.connection.send(stanza);
-        _converse.emit('send', stanza); 
+        _converse.emit('send', stanza);
     },
 
     /**
@@ -1656,7 +1656,7 @@ _converse.api = {
     'sendIQ' (stanza, timeout) {
         return new Promise((resolve, reject) => {
             _converse.connection.sendIQ(stanza, resolve, reject, timeout || _converse.IQ_TIMEOUT);
-            _converse.emit('send', stanza); 
+            _converse.emit('send', stanza);
         });
     }
 };
@@ -1701,6 +1701,9 @@ const converse = {
         return _converse.initialize(settings, callback);
     },
     'updateContacts' (contacts, group) {
+      if (_converse.roster) {
+        return _converse.roster.compareContacts(contacts, group, true);
+      }
       return _converse.api.listen.on('roster', () => {
         _converse.roster.compareContacts(contacts, group, true);
       });

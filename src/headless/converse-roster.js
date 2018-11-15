@@ -22,6 +22,7 @@ converse.plugins.add('converse-roster', {
         var importedContacts = _converse.user_settings.imported_contacts;
         var organizationContacts = _converse.user_settings.my_organization;
         var currentItems = [];
+        var rawItems = [];
         const domain = _converse.user_settings.domain;
 
         _converse.api.settings.update({
@@ -251,7 +252,7 @@ converse.plugins.add('converse-roster', {
             },
 
             getDisplayName () {
-                return this.get('nickname') || this.vcard.get('nickname') || this.vcard.get('fullname') || this.get('jid');
+                return this.get('nickname') || this.vcard.get('nickname') || this.vcard.get('fullname') || 'Loading...';
             },
 
             getFullname () {
@@ -541,7 +542,7 @@ converse.plugins.add('converse-roster', {
                 const from = iq.getAttribute('from');
                 if (from && from !== _converse.bare_jid) {
                     // https://tools.ietf.org/html/rfc6121#page-15
-                    // 
+                    //
                     // A receiving client MUST ignore the stanza unless it has no 'from'
                     // attribute (i.e., implicitly from the bare JID of the user's
                     // account) or it has a 'from' attribute whose value matches the
@@ -601,7 +602,8 @@ converse.plugins.add('converse-roster', {
                 const query = sizzle(`query[xmlns="${Strophe.NS.ROSTER}"]`, iq).pop();
                 if (query) {
                     const items = sizzle(`item`, query);
-                    currentItems = items;
+                    currentItems = _.cloneDeep(items);
+                    rawItems = _.cloneDeep(items);
                     this.compareContacts(importedContacts, 'Contacts');
                     this.compareContacts(organizationContacts, 'Organization');
                     this.data.save('version', query.getAttribute('ver'));
@@ -611,6 +613,9 @@ converse.plugins.add('converse-roster', {
             },
 
             compareContacts(contacts, group, sync) {
+              if (!currentItems || !currentItems.length) {
+                currentItems = _.cloneDeep(rawItems);
+              }
               if (sync) {
                 if (group === 'Organization') {
                   organizationContacts = contacts;
@@ -627,7 +632,7 @@ converse.plugins.add('converse-roster', {
                   ) {
                     this.updateContact(item, ['Contacts', 'Organization']);
                   } else {
-                    this.updateContact(item, [group]);                    
+                    this.updateContact(item, [group]);
                   }
 
                 } else {

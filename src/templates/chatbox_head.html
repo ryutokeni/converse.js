@@ -3,11 +3,11 @@
     <div class="chatbox-title">
         <div class="row no-gutters">
             <canvas class="avatar" height="36" width="36"></canvas>
-            <div class="col chat-title" title="{{{o.jid}}}">
+            <div class="col chat-title" title="{{{o.nickname || o.fullname || 'Loading...'}}}">
                 {[ if (o.url) { ]}
                     <a href="{{{o.url}}}" target="_blank" rel="noopener" class="user">
                 {[ } ]}
-                        {{{ o.nickname || o.fullname || o.jid }}}
+                        {{{ o.nickname || o.fullname || 'Loading...' }}}
                 {[ if (o.url) { ]}
                     </a>
                 {[ } ]}
