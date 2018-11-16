@@ -55,6 +55,7 @@ const WHITELISTED_PLUGINS = [
 const initialize = converse.initialize;
 const updateContacts = converse.updateContacts;
 const onLogOut = converse.onLogOut;
+const onOpenChat = converse.onOpenChat;
 
 converse.initialize = function (settings, callback) {
     if (converse.env._.isArray(settings.whitelisted_plugins)) {
@@ -71,6 +72,10 @@ converse.updateContacts = function (contacts, group) {
 
 converse.onLogOut = function (callback) {
     return onLogOut(callback);
+}
+
+converse.onOpenChat = function (callback) {
+    return onOpenChat(callback);
 }
 
 export default converse;

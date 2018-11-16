@@ -26,7 +26,8 @@ converse.plugins.add('converse-chatboxes', {
          * loaded by converse.js's plugin machinery.
          */
         const { _converse } = this,
-              { __ } = _converse;
+              { __ } = _converse,
+              timeToRead = _converse.user_settings.time_to_read || '86400';
 
         // Configuration values for this plugin
         // ====================================
@@ -41,7 +42,8 @@ converse.plugins.add('converse-chatboxes', {
         _converse.api.promises.add([
             'chatBoxesFetched',
             'chatBoxesInitialized',
-            'privateChatsAutoJoined'
+            'privateChatsAutoJoined',
+            'chatOpenned'
         ]);
 
         function openChat (jid) {
@@ -66,6 +68,13 @@ converse.plugins.add('converse-chatboxes', {
             },
 
             initialize () {
+                if (this.get('sent') && this.get('time_to_read')) {
+                  const expiration = (new Date(this.get('sent'))).getTime() + this.get('time_to_read')*1000;
+                  if (expiration - (new Date()).getTime() <= 0) {
+                    this.destroy.bind(this);
+                    return;
+                  }
+                }
                 this.setVCard();
                 if (this.get('file')) {
                     this.on('change:put', this.uploadFile, this);
@@ -209,10 +218,6 @@ converse.plugins.add('converse-chatboxes', {
                 xhr.open('PUT', this.get('put'), true);
                 xhr.setRequestHeader("Content-type", this.file.type);
                 xhr.send(this.file);
-            },
-
-            findWhere(option) {
-              return findWhere(option)
             }
         });
 
@@ -242,6 +247,7 @@ converse.plugins.add('converse-chatboxes', {
                 _converse.api.waitUntil('rosterContactsFetched').then(() => {
                     this.addRelatedContact(_converse.roster.findWhere({'jid': this.get('jid')}));
                 });
+                _converse.api.emit('chatOpenned', this.get('jid'));
                 this.messages = new _converse.Messages();
                 const storage = _converse.config.get('storage');
                 this.messages.browserStorage = new Backbone.BrowserStorage[storage](
@@ -327,16 +333,19 @@ converse.plugins.add('converse-chatboxes', {
                  *  Parameters:
                  *    (Object) message - The Backbone.Model representing the message
                  */
+                const sentDate = message.get('sent');
                 const stanza = $msg({
                         'from': _converse.connection.jid,
                         'to': this.get('jid'),
                         'type': this.get('message_type'),
                         'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid'),
+                        'sent': sentDate,
+                        'time_to_read': timeToRead
                     }).c('body').t(body).up()
                       .c(_converse.ACTIVE, {'xmlns': Strophe.NS.CHATSTATES}).up()
                       .c('data', {'xmlns': 'pageMe.message.data'})
-                      .c('sentDate').t((new Date()).getTime() / 1000).up()
-                      .c('timeToRead').t('86400').up()
+                      .c('sentDate').t(sentDate).up()
+                      .c('timeToRead').t(timeToRead).up()
                       .c('encrypted').t('0').up().up()
                       .c('request', {'xmlns': Strophe.NS.RECEIPTS}).up();
 
@@ -411,7 +420,7 @@ converse.plugins.add('converse-chatboxes', {
                  *  Parameters:
                  *    (Message) message - The chat message
                  */
-                attrs.sent = moment().format();
+                attrs.sent = (new Date()).getTime() / 1000;
                 const body = attrs.message;
                 let message = this.messages.findWhere('correcting')
                 if (message) {
@@ -538,7 +547,8 @@ converse.plugins.add('converse-chatboxes', {
                     'references': this.getReferencesFromStanza(stanza),
                     'msgid': stanza.getAttribute('id'),
                     'time': delay ? delay.getAttribute('stamp') : moment().format(),
-                    'type': stanza.getAttribute('type')
+                    'type': stanza.getAttribute('type'),
+                    'sent': stanza.getAttribute('sent')
                 };
                 if (attrs.type === 'groupchat') {
                     attrs.from = stanza.getAttribute('from');
@@ -701,12 +711,7 @@ converse.plugins.add('converse-chatboxes', {
                     'id': _converse.connection.getUniqueId(),
                     'to': to_jid.replace('/pageme', ''),
                     'type': 'chat'
-                }).c(
-                    'received', {
-                      'xmlns': Strophe.NS.RECEIPTS,
-                      'id': id
-                    }
-                ).up();
+                }).c('received', { 'xmlns': Strophe.NS.RECEIPTS, 'id': id }).up();
                 _converse.api.send(receipt_stanza);
             },
 

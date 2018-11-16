@@ -34,6 +34,10 @@ converse.plugins.add('converse-message-view', {
             'show_images_inline': true
         });
 
+        _converse.api.promises.add([
+            'rerenderMessage'
+        ]);
+
         _converse.MessageVersionsModal = _converse.BootstrapModal.extend({
             toHTML () {
                 return tpl_message_versions_modal(_.extend(
@@ -55,6 +59,7 @@ converse.plugins.add('converse-message-view', {
                 }
                 this.model.on('change', this.onChanged, this);
                 this.model.on('destroy', this.remove, this);
+                _converse.api.on('rerenderMessage', (attrs) => this.renderChatMessage(attrs.body, attrs.view))
             },
 
             async render () {
@@ -111,27 +116,30 @@ converse.plugins.add('converse-message-view', {
                 return this.el;
             },
 
-            async renderChatMessage () {
-                const is_me_message = this.isMeCommand(),
-                      moment_time = moment(this.model.get('time')),
-                      role = this.model.vcard ? this.model.vcard.get('role') : null,
+            async renderChatMessage (message, model) {
+                if (!model) {
+                  model = this;
+                }
+                const is_me_message = model.isMeCommand(),
+                      moment_time = moment(model.model.get('time')),
+                      role = model.model.vcard ? model.model.vcard.get('role') : null,
                       roles = role ? role.split(',') : [];
 
                 const msg = u.stringToElement(tpl_message(
                     _.extend(
-                        this.model.toJSON(), {
+                        model.model.toJSON(), {
                         '__': __,
                         'is_me_message': is_me_message,
                         'roles': roles,
                         'pretty_time': moment_time.format(_converse.time_format),
                         'time': moment_time.format(),
-                        'extra_classes': this.getExtraMessageClasses(),
+                        'extra_classes': model.getExtraMessageClasses(),
                         'label_show': __('Show more'),
-                        'username': this.model.getDisplayName()
+                        'username': model.model.getDisplayName()
                     })
                 ));
 
-                const url = this.model.get('oob_url');
+                const url = model.model.get('oob_url');
                 if (url) {
                     msg.querySelector('.chat-msg__media').innerHTML = _.flow(
                         _.partial(u.renderFileURL, _converse),
@@ -140,7 +148,10 @@ converse.plugins.add('converse-message-view', {
                         _.partial(u.renderImageURL, _converse))(url);
                 }
 
-                let text = this.getMessageText();
+                let text = message ? message : model.getMessageText();
+                // if (!text) {
+                //   return;
+                // }
                 const msg_content = msg.querySelector('.chat-msg__text');
                 if (text && text !== url) {
                     if (is_me_message) {
@@ -149,7 +160,7 @@ converse.plugins.add('converse-message-view', {
                     text = xss.filterXSS(text, {'whiteList': {}});
                     msg_content.innerHTML = _.flow(
                         _.partial(u.geoUriToHttp, _, _converse.geouri_replacement),
-                        _.partial(u.addMentionsMarkup, _, this.model.get('references'), this.model.collection.chatbox),
+                        _.partial(u.addMentionsMarkup, _, model.model.get('references'), model.model.collection.chatbox),
                         u.addHyperlinks,
                         u.renderNewLines,
                         _.partial(u.addEmoji, _converse, _)
@@ -157,12 +168,12 @@ converse.plugins.add('converse-message-view', {
                 }
                 const promises = [];
                 promises.push(u.renderImageURLs(_converse, msg_content));
-                if (this.model.get('type') !== 'headline') {
-                    promises.push(this.renderAvatar(msg));
+                if (model.model.get('type') !== 'headline') {
+                    promises.push(model.renderAvatar(msg));
                 }
                 await Promise.all(promises);
-                this.replaceElement(msg);
-                this.model.collection.trigger('rendered', this);
+                model.replaceElement(msg);
+                model.model.collection.trigger('rendered', model);
             },
 
             renderErrorMessage () {

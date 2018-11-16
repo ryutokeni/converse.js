@@ -74,7 +74,7 @@ converse.plugins.add('converse-rosterview', {
             'show_toolbar': true,
             'xhr_user_search_url': null
         });
-        _converse.api.promises.add('rosterViewInitialized');
+        _converse.api.promises.add(['rosterViewInitialized']);
 
         const STATUSES = {
             'dnd': __('This contact is busy'),
@@ -397,7 +397,7 @@ converse.plugins.add('converse-rosterview', {
                     if (chatbox) {
                         if (chatbox.get('hidden')) {
                             this.el.classList.remove('open');
-                        } else {
+                        } else {                            
                             this.el.classList.add('open');
                         }
                     }
@@ -1002,4 +1002,3 @@ converse.plugins.add('converse-rosterview', {
         _converse.api.listen.on('rosterReadyAfterReconnection', initRoster);
     }
 });
-

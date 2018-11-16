@@ -84,7 +84,8 @@ u.isOnlyChatStateNotification = function (attrs) {
         !attrs['oob_url'] &&
         !attrs['file'] &&
         !(attrs['is_encrypted'] && attrs['plaintext']) &&
-        !attrs['message'];
+        !attrs['message'] &&
+        !attrs['sent'];
 };
 
 u.isHeadlineMessage = function (_converse, message) {

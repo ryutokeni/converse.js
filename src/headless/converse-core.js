@@ -1266,6 +1266,7 @@ _converse.api = {
          * @memberOf _converse.api.connection
          */
         'disconnect' () {
+          alert('disconnect')
             _converse.connection.disconnect();
         },
     },
@@ -1712,6 +1713,21 @@ const converse = {
       return _converse.api.listen.on('logout', () => {
         callback();
       });
+    },
+    'onOpenChat' (callback) {
+      return _converse.api.on('chatOpenned', (jid) => {
+        callback(jid, 1, 50);
+      });
+    },
+    'updateMessages' (jid, pagemeMessages) {
+      const chatbox = _converse.chatboxes.findWhere({'jid': jid});
+      chatbox.messageViews.forEach(messageView => {
+        const msgid = messageView.get('msgid');
+        console.log(messageView);
+        const pagemeMessage = _.find(pagemeMessages, msg => (msg.stanza.id === msgid));
+        // console.log(pagemeMessage);
+        _converse.api.emit('rerenderMessage', {view: messageView, body: pagemeMessage.body})
+      })
     },
     /**
      * Exposes methods for adding and removing plugins. You'll need to write a plugin
