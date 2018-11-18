@@ -1715,7 +1715,7 @@ const converse = {
       });
     },
     'onOpenChat' (callback) {
-      return _converse.api.on('chatOpenned', (jid) => {
+      return _converse.on('chatOpenned', (jid) => {
         callback(jid, 1, 50);
       });
     },
@@ -1723,9 +1723,8 @@ const converse = {
       const chatbox = _converse.chatboxes.findWhere({'jid': jid});
       chatbox.messageViews.forEach(messageView => {
         const msgid = messageView.get('msgid');
-        console.log(messageView);
         const pagemeMessage = _.find(pagemeMessages, msg => (msg.stanza.id === msgid));
-        // console.log(pagemeMessage);
+
         _converse.api.emit('rerenderMessage', {view: messageView, body: pagemeMessage.body})
       })
     },
