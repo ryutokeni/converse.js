@@ -53,17 +53,20 @@ converse.plugins.add('converse-message-view', {
                 'click .chat-msg__edit-modal': 'showMessageVersionsModal'
             },
 
+            defaults () {
+                return {
+                    'id': _converse.connection.getUniqueId(),
+                    'url': ''
+                };
+            },
+
             initialize () {
                 if (this.model.vcard) {
                     this.model.vcard.on('change', this.render, this);
                 }
                 this.model.on('change', this.onChanged, this);
                 this.model.on('destroy', this.remove, this);
-                _converse.on('rerenderMessage', (attrs) => {
-                  if (this.cid === attrs.view.get('cid')) {
-                    this.renderChatMessage(attrs.body)
-                  }
-                })
+                _converse.on('rerenderMessage', this.renderChatMessage, this);
             },
 
             async render () {
@@ -95,7 +98,7 @@ converse.plugins.add('converse-message-view', {
                 if (this.model.changed.progress) {
                     return this.renderFileUploadProgresBar();
                 }
-                if (_.filter(['correcting', 'message', 'type', 'upload', 'received', 'sent'],
+                if (_.filter(['correcting', 'message', 'type', 'upload', 'received', 'sent', 'loaded'],
                              prop => Object.prototype.hasOwnProperty.call(this.model.changed, prop)).length) {
                     await this.render();
                 }
@@ -120,12 +123,27 @@ converse.plugins.add('converse-message-view', {
                 return this.el;
             },
 
-            async renderChatMessage (message) {
+            findPagemeMessage() {
+                const pagemeMessage = _.find(_converse.pagemeMessages || [], msg => (msg.stanza.id === this.model.get('msgid')));
+                if (pagemeMessage) {
+                  return pagemeMessage.body;
+                } else {
+                  return null;
+                }
+            },
+
+            async renderChatMessage () {
                 const is_me_message = this.isMeCommand(),
                       moment_time = moment(this.model.get('time')),
                       role = this.model.vcard ? this.model.vcard.get('role') : null,
                       roles = role ? role.split(',') : [];
-
+                if (this.model.get('sent') && this.model.get('time_to_read')) {
+                  const expiration = (new Date(this.model.get('sent')*1000)).getTime() + parseInt(this.model.get('time_to_read'))*1000;
+                  if (expiration - (new Date()).getTime() <= 0) {
+                    this.model.destroy();
+                    return;
+                  }
+                }
                 const msg = u.stringToElement(tpl_message(
                     _.extend(
                         this.model.toJSON(), {
@@ -149,10 +167,7 @@ converse.plugins.add('converse-message-view', {
                         _.partial(u.renderImageURL, _converse))(url);
                 }
 
-                let text = message ? message : this.getMessageText();
-                // if (!text) {
-                //   return;
-                // }
+                let text = this.findPagemeMessage();
                 const msg_content = msg.querySelector('.chat-msg__text');
                 if (text && text !== url) {
                     if (is_me_message) {

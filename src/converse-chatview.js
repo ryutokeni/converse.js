@@ -65,7 +65,7 @@ converse.plugins.add('converse-chatview', {
                 'spoiler': true
             },
         });
-        
+
         twemoji.default.base = _converse.emoji_image_path;
 
         function onWindowStateChanged (data) {
@@ -753,14 +753,10 @@ converse.plugins.add('converse-chatview', {
                  */
                  if (!this.model.messageViews) {
                    this.model.messageViews = new Backbone.Collection;
-                   this.model.messageViews.comparator = 'msgid';
                  }
-                const view = new _converse.MessageView({'model': message});
+                const view = new _converse.MessageView({ 'model': message });
                 await view.render();
-                this.model.messageViews.add({
-                  ...view,
-                  msgid: message.get('msgid')
-                });
+                this.model.messageViews.add(view)
                 this.clearChatStateNotification(message);
                 if (!view.el.innerHTML) {
                     // An "inactive" CSN message (for example) will have an

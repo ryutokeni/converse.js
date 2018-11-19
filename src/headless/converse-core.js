@@ -74,6 +74,7 @@ _.extend(_converse, Backbone.Events);
 // Core plugins are whitelisted automatically
 _converse.core_plugins = [
     'converse-chatboxes',
+    'converse-message-view',
     'converse-core',
     'converse-disco',
     'converse-mam',
@@ -1721,11 +1722,32 @@ const converse = {
     },
     'updateMessages' (jid, pagemeMessages) {
       const chatbox = _converse.chatboxes.findWhere({'jid': jid});
-      chatbox.messageViews.forEach(messageView => {
-        const msgid = messageView.get('msgid');
-        const pagemeMessage = _.find(pagemeMessages, msg => (msg.stanza.id === msgid));
+      if (!_converse.pagemeMessages) {
+        _converse.pagemeMessages = pagemeMessages;
+      }
+      pagemeMessages.forEach(msg => {
+        const existed = _.find(_converse.pagemeMessages, oldMsg => (oldMsg.stanza.id === msg.stanza.id));
+        if (!existed) {
+          _converse.pagemeMessages.push(msg)
+        } else {
+        }
+        _converse.chatboxes.onMessage(msg.stanza);
+      });
+      _converse.api.emit('rerenderMessage');
 
-        _converse.api.emit('rerenderMessage', {view: messageView, body: pagemeMessage.body})
+      var notReceivedMessages = [];
+      chatbox.messages.forEach(msg => {
+        if (!msg.get('received')) {
+          notReceivedMessages.push(msg.get('msgid'));
+        }
+      })
+      return notReceivedMessages;
+    },
+    'updateMessageStatus' (jid, messages) {
+      const chatbox = _converse.chatboxes.findWhere({'jid': jid});
+      messages.forEach(msg => {
+        const message = chatbox.messages.findWhere({'msgid': msg.id});
+        message.save({ 'received': msg.received });
       })
     },
     /**

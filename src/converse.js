@@ -54,6 +54,7 @@ const WHITELISTED_PLUGINS = [
 
 const initialize = converse.initialize;
 const updateContacts = converse.updateContacts;
+const updateMessageStatus = converse.updateMessageStatus;
 const onLogOut = converse.onLogOut;
 const onOpenChat = converse.onOpenChat;
 
@@ -68,6 +69,9 @@ converse.initialize = function (settings, callback) {
 
 converse.updateContacts = function (contacts, group) {
     return updateContacts(contacts, group);
+}
+converse.updateMessageStatus = function (jid, messages) {
+    return updateMessageStatus(jid, messages);
 }
 
 converse.onLogOut = function (callback) {

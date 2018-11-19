@@ -68,13 +68,6 @@ converse.plugins.add('converse-chatboxes', {
             },
 
             initialize () {
-                if (this.get('sent') && this.get('time_to_read')) {
-                  const expiration = (new Date(this.get('sent'))).getTime() + this.get('time_to_read')*1000;
-                  if (expiration - (new Date()).getTime() <= 0) {
-                    this.destroy.bind(this);
-                    return;
-                  }
-                }
                 this.setVCard();
                 if (this.get('file')) {
                     this.on('change:put', this.uploadFile, this);
@@ -253,7 +246,6 @@ converse.plugins.add('converse-chatboxes', {
                 this.messages.browserStorage = new Backbone.BrowserStorage[storage](
                     b64_sha1(`converse.messages${this.get('jid')}${_converse.bare_jid}`));
                 this.messages.chatbox = this;
-
                 this.messages.on('change:upload', (message) => {
                     if (message.get('upload') === _converse.SUCCESS) {
                         this.sendMessageStanza(this.createMessageStanza(message, message.get('message')));
@@ -378,6 +370,12 @@ converse.plugins.add('converse-chatboxes', {
                         'id': message.get('msgid')
                     }).up();
                 }
+                _converse.pagemeMessages.push({
+                  body: body,
+                  sentDate: sentDate,
+                  stanza: stanza.node
+                })
+                _converse.api.emit('rerenderMessage');
                 return stanza;
             },
 
@@ -537,7 +535,6 @@ converse.plugins.add('converse-chatboxes', {
                             stanza.getElementsByTagName(_converse.INACTIVE).length && _converse.INACTIVE ||
                             stanza.getElementsByTagName(_converse.ACTIVE).length && _converse.ACTIVE ||
                             stanza.getElementsByTagName(_converse.GONE).length && _converse.GONE;
-
                 const attrs = {
                     'chat_state': chat_state,
                     'is_archived': !_.isNil(archive),
@@ -546,7 +543,8 @@ converse.plugins.add('converse-chatboxes', {
                     'message': _converse.chatboxes.getMessageBody(stanza) || undefined,
                     'references': this.getReferencesFromStanza(stanza),
                     'msgid': stanza.getAttribute('id'),
-                    'time': delay ? delay.getAttribute('stamp') : moment().format(),
+                    'time': delay ? delay.getAttribute('stamp') : (stanza.getAttribute('sent') ? moment(stanza.getAttribute('sent')*1000).format() : moment().format()),
+                    'time_to_read': stanza.getAttribute('time_to_read'),
                     'type': stanza.getAttribute('type'),
                     'sent': stanza.getAttribute('sent')
                 };
