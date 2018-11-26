@@ -334,13 +334,14 @@ converse.plugins.add('converse-chatboxes', {
                         'sent': sentDate,
                         'time_to_read': timeToRead
                     }).c('body').t(body).up()
-                      .c(_converse.ACTIVE, {'xmlns': Strophe.NS.CHATSTATES}).up()
-                      .c('data', {'xmlns': 'pageMe.message.data'})
-                      .c('sentDate').t(sentDate).up()
-                      .c('timeToRead').t(timeToRead).up()
-                      .c('encrypted').t('0').up().up()
-                      .c('request', {'xmlns': Strophe.NS.RECEIPTS}).up();
-
+                      .c(_converse.ACTIVE, {'xmlns': Strophe.NS.CHATSTATES}).up();
+                if (message.get('type') === 'chat') {
+                    stanza.c('data', {'xmlns': 'pageMe.message.data'})
+                    .c('sentDate').t(sentDate).up()
+                    .c('timeToRead').t(timeToRead).up()
+                    .c('encrypted').t('0').up().up()
+                    .c('request', {'xmlns': Strophe.NS.RECEIPTS}).up();
+                }
                 if (message.get('is_spoiler')) {
                     if (message.get('spoiler_hint')) {
                         stanza.c('spoiler', {'xmlns': Strophe.NS.SPOILER}, message.get('spoiler_hint')).up();
@@ -448,10 +449,13 @@ converse.plugins.add('converse-chatboxes', {
                  */
                 if (_converse.send_chat_state_notifications && this.get('chat_state')) {
                     _converse.api.send(
-                        $msg({'to':this.get('jid'), 'type': 'chat'})
-                            .c(this.get('chat_state'), {'xmlns': Strophe.NS.CHATSTATES}).up()
-                            .c('no-store', {'xmlns': Strophe.NS.HINTS}).up()
-                            .c('no-permanent-store', {'xmlns': Strophe.NS.HINTS})
+                        $msg({
+                            'id': _converse.connection.getUniqueId(),
+                            'to': this.get('jid'),
+                            'type': 'chat'
+                        }).c(this.get('chat_state'), {'xmlns': Strophe.NS.CHATSTATES}).up()
+                          .c('no-store', {'xmlns': Strophe.NS.HINTS}).up()
+                          .c('no-permanent-store', {'xmlns': Strophe.NS.HINTS})
                     );
                 }
             },
@@ -688,6 +692,23 @@ converse.plugins.add('converse-chatboxes', {
                 const chatbox = this.getChatBox(from_jid);
                 if (!chatbox) {
                     return true;
+                }
+                const id = message.getAttribute('id');
+                if (id) {
+                    const msgs = chatbox.messages.where({'msgid': id});
+                    if (!msgs.length || msgs.filter(m => m.get('type') === 'error').length) {
+                        // If the error refers to a message not included in our store.
+                        // We assume that this was a CSI message (which we don't store).
+                        // See https://github.com/conversejs/converse.js/issues/1317
+                        //
+                        // We also ignore duplicate error messages.
+                        return;
+                    }
+                } else {
+                    // An error message without id likely means that we
+                    // sent a message without id (which shouldn't happen).
+                    _converse.log('Received an error message without id attribute!', Strophe.LogLevel.ERROR);
+                    _converse.log(message, Strophe.LogLevel.ERROR);
                 }
                 chatbox.createMessage(message, message);
                 return true;
