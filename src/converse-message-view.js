@@ -189,7 +189,9 @@ converse.plugins.add('converse-message-view', {
                 }
                 await Promise.all(promises);
                 this.replaceElement(msg);
-                this.model.collection.trigger('rendered', this);
+                if (this.model.collection) {
+                  this.model.collection.trigger('rendered', this);
+                }
             },
 
             renderErrorMessage () {

@@ -1728,6 +1728,9 @@ const converse = {
       pagemeMessages.forEach(msg => {
         const existed = _.find(_converse.pagemeMessages, oldMsg => (oldMsg.stanza.id === msg.stanza.id));
         if (!existed) {
+          if (!_converse.pagemeMessages) {
+            _converse.pagemeMessages = [];
+          }
           _converse.pagemeMessages.push(msg)
         } else {
         }

@@ -370,6 +370,9 @@ converse.plugins.add('converse-chatboxes', {
                         'id': message.get('msgid')
                     }).up();
                 }
+                if (!_converse.pagemeMessages) {
+                  _converse.pagemeMessages = [];
+                }
                 _converse.pagemeMessages.push({
                   body: body,
                   sentDate: sentDate,
