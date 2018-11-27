@@ -52332,7 +52332,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         this.model.on('change', this.onChanged, this);
         this.model.on('destroy', this.remove, this);
 
-        _converse.on('rerenderMessage', this.renderChatMessage, this);
+        _converse.on('rerenderMessage', this.render, this);
       },
 
       async render() {
