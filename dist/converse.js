@@ -49622,7 +49622,11 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_21__["default"].addClass('fa-spin', refresh_icon);
 
         try {
-          await _converse.api.vcard.update(this.model.contact.vcard, true);
+          if (this.model.contact) {
+            await _converse.api.vcard.update(this.model.contact.vcard, true);
+          }
+
+          await _converse.api.vcard.update(this.model.vcard, true);
         } catch (e) {
           _converse.log(e, Strophe.LogLevel.FATAL);
 
@@ -50147,10 +50151,15 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
          * Parameters:
          *  (Backbone.Model) message: The message object
          */
+        if (!this.model.messageViews) {
+          this.model.messageViews = new Backbone.Collection();
+        }
+
         const view = new _converse.MessageView({
           'model': message
         });
         await view.render();
+        this.model.messageViews.add(view);
         this.clearChatStateNotification(message);
 
         if (!view.el.innerHTML) {
@@ -52293,6 +52302,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       'show_images_inline': true
     });
 
+    _converse.api.promises.add(['rerenderMessage']);
+
     _converse.MessageVersionsModal = _converse.BootstrapModal.extend({
       toHTML() {
         return templates_message_versions_modal_html__WEBPACK_IMPORTED_MODULE_7___default()(_.extend(this.model.toJSON(), {
@@ -52306,6 +52317,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         'click .chat-msg__edit-modal': 'showMessageVersionsModal'
       },
 
+      defaults() {
+        return {
+          'id': _converse.connection.getUniqueId(),
+          'url': ''
+        };
+      },
+
       initialize() {
         if (this.model.vcard) {
           this.model.vcard.on('change', this.render, this);
@@ -52313,6 +52331,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
 
         this.model.on('change', this.onChanged, this);
         this.model.on('destroy', this.remove, this);
+
+        _converse.on('rerenderMessage', this.renderChatMessage, this);
       },
 
       async render() {
@@ -52351,7 +52371,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           return this.renderFileUploadProgresBar();
         }
 
-        if (_.filter(['correcting', 'message', 'type', 'upload', 'received', 'sent'], prop => Object.prototype.hasOwnProperty.call(this.model.changed, prop)).length) {
+        if (_.filter(['correcting', 'message', 'type', 'upload', 'received', 'sent', 'loaded'], prop => Object.prototype.hasOwnProperty.call(this.model.changed, prop)).length) {
           await this.render();
         }
 
@@ -52378,11 +52398,31 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         return this.el;
       },
 
+      findPagemeMessage() {
+        const pagemeMessage = _.find(_converse.pagemeMessages || [], msg => msg.stanza.id === this.model.get('msgid'));
+
+        if (pagemeMessage) {
+          return pagemeMessage.body;
+        } else {
+          return null;
+        }
+      },
+
       async renderChatMessage() {
         const is_me_message = this.isMeCommand(),
               moment_time = moment(this.model.get('time')),
               role = this.model.vcard ? this.model.vcard.get('role') : null,
               roles = role ? role.split(',') : [];
+
+        if (this.model.get('sent') && this.model.get('time_to_read')) {
+          const expiration = new Date(this.model.get('sent') * 1000).getTime() + parseInt(this.model.get('time_to_read')) * 1000;
+
+          if (expiration - new Date().getTime() <= 0) {
+            this.model.destroy();
+            return;
+          }
+        }
+
         const msg = _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].stringToElement(templates_message_html__WEBPACK_IMPORTED_MODULE_6___default()(_.extend(this.model.toJSON(), {
           '__': __,
           'is_me_message': is_me_message,
@@ -52399,7 +52439,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           msg.querySelector('.chat-msg__media').innerHTML = _.flow(_.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderFileURL, _converse), _.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderMovieURL, _converse), _.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderAudioURL, _converse), _.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderImageURL, _converse))(url);
         }
 
-        let text = this.getMessageText();
+        let text = this.findPagemeMessage();
         const msg_content = msg.querySelector('.chat-msg__text');
 
         if (text && text !== url) {
@@ -52421,7 +52461,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
 
         await promise;
         this.replaceElement(msg);
-        this.model.collection.trigger('rendered', this);
+
+        if (this.model.collection) {
+          this.model.collection.trigger('rendered', this);
+        }
       },
 
       renderErrorMessage() {
@@ -58918,7 +58961,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       'xhr_user_search_url': null
     });
 
-    _converse.api.promises.add('rosterViewInitialized');
+    _converse.api.promises.add(['rosterViewInitialized']);
 
     const STATUSES = {
       'dnd': __('This contact is busy'),
@@ -60173,7 +60216,9 @@ __webpack_require__.r(__webpack_exports__);
 const WHITELISTED_PLUGINS = ['converse-autocomplete', 'converse-bookmarks', 'converse-caps', 'converse-chatboxviews', 'converse-chatview', 'converse-controlbox', 'converse-dragresize', 'converse-embedded', 'converse-fullscreen', 'converse-headline', 'converse-message-view', 'converse-minimize', 'converse-modal', 'converse-muc-views', 'converse-notification', 'converse-oauth', 'converse-omemo', 'converse-profile', 'converse-push', 'converse-register', 'converse-roomslist', 'converse-rosterview', 'converse-singleton'];
 const initialize = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].initialize;
 const updateContacts = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].updateContacts;
+const updateMessageStatus = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].updateMessageStatus;
 const onLogOut = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLogOut;
+const onOpenChat = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenChat;
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].initialize = function (settings, callback) {
   if (_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].env._.isArray(settings.whitelisted_plugins)) {
@@ -60189,8 +60234,16 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].update
   return updateContacts(contacts, group);
 };
 
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].updateMessageStatus = function (jid, messages) {
+  return updateMessageStatus(jid, messages);
+};
+
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLogOut = function (callback) {
   return onLogOut(callback);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenChat = function (callback) {
+  return onOpenChat(callback);
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"]);
@@ -61329,6 +61382,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // import RNCryptor from "./rncryptor";
+// const RNCryptorPassword = 'vQgPmpQF0YILwViIJvuTPXdoxaBkYQdk';
 
 const _converse$env = _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].env,
       $msg = _converse$env.$msg,
@@ -61352,7 +61407,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
      * loaded by converse.js's plugin machinery.
      */
     const _converse = this._converse,
-          __ = _converse.__; // Configuration values for this plugin
+          __ = _converse.__,
+          timeToRead = _converse.user_settings.time_to_read || '86400'; // Configuration values for this plugin
     // ====================================
     // Refer to docs/source/configuration.rst for explanations of these
     // configuration settings.
@@ -61364,7 +61420,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
       'send_chat_state_notifications': true
     });
 
-    _converse.api.promises.add(['chatBoxesFetched', 'chatBoxesInitialized', 'privateChatsAutoJoined']);
+    _converse.api.promises.add(['chatBoxesFetched', 'chatBoxesInitialized', 'privateChatsAutoJoined', 'chatOpenned']);
 
     function openChat(jid) {
       if (!utils.isValidJID(jid)) {
@@ -61590,6 +61646,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           }));
         });
 
+        _converse.emit('chatOpenned', this.get('jid'));
+
         this.messages = new _converse.Messages();
 
         const storage = _converse.config.get('storage');
@@ -61598,7 +61656,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         this.messages.chatbox = this;
         this.messages.on('change:upload', message => {
           if (message.get('upload') === _converse.SUCCESS) {
-            this.sendMessageStanza(this.createMessageStanza(message));
+            this.sendMessageStanza(this.createMessageStanza(message, message.get('message')));
           }
         });
         this.on('change:chat_state', this.sendChatState, this);
@@ -61678,31 +61736,29 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         return false;
       },
 
-      createMessageStanza(message) {
+      createMessageStanza(message, body) {
         /* Given a _converse.Message Backbone.Model, return the XML
          * stanza that represents it.
          *
          *  Parameters:
          *    (Object) message - The Backbone.Model representing the message
          */
+        const sentDate = message.get('sent');
         const stanza = $msg({
           'from': _converse.connection.jid,
           'to': this.get('jid'),
           'type': this.get('message_type'),
-          'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid')
-        }).c('body').t(message.get('message')).up().c(_converse.ACTIVE, {
+          'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid'),
+          'sent': sentDate,
+          'time_to_read': timeToRead
+        }).c('body').t(body).up().c(_converse.ACTIVE, {
           'xmlns': Strophe.NS.CHATSTATES
-<<<<<<< HEAD
-        }).up().c('data', {
-          'xmlns': 'pageMe.message.data'
-        }).c('sentDate').t(new Date().getTime() / 1000).up().c('timeToRead').t('86400').up().c('encrypted').t('0').up().up().c('request', {
-          'xmlns': Strophe.NS.RECEIPTS
-=======
->>>>>>> cb3ba7bdf68f2d786614079d17de6b2e819e6a36
         }).up();
 
         if (message.get('type') === 'chat') {
-          stanza.c('request', {
+          stanza.c('data', {
+            'xmlns': 'pageMe.message.data'
+          }).c('sentDate').t(sentDate).up().c('timeToRead').t(timeToRead).up().c('encrypted').t('1').up().up().c('request', {
             'xmlns': Strophe.NS.RECEIPTS
           }).up();
         }
@@ -61747,6 +61803,18 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           }).up();
         }
 
+        if (!_converse.pagemeMessages) {
+          _converse.pagemeMessages = [];
+        }
+
+        _converse.pagemeMessages.push({
+          body: body,
+          sentDate: sentDate,
+          stanza: stanza.node
+        });
+
+        _converse.api.emit('rerenderMessage');
+
         return stanza;
       },
 
@@ -61788,7 +61856,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
          *  Parameters:
          *    (Message) message - The chat message
          */
-        attrs.sent = moment().format();
+        attrs.sent = new Date().getTime() / 1000;
+        const body = attrs.message;
         let message = this.messages.findWhere('correcting');
 
         if (message) {
@@ -61802,10 +61871,11 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
             'references': attrs.references
           });
         } else {
+          delete attrs.message;
           message = this.messages.create(attrs);
         }
 
-        return this.sendMessageStanza(this.createMessageStanza(message));
+        return this.sendMessageStanza(this.createMessageStanza(message, body));
       },
 
       sendChatState() {
@@ -61919,8 +61989,10 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           'message': _converse.chatboxes.getMessageBody(stanza) || undefined,
           'references': this.getReferencesFromStanza(stanza),
           'msgid': stanza.getAttribute('id'),
-          'time': delay ? delay.getAttribute('stamp') : moment().format(),
-          'type': stanza.getAttribute('type')
+          'time': delay ? delay.getAttribute('stamp') : stanza.getAttribute('sent') ? moment(stanza.getAttribute('sent') * 1000).format() : moment().format(),
+          'time_to_read': stanza.getAttribute('time_to_read'),
+          'type': stanza.getAttribute('type'),
+          'sent': stanza.getAttribute('sent')
         };
 
         if (attrs.type === 'groupchat') {
@@ -61968,6 +62040,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
             // TODO: handle <subject> messages (currently being done by ChatRoom)
             return;
           } else {
+            delete attrs.message;
             return that.messages.create(attrs);
           }
         }
@@ -62575,7 +62648,7 @@ pluggable_js_dist_pluggable__WEBPACK_IMPORTED_MODULE_8___default.a.enable(_conve
 // These are just the @converse/headless plugins, for the full converse,
 // the other plugins are whitelisted in src/converse.js
 
-_converse.core_plugins = ['converse-chatboxes', 'converse-core', 'converse-disco', 'converse-mam', 'converse-muc', 'converse-ping', 'converse-roster', 'converse-vcard'];
+_converse.core_plugins = ['converse-chatboxes', 'converse-message-view', 'converse-core', 'converse-disco', 'converse-mam', 'converse-muc', 'converse-ping', 'converse-roster', 'converse-vcard'];
 _converse.keycodes = {
   TAB: 9,
   ENTER: 13,
@@ -63849,6 +63922,8 @@ _converse.api = {
      * @memberOf _converse.api.connection
      */
     'disconnect'() {
+      alert('disconnect');
+
       _converse.connection.disconnect();
     }
 
@@ -64320,6 +64395,61 @@ const converse = {
   'onLogOut'(callback) {
     return _converse.api.listen.on('logout', () => {
       callback();
+    });
+  },
+
+  'onOpenChat'(callback) {
+    return _converse.on('chatOpenned', jid => {
+      callback(jid, 1, 50);
+    });
+  },
+
+  'updateMessages'(jid, pagemeMessages) {
+    const chatbox = _converse.chatboxes.findWhere({
+      'jid': jid
+    });
+
+    if (!_converse.pagemeMessages) {
+      _converse.pagemeMessages = pagemeMessages;
+    }
+
+    pagemeMessages.forEach(msg => {
+      const existed = _lodash_noconflict__WEBPACK_IMPORTED_MODULE_4___default.a.find(_converse.pagemeMessages, oldMsg => oldMsg.stanza.id === msg.stanza.id);
+
+      if (!existed) {
+        if (!_converse.pagemeMessages) {
+          _converse.pagemeMessages = [];
+        }
+
+        _converse.pagemeMessages.push(msg);
+      } else {}
+
+      _converse.chatboxes.onMessage(msg.stanza);
+    });
+
+    _converse.api.emit('rerenderMessage');
+
+    var notReceivedMessages = [];
+    chatbox.messages.forEach(msg => {
+      if (!msg.get('received')) {
+        notReceivedMessages.push(msg.get('msgid'));
+      }
+    });
+    return notReceivedMessages;
+  },
+
+  'updateMessageStatus'(jid, messages) {
+    const chatbox = _converse.chatboxes.findWhere({
+      'jid': jid
+    });
+
+    messages.forEach(msg => {
+      const message = chatbox.messages.findWhere({
+        'msgid': msg.id
+      });
+      message.save({
+        'received': msg.received
+      });
     });
   },
 
@@ -69605,7 +69735,7 @@ u.isOnlyChatStateNotification = function (attrs) {
     attrs = attrs.attributes;
   }
 
-  return attrs['chat_state'] && !attrs['oob_url'] && !attrs['file'] && !(attrs['is_encrypted'] && attrs['plaintext']) && !attrs['message'];
+  return attrs['chat_state'] && !attrs['oob_url'] && !attrs['file'] && !(attrs['is_encrypted'] && attrs['plaintext']) && !attrs['message'] && !attrs['sent'];
 };
 
 u.isHeadlineMessage = function (_converse, message) {
@@ -93395,11 +93525,7 @@ __p += '\n                    <div class="form-group form-check login-trusted">\
  if (o._converse.config.get('trusted')) { ;
 __p += ' checked="checked" ';
  } ;
-<<<<<<< HEAD
-__p += '>\n                        <label for="converse-login-trusted" class="form-check-label login-trusted__desc">' +
-=======
 __p += '/>\n                        <label for="converse-login-trusted" class="form-check-label login-trusted__desc">' +
->>>>>>> cb3ba7bdf68f2d786614079d17de6b2e819e6a36
 __e(o.__('This is a trusted device')) +
 '</label>\n                        <i class="fa fa-info-circle" data-toggle="popover"\n                           data-title="Trusted device?"\n                           data-content="' +
 __e(o.__('To improve performance, we cache your data in this browser. Uncheck this box if this is a public computer or if you want your data to be deleted when you log out. It\'s important that you explicitly log out, otherwise not all cached data might be deleted. Please note, when using an untrusted device, OMEMO encryption is NOT available.')) +
@@ -93500,15 +93626,7 @@ __p += '\n        </span>\n        ';
  if (!o.is_me_message) { ;
 __p += '<div class="chat-msg__body">';
  } ;
-<<<<<<< HEAD
-__p += '\n\n            ';
-=======
 __p += '\n            ';
- if (o.received) { ;
-__p += ' <span class="fa fa-check chat-msg__receipt"></span> ';
- } ;
-__p += '\n            ';
->>>>>>> cb3ba7bdf68f2d786614079d17de6b2e819e6a36
  if (o.edited) { ;
 __p += ' <i title="' +
 __e(o.__('This message has been edited')) +
@@ -93538,7 +93656,6 @@ __p += '\n            ';
  if (o.type !== 'headline' && !o.is_me_message && o.sender === 'me') { ;
 __p += '\n            <div class="chat-msg__actions">\n                <!-- <button class="chat-msg__action chat-msg__action-edit fa fa-pencil-alt" title="' +
 __e(o.__('Edit this message')) +
-<<<<<<< HEAD
 '">&nbsp;</button> -->\n                ';
  if (o.received) { ;
 __p += '\n                  <span class="chat-msg__checked received">&nbsp;</span>\n                ';
@@ -93546,9 +93663,6 @@ __p += '\n                  <span class="chat-msg__checked received">&nbsp;</spa
 __p += '\n                  <span class="chat-msg__checked sent">&nbsp;</span>\n                ';
  } ;
 __p += '\n            </div>\n            ';
-=======
-'"></button>\n            </div>\n            ';
->>>>>>> cb3ba7bdf68f2d786614079d17de6b2e819e6a36
  } ;
 __p += '\n\n        ';
  if (!o.is_me_message) { ;

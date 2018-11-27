@@ -236,7 +236,10 @@ converse.plugins.add('converse-chatview', {
                 const refresh_icon = this.el.querySelector('.fa-refresh');
                 u.addClass('fa-spin', refresh_icon);
                 try {
-                    await _converse.api.vcard.update(this.model.contact.vcard, true);
+                    if (this.model.contact) {
+                      await _converse.api.vcard.update(this.model.contact.vcard, true);
+                    }
+                    await _converse.api.vcard.update(this.model.vcard, true);
                 } catch (e) {
                     _converse.log(e, Strophe.LogLevel.FATAL);
                     this.el.querySelector('.modal-body').insertAdjacentHTML(

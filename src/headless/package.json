@@ -33,6 +33,7 @@
     "strophejs-plugin-ping": "0.0.3",
     "strophejs-plugin-rsm": "0.0.2",
     "twemoji": "^11.0.1",
-    "urijs": "^1.19.1"
+    "urijs": "^1.19.1",
+    "jscryptor": "0.0.12"
   }
 }

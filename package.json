@@ -60,6 +60,7 @@
     "jasmine-core": "2.6.4",
     "jed": "1.1.1",
     "jquery": "3.2.1",
+    "jscryptor": "0.0.12",
     "jsdoc": "^3.5.5",
     "lerna": "^3.4.3",
     "lodash-template-loader": "^2.0.0",
@@ -85,6 +86,7 @@
     "xss": "^0.3.3"
   },
   "dependencies": {
-    "fast-text-encoding": "^1.0.0"
+    "fast-text-encoding": "^1.0.0",
+    "fs": "0.0.1-security"
   }
 }

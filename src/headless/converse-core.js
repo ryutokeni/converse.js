@@ -16,7 +16,6 @@ import pluggable from "pluggable.js/dist/pluggable";
 import polyfill from "./polyfill";
 import sizzle from "sizzle";
 import u from "@converse/headless/utils/core";
-
 Backbone = Backbone.noConflict();
 
 // Strophe globals

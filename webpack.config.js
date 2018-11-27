@@ -3,7 +3,6 @@
 const minimist = require('minimist');
 const path = require('path');
 const webpack = require('webpack');
-
 const config = {
     entry: path.resolve(__dirname, 'src/converse.js'),
     externals: [{
@@ -17,6 +16,9 @@ const config = {
     plugins: [
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
     ],
+    node: {
+      fs: 'empty'
+    },
     module: {
         rules: [
         {

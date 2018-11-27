@@ -8,7 +8,8 @@ import "./utils/emoji";
 import "./utils/form";
 import converse from "./converse-core";
 import filesize from "filesize";
-
+// import RNCryptor from "./rncryptor";
+// const RNCryptorPassword = 'vQgPmpQF0YILwViIJvuTPXdoxaBkYQdk';
 const { $msg, Backbone, Promise, Strophe, b64_sha1, moment, sizzle, utils, _ } = converse.env;
 const u = converse.env.utils;
 
@@ -339,7 +340,7 @@ converse.plugins.add('converse-chatboxes', {
                     stanza.c('data', {'xmlns': 'pageMe.message.data'})
                     .c('sentDate').t(sentDate).up()
                     .c('timeToRead').t(timeToRead).up()
-                    .c('encrypted').t('0').up().up()
+                    .c('encrypted').t('1').up().up()
                     .c('request', {'xmlns': Strophe.NS.RECEIPTS}).up();
                 }
                 if (message.get('is_spoiler')) {
