@@ -69,7 +69,10 @@ converse.plugins.add('converse-message-view', {
                 _converse.on('rerenderMessage', this.render, this);
             },
 
-            async render () {
+            async render (force) {
+                if (this.rendered && !force) {
+                  return;
+                }
                 const is_followup = u.hasClass('chat-msg--followup', this.el);
                 if (this.model.isOnlyChatStateNotification()) {
                     this.renderChatStateNotification()
@@ -100,7 +103,7 @@ converse.plugins.add('converse-message-view', {
                 }
                 if (_.filter(['correcting', 'message', 'type', 'upload', 'received', 'sent', 'loaded'],
                              prop => Object.prototype.hasOwnProperty.call(this.model.changed, prop)).length) {
-                    await this.render();
+                    await this.render(true);
                 }
                 if (edited) {
                     this.onMessageEdited();
@@ -126,7 +129,7 @@ converse.plugins.add('converse-message-view', {
             findPagemeMessage() {
                 const pagemeMessage = _.find(_converse.pagemeMessages || [], msg => (msg.stanza.id === this.model.get('msgid')));
                 if (pagemeMessage) {
-                  return pagemeMessage.body;
+                  return pagemeMessage.decrypted;
                 } else {
                   return null;
                 }
@@ -137,12 +140,19 @@ converse.plugins.add('converse-message-view', {
                       moment_time = moment(this.model.get('time')),
                       role = this.model.vcard ? this.model.vcard.get('role') : null,
                       roles = role ? role.split(',') : [];
-                if (this.model.get('sent') && this.model.get('time_to_read')) {
-                  const expiration = (new Date(this.model.get('sent')*1000)).getTime() + parseInt(this.model.get('time_to_read'))*1000;
-                  if (expiration - (new Date()).getTime() <= 0) {
-                    this.model.destroy();
-                    return;
+
+
+                if (this.model.get('time_to_read')) {
+                  if (this.model.get('sent')) {
+                    const expiration = (new Date(this.model.get('sent')*1000)).getTime() + parseInt(this.model.get('time_to_read'))*1000;
+                    if (expiration - (new Date()).getTime() <= 0) {
+                      this.model.destroy();
+                      return;
+                    }
                   }
+                } else {
+                  this.model.destroy();
+                  return;
                 }
                 const msg = u.stringToElement(tpl_message(
                     _.extend(
@@ -157,7 +167,6 @@ converse.plugins.add('converse-message-view', {
                         'username': this.model.getDisplayName()
                     })
                 ));
-
                 const url = this.model.get('oob_url');
                 if (url) {
                     msg.querySelector('.chat-msg__media').innerHTML = _.flow(
@@ -168,6 +177,15 @@ converse.plugins.add('converse-message-view', {
                 }
 
                 let text = this.findPagemeMessage();
+                // if (text) {
+                //   this.rendered = true;
+                //   const is_hidden = u.hasClass('hidden', msg);
+                //   if (is_hidden) {
+                //     u.removeClass('hidden', msg);
+                //   }
+                // } else {
+                //   u.addClass('hidden', msg);
+                // }
                 const msg_content = msg.querySelector('.chat-msg__text');
                 if (text && text !== url) {
                     if (is_me_message) {

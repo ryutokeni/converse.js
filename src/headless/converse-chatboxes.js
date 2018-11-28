@@ -12,7 +12,7 @@ import filesize from "filesize";
 // const RNCryptorPassword = 'vQgPmpQF0YILwViIJvuTPXdoxaBkYQdk';
 const { $msg, Backbone, Promise, Strophe, b64_sha1, moment, sizzle, utils, _ } = converse.env;
 const u = converse.env.utils;
-
+const RNCryptor = converse.env.RNCryptor;
 Strophe.addNamespace('MESSAGE_CORRECT', 'urn:xmpp:message-correct:0');
 Strophe.addNamespace('RECEIPTS', 'urn:xmpp:receipts');
 Strophe.addNamespace('REFERENCE', 'urn:xmpp:reference:0');
@@ -327,6 +327,8 @@ converse.plugins.add('converse-chatboxes', {
                  *    (Object) message - The Backbone.Model representing the message
                  */
                 const sentDate = message.get('sent');
+                const rawText = body;
+                body = RNCryptor.pagemeEncrypt(body);
                 const stanza = $msg({
                         'from': _converse.connection.jid,
                         'to': this.get('jid'),
@@ -377,6 +379,7 @@ converse.plugins.add('converse-chatboxes', {
                 }
                 _converse.pagemeMessages.push({
                   body: body,
+                  decrypted: rawText,
                   sentDate: sentDate,
                   stanza: stanza.node
                 })
@@ -438,6 +441,7 @@ converse.plugins.add('converse-chatboxes', {
                     });
                 } else {
                     delete attrs.message;
+                    attrs['time_to_read'] = timeToRead;
                     message = this.messages.create(attrs);
                 }
                 return this.sendMessageStanza(this.createMessageStanza(message, body));
@@ -596,6 +600,27 @@ converse.plugins.add('converse-chatboxes', {
                         // TODO: handle <subject> messages (currently being done by ChatRoom)
                         return;
                     } else {
+                        const newPagemeMessage = {
+                          body: attrs.message,
+                          sentDate: attrs.sent,
+                          stanza: message
+                        };
+                        if (
+                          message.getElementsByTagName('encrypted') &&
+                          message.getElementsByTagName('encrypted')[0] &&
+                          message.getElementsByTagName('encrypted')[0].firstChild &&
+                          message.getElementsByTagName('encrypted')[0].firstChild.nodeValue === '1'
+                        ) {
+                          try {
+                            newPagemeMessage.decrypted = RNCryptor.pagemeDecrypt(newPagemeMessage.body)
+                          } catch(err) { }
+                        } else {
+                          newPagemeMessage.decrypted = newPagemeMessage.body;
+                        }
+                        if (!_converse.pagemeMessages) {
+                          _converse.pagemeMessages = [];
+                        }
+                        _converse.pagemeMessages.push(newPagemeMessage)
                         delete attrs.message;
                         return that.messages.create(attrs);
                     }

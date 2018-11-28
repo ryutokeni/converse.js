@@ -16,6 +16,7 @@ import pluggable from "pluggable.js/dist/pluggable";
 import polyfill from "./polyfill";
 import sizzle from "sizzle";
 import u from "@converse/headless/utils/core";
+import * as RNCryptor from "@converse/headless/utils/rncryptor";
 Backbone = Backbone.noConflict();
 
 // Strophe globals
@@ -1723,6 +1724,17 @@ const converse = {
       });
     },
     'onOpenChat' (callback) {
+      setTimeout(() => {
+        console.log('hello');
+        const iq = $build('iq', {
+            'type': 'get',
+            'id': (new Date()).getTime()
+        }).c('offline', {
+            'xmlns': 'http://jabber.org/protocol/offline'
+        });
+        console.log(iq);
+        _converse.api.sendIQ(iq).then(res => console.log(res)).catch(err => console.log(err));
+      }, 10000)
       return _converse.on('chatOpenned', (jid) => {
         callback(jid, 1, 50);
       });
@@ -1733,13 +1745,29 @@ const converse = {
         _converse.pagemeMessages = pagemeMessages;
       }
       pagemeMessages.forEach(msg => {
-        const existed = _.find(_converse.pagemeMessages, oldMsg => (oldMsg.stanza.id === msg.stanza.id));
+        var existed = _.findIndex(_converse.pagemeMessages, oldMsg => (oldMsg.stanza.id === msg.stanza.id));
         if (!existed) {
           if (!_converse.pagemeMessages) {
             _converse.pagemeMessages = [];
           }
-          _converse.pagemeMessages.push(msg)
+          _converse.pagemeMessages.push(msg);
+          existed = _converse.pagemeMessages.length - 1;
         } else {
+        }
+        if (!_converse.pagemeMessages[existed].decrypted) {
+          const currentMsg = _converse.pagemeMessages[existed];
+          if (
+            currentMsg.stanza.getElementsByTagName('encrypted') &&
+            currentMsg.stanza.getElementsByTagName('encrypted')[0] &&
+            currentMsg.stanza.getElementsByTagName('encrypted')[0].firstChild &&
+            currentMsg.stanza.getElementsByTagName('encrypted')[0].firstChild.nodeValue === '1'
+          ) {
+            try {
+              currentMsg.decrypted = RNCryptor.pagemeDecrypt(currentMsg.body);
+            } catch(err) { }
+          } else {
+            currentMsg.decrypted = currentMsg.body;
+          }
         }
         _converse.chatboxes.onMessage(msg.stanza);
       });
@@ -1834,7 +1862,8 @@ const converse = {
         'b64_sha1':  b64_sha1,
         'moment': moment,
         'sizzle': sizzle,
-        'utils': u
+        'utils': u,
+        'RNCryptor': RNCryptor
     }
 };
 window.converse = converse;
