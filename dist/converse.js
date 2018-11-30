@@ -72589,6 +72589,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       },
 
       render() {
+        console.log(_.cloneDeep(this.model.vcard));
         this.el.innerHTML = templates_chatbox_head_html__WEBPACK_IMPORTED_MODULE_8___default()(_.extend(this.model.vcard.toJSON(), this.model.toJSON(), {
           '_converse': _converse,
           'info_close': __('Close this chat box')
@@ -73793,6 +73794,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
       _converse.chatboxes.on('add', item => {
         if (!that.get(item.get('id')) && item.get('type') === _converse.PRIVATE_CHAT_TYPE) {
+          console.log(_.cloneDeep(item.vcard));
           that.add(item.get('id'), new _converse.ChatBoxView({
             model: item
           }));
@@ -86064,21 +86066,21 @@ function initClientConfig() {
 _converse.initConnection = function () {
   /* Creates a new Strophe.Connection instance if we don't already have one.
    */
-  if (!_converse.connection) {
-    if (!_converse.bosh_service_url && !_converse.websocket_url) {
-      throw new Error("initConnection: you must supply a value for either the bosh_service_url or websocket_url or both.");
-    }
-
-    if (('WebSocket' in window || 'MozWebSocket' in window) && _converse.websocket_url) {
-      _converse.connection = new strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].Connection(_converse.websocket_url, _converse.connection_options);
-    } else if (_converse.bosh_service_url) {
-      _converse.connection = new strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].Connection(_converse.bosh_service_url, _lodash_noconflict__WEBPACK_IMPORTED_MODULE_4___default.a.assignIn(_converse.connection_options, {
-        'keepalive': _converse.keepalive
-      }));
-    } else {
-      throw new Error("initConnection: this browser does not support websockets and bosh_service_url wasn't specified.");
-    }
+  // if (!_converse.connection) {
+  if (!_converse.bosh_service_url && !_converse.websocket_url) {
+    throw new Error("initConnection: you must supply a value for either the bosh_service_url or websocket_url or both.");
   }
+
+  if (('WebSocket' in window || 'MozWebSocket' in window) && _converse.websocket_url) {
+    _converse.connection = new strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].Connection(_converse.websocket_url, _converse.connection_options);
+  } else if (_converse.bosh_service_url) {
+    _converse.connection = new strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].Connection(_converse.bosh_service_url, _lodash_noconflict__WEBPACK_IMPORTED_MODULE_4___default.a.assignIn(_converse.connection_options, {
+      'keepalive': _converse.keepalive
+    }));
+  } else {
+    throw new Error("initConnection: this browser does not support websockets and bosh_service_url wasn't specified.");
+  } // }
+
 
   _converse.emit('connectionInitialized');
 };
@@ -87533,7 +87535,6 @@ const converse = {
 
   'onLogOut'(callback) {
     return _converse.on('disconnected', () => {
-      delete _converse.connection;
       callback();
     });
   },
@@ -92366,6 +92367,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins.add('converse-vca
          */
         'update'(model, force) {
           return this.get(model, force).then(vcard => {
+            console.log(model);
             delete vcard['stanza'];
             model.save(vcard);
           });
@@ -116415,7 +116417,7 @@ module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 __p += '<!-- src/templates/chatbox_head.html -->\n<div class="chat-head chat-head-chatbox row no-gutters">\n    <div class="chatbox-navback"><i class="fa fa-arrow-left"></i></div>\n    <div class="chatbox-title">\n        <div class="row no-gutters">\n            <canvas class="avatar" height="36" width="36"></canvas>\n            <div class="col chat-title" title="' +
-__e(o.nickname || o.fullname || 'Loading...') +
+__e(o.nickname || o.fullname) +
 '">\n                ';
  if (o.url) { ;
 __p += '\n                    <a href="' +

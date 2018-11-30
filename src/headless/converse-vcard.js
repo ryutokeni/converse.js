@@ -221,7 +221,8 @@ converse.plugins.add('converse-vcard', {
                 'update' (model, force) {
                     return this.get(model, force)
                         .then(vcard => {
-                            delete vcard['stanza']
+                            console.log(model);
+                            delete vcard['stanza'];
                             model.save(vcard);
                         });
                 }
