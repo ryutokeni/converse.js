@@ -47,8 +47,40 @@ converse.plugins.add('converse-message-view', {
             }
         });
 
+        _converse.MessageCountDown = Backbone.Model.extend({
+          msgid: null,
+          expiration: null,
+          time_remain: null,
+          defaults () {
+              return {
+                  'id': _converse.connection.getUniqueId(),
+                  'url': ''
+              };
+          }
+        });
+
+        _converse.MessageCountDownView = Backbone.VDOMView.extend({
+          tagName: 'span',
+          defaults () {
+              return {
+                  'id': _converse.connection.getUniqueId()
+              };
+          },
+          initialize () {
+            setInterval(() => this.model.save({ 'time_remain':  this.model.get('expiration') - (new Date()).getTime()}), 1000);
+            this.model.on('change:time_remain', this.render, this);
+          },
+          render () {
+            const tempTime = moment.duration(this.model.get('time_remain'));
+            const timeStr = tempTime.hours() + ":" + tempTime.minutes() + ":" + tempTime.seconds();
+            this.el.innerHTML = timeStr;
+            return this.el;
+          }
+        })
+
 
         _converse.MessageView = _converse.ViewWithAvatar.extend({
+            countDown: _converse.MessageCountDownView,
             events: {
                 'click .chat-msg__edit-modal': 'showMessageVersionsModal'
             },
@@ -61,11 +93,21 @@ converse.plugins.add('converse-message-view', {
             },
 
             initialize () {
+                const countDownModel = new _converse.MessageCountDown({
+                  msgid: this.model.get('msgid'),
+                  expiration: (new Date(this.model.get('sent')*1000)).getTime() + parseInt(this.model.get('time_to_read'))*1000
+                });
+                this.countDown = new _converse.MessageCountDownView({'model': countDownModel});
                 if (this.model.vcard) {
                     this.model.vcard.on('change', this.render, this);
                 }
                 this.model.on('change', this.onChanged, this);
-                this.model.on('destroy', this.remove, this);
+                this.model.on('destroy', () => {
+                  if (this.countDown) {
+                    this.countDown.destroy();
+                  }
+                  this.remove();
+                }, this);
                 _converse.on('rerenderMessage', this.render, this);
             },
 
@@ -90,6 +132,8 @@ converse.plugins.add('converse-message-view', {
                 if (is_followup) {
                     u.addClass('chat-msg--followup', this.el);
                 }
+                var countDownEl = this.el.querySelector('.chat-msg__count_down');
+                countDownEl.replaceWith(this.countDown.render());
                 return this.el;
             },
 
@@ -154,10 +198,12 @@ converse.plugins.add('converse-message-view', {
                   this.model.destroy();
                   return;
                 }
+                let text = this.findPagemeMessage();
                 const msg = u.stringToElement(tpl_message(
                     _.extend(
                         this.model.toJSON(), {
                         '__': __,
+                        'is_encrypted': text ? true : false,
                         'is_me_message': is_me_message,
                         'roles': roles,
                         'pretty_time': moment_time.format(_converse.time_format),
@@ -175,17 +221,15 @@ converse.plugins.add('converse-message-view', {
                         _.partial(u.renderAudioURL, _converse),
                         _.partial(u.renderImageURL, _converse))(url);
                 }
-
-                let text = this.findPagemeMessage();
-                // if (text) {
-                //   this.rendered = true;
-                //   const is_hidden = u.hasClass('hidden', msg);
-                //   if (is_hidden) {
-                //     u.removeClass('hidden', msg);
-                //   }
-                // } else {
-                //   u.addClass('hidden', msg);
-                // }
+                if (text) {
+                  this.rendered = true;
+                  const is_hidden = u.hasClass('hidden', msg);
+                  if (is_hidden) {
+                    u.removeClass('hidden', msg);
+                  }
+                } else {
+                  u.addClass('hidden', msg);
+                }
                 const msg_content = msg.querySelector('.chat-msg__text');
                 if (text && text !== url) {
                     if (is_me_message) {

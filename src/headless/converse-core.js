@@ -1721,20 +1721,10 @@ const converse = {
     'onLogOut' (callback) {
       return _converse.api.listen.on('logout', () => {
         callback();
+        
       });
     },
     'onOpenChat' (callback) {
-      setTimeout(() => {
-        console.log('hello');
-        const iq = $build('iq', {
-            'type': 'get',
-            'id': (new Date()).getTime()
-        }).c('offline', {
-            'xmlns': 'http://jabber.org/protocol/offline'
-        });
-        console.log(iq);
-        _converse.api.sendIQ(iq).then(res => console.log(res)).catch(err => console.log(err));
-      }, 10000)
       return _converse.on('chatOpenned', (jid) => {
         callback(jid, 1, 50);
       });
@@ -1746,7 +1736,7 @@ const converse = {
       }
       pagemeMessages.forEach(msg => {
         var existed = _.findIndex(_converse.pagemeMessages, oldMsg => (oldMsg.stanza.id === msg.stanza.id));
-        if (!existed) {
+        if (existed === -1) {
           if (!_converse.pagemeMessages) {
             _converse.pagemeMessages = [];
           }

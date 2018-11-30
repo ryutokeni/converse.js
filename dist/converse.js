@@ -75347,7 +75347,45 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       }
 
     });
+    _converse.MessageCountDown = Backbone.Model.extend({
+      msgid: null,
+      expiration: null,
+      time_remain: null,
+
+      defaults() {
+        return {
+          'id': _converse.connection.getUniqueId(),
+          'url': ''
+        };
+      }
+
+    });
+    _converse.MessageCountDownView = Backbone.VDOMView.extend({
+      tagName: 'span',
+
+      defaults() {
+        return {
+          'id': _converse.connection.getUniqueId()
+        };
+      },
+
+      initialize() {
+        setInterval(() => this.model.save({
+          'time_remain': this.model.get('expiration') - new Date().getTime()
+        }), 1000);
+        this.model.on('change:time_remain', this.render, this);
+      },
+
+      render() {
+        const tempTime = moment.duration(this.model.get('time_remain'));
+        const timeStr = tempTime.hours() + ":" + tempTime.minutes() + ":" + tempTime.seconds();
+        this.el.innerHTML = timeStr;
+        return this.el;
+      }
+
+    });
     _converse.MessageView = _converse.ViewWithAvatar.extend({
+      countDown: _converse.MessageCountDownView,
       events: {
         'click .chat-msg__edit-modal': 'showMessageVersionsModal'
       },
@@ -75360,12 +75398,26 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       },
 
       initialize() {
+        const countDownModel = new _converse.MessageCountDown({
+          msgid: this.model.get('msgid'),
+          expiration: new Date(this.model.get('sent') * 1000).getTime() + parseInt(this.model.get('time_to_read')) * 1000
+        });
+        this.countDown = new _converse.MessageCountDownView({
+          'model': countDownModel
+        });
+
         if (this.model.vcard) {
           this.model.vcard.on('change', this.render, this);
         }
 
         this.model.on('change', this.onChanged, this);
-        this.model.on('destroy', this.remove, this);
+        this.model.on('destroy', () => {
+          if (this.countDown) {
+            this.countDown.destroy();
+          }
+
+          this.remove();
+        }, this);
 
         _converse.on('rerenderMessage', this.render, this);
       },
@@ -75397,6 +75449,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].addClass('chat-msg--followup', this.el);
         }
 
+        var countDownEl = this.el.querySelector('.chat-msg__count_down');
+        countDownEl.replaceWith(this.countDown.render());
         return this.el;
       },
 
@@ -75467,8 +75521,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           return;
         }
 
+        let text = this.findPagemeMessage();
         const msg = _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].stringToElement(templates_message_html__WEBPACK_IMPORTED_MODULE_6___default()(_.extend(this.model.toJSON(), {
           '__': __,
+          'is_encrypted': text ? true : false,
           'is_me_message': is_me_message,
           'roles': roles,
           'pretty_time': moment_time.format(_converse.time_format),
@@ -75483,15 +75539,16 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           msg.querySelector('.chat-msg__media').innerHTML = _.flow(_.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderFileURL, _converse), _.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderMovieURL, _converse), _.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderAudioURL, _converse), _.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderImageURL, _converse))(url);
         }
 
-        let text = this.findPagemeMessage(); // if (text) {
-        //   this.rendered = true;
-        //   const is_hidden = u.hasClass('hidden', msg);
-        //   if (is_hidden) {
-        //     u.removeClass('hidden', msg);
-        //   }
-        // } else {
-        //   u.addClass('hidden', msg);
-        // }
+        if (text) {
+          this.rendered = true;
+          const is_hidden = _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].hasClass('hidden', msg);
+
+          if (is_hidden) {
+            _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].removeClass('hidden', msg);
+          }
+        } else {
+          _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].addClass('hidden', msg);
+        }
 
         const msg_content = msg.querySelector('.chat-msg__text');
 
@@ -87479,18 +87536,6 @@ const converse = {
   },
 
   'onOpenChat'(callback) {
-    setTimeout(() => {
-      console.log('hello');
-      const iq = Object(strophe_js__WEBPACK_IMPORTED_MODULE_0__["$build"])('iq', {
-        'type': 'get',
-        'id': new Date().getTime()
-      }).c('offline', {
-        'xmlns': 'http://jabber.org/protocol/offline'
-      });
-      console.log(iq);
-
-      _converse.api.sendIQ(iq).then(res => console.log(res)).catch(err => console.log(err));
-    }, 10000);
     return _converse.on('chatOpenned', jid => {
       callback(jid, 1, 50);
     });
@@ -87508,7 +87553,7 @@ const converse = {
     pagemeMessages.forEach(msg => {
       var existed = _lodash_noconflict__WEBPACK_IMPORTED_MODULE_4___default.a.findIndex(_converse.pagemeMessages, oldMsg => oldMsg.stanza.id === msg.stanza.id);
 
-      if (!existed) {
+      if (existed === -1) {
         if (!_converse.pagemeMessages) {
           _converse.pagemeMessages = [];
         }
@@ -117864,7 +117909,7 @@ __p += '\n                <div class="chat-msg__text';
  if (o.is_spoiler) { ;
 __p += ' spoiler collapsed';
  } ;
-__p += '"><!-- message gets added here via renderMessage --></div>\n                <div class="chat-msg__media"></div>\n            ';
+__p += '"><!-- message gets added here via renderMessage --></div>\n                <span class="chat-msg__count_down">time here</span>\n                <div class="chat-msg__media"></div>\n            ';
  if (!o.is_me_message) { ;
 __p += '</div>';
  } ;
