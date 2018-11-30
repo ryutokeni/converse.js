@@ -87532,7 +87532,8 @@ const converse = {
   },
 
   'onLogOut'(callback) {
-    return _converse.api.listen.on('logout', () => {
+    return _converse.on('disconnected', () => {
+      delete _converse.connection;
       callback();
     });
   },
@@ -118252,9 +118253,9 @@ var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 __p += '<!-- src/templates/profile_view.html -->\n<div class="userinfo controlbox-padded">\n<div class="controlbox-section profile d-flex">\n    <a class="show-profile" href="#">\n        <canvas class="avatar align-self-center" height="40" width="40"></canvas>\n    </a>\n    <span class="username w-100 align-self-center">' +
 __e(o.fullname) +
-'</span>\n    <a class="controlbox-heading__btn show-client-info fa fa-info-circle align-self-center" title="' +
+'</span>\n    <!-- <a class="controlbox-heading__btn show-client-info fa fa-info-circle align-self-center" title="' +
 __e(o.info_details) +
-'"></a>\n    ';
+'"></a> -->\n    ';
  if (o._converse.allow_logout) { ;
 __p += '\n        <a class="controlbox-heading__btn logout fa fa-sign-out-alt align-self-center" title="' +
 __e(o.title_log_out) +
@@ -118739,9 +118740,9 @@ var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 __p += '<!-- src/templates/roster.html -->\n<div class="d-flex controlbox-padded">\n    <span class="w-100 controlbox-heading">' +
 __e(o.heading_contacts) +
-'</span>\n    <a class="controlbox-heading__btn sync-contacts fa fa-sync" title="' +
+'</span>\n    <!-- <a class="controlbox-heading__btn sync-contacts fa fa-sync" title="' +
 __e(o.title_sync_contacts) +
-'"></a>\n    ';
+'"></a> -->\n    ';
  if (o.allow_contact_requests) { ;
 __p += '\n        <a class="controlbox-heading__btn add-contact fa fa-user-plus"\n           title="' +
 __e(o.title_add_contact) +
