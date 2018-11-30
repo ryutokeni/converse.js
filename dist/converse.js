@@ -20034,7 +20034,7 @@ utils.intFromLE = intFromLE;
 /*! exports provided: _args, _development, _from, _id, _inBundle, _integrity, _location, _phantomChildren, _requested, _requiredBy, _resolved, _spec, _where, author, bugs, dependencies, description, devDependencies, files, homepage, keywords, license, main, name, repository, scripts, version, default */
 /***/ (function(module) {
 
-module.exports = {"_args":[["elliptic@6.4.0","/Users/admin/Ant-Tech/Projects/converse-test/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/admin/Ant-Tech/Projects/converse-test/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
+module.exports = {"_args":[["elliptic@6.4.0","/Users/macuser/Desktop/pageme/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/macuser/Desktop/pageme/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
 
 /***/ }),
 
@@ -72447,6 +72447,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+const ut = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].env.utils;
 const _converse$env = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].env,
       $msg = _converse$env.$msg,
       Backbone = _converse$env.Backbone,
@@ -72928,6 +72929,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           'success': this.afterMessagesFetched.bind(this),
           'error': this.afterMessagesFetched.bind(this)
         });
+        ut.hideElement(this.el.querySelector('.chat-loading'));
         return this;
       },
 
@@ -74134,7 +74136,15 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         /* Place the rosterview inside the "Contacts" panel. */
 
 
-        _converse.api.waitUntil('rosterViewInitialized').then(() => this.controlbox_pane.el.insertAdjacentElement('beforeEnd', _converse.rosterview.el)).catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
+        _converse.api.waitUntil('rosterViewTrulyInitial').then(() => {
+          const loading = this.el.querySelector('.loading-contact');
+          console.log('rosterview init');
+          u.hideElement(loading);
+        });
+
+        _converse.api.waitUntil('rosterViewInitialized').then(() => {
+          this.controlbox_pane.el.insertAdjacentElement('beforeEnd', _converse.rosterview.el);
+        }).catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
       },
 
       createBrandHeadingHTML() {
@@ -74411,7 +74421,11 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         _converse.xmppstatusview = new _converse.XMPPStatusView({
           'model': _converse.xmppstatus
         });
-        this.el.insertAdjacentElement('afterBegin', _converse.xmppstatusview.render().el);
+        this.el.insertAdjacentElement('afterBegin', _converse.xmppstatusview.render().el); // _converse.api.waitUntil('rosterViewInitialized')
+        // .then(()=> {
+        //     const loading = this.el.querySelector('.loading-contact');
+        //     u.hideElement(loading);
+        // })
       }
 
     });
@@ -82075,6 +82089,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
     _converse.api.promises.add(['rosterViewInitialized']);
 
+    _converse.api.promises.add(['rosterViewTrulyInitial']);
+
     const STATUSES = {
       'dnd': __('This contact is busy'),
       'online': __('This contact is online'),
@@ -82615,6 +82631,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       sortEvent: 'presenceChanged',
 
       initialize() {
+        const loading = _converse.rosterview.loading_el;
+        u.hideElement(loading);
         Backbone.OrderedListView.prototype.initialize.apply(this, arguments);
         this.model.contacts.on("change:subscription", this.onContactSubscriptionChange, this);
         this.model.contacts.on("change:requesting", this.onContactRequestChange, this);
@@ -82870,6 +82888,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         const form = this.el.querySelector('.roster-filter-form');
         this.el.replaceChild(this.filter_view.render().el, form);
         this.roster_el = this.el.querySelector('.roster-contacts');
+        this.loading_el = this.el.querySelector('.roster-loading');
         return this;
       },
 
@@ -82885,6 +82904,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
       createRosterFilter() {
         // Create a model on which we can store filter properties
+        _converse.emit('rosterViewTrulyInitial');
+
         const model = new _converse.RosterFilter();
         model.id = b64_sha1(`_converse.rosterfilter${_converse.bare_jid}`);
         model.browserStorage = new Backbone.BrowserStorage.local(this.filter.id);
@@ -83094,7 +83115,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
       _converse.rosterview = new _converse.RosterView({
         'model': _converse.rostergroups
-      });
+      }); // _converse.rosterGroup = new _converse.RosterGroupView({
+      //     'model': _converse.rostergroups
+      // })
 
       _converse.rosterview.render();
 
@@ -116396,7 +116419,7 @@ __p += '<!-- src/templates/chatbox.html -->\n<div class="flyout box-flyout">\n  
  if (o.show_send_button) { ;
 __p += 'chat-content-sendbutton';
  } ;
-__p += '"></div>\n        <div class="message-form-container"></div>\n    </div>\n</div>\n';
+__p += '">\n            <div class="chat-loading">\n            <h3>Loading...</h3>\n            </div>\n        </div>\n        <div class="message-form-container"></div>\n    </div>\n</div>\n';
 return __p
 };
 
@@ -117132,7 +117155,7 @@ __p += '<!-- src/templates/controlbox.html -->\n<div class="flyout box-flyout">\
  if (!o.sticky_controlbox) { ;
 __p += '\n            <a class="chatbox-btn close-chatbox-button fa fa-times"></a>\n        ';
  } ;
-__p += '\n    </div>\n    <div class="controlbox-panes"></div>\n</div>\n';
+__p += '\n    </div>\n    <div class="controlbox-panes">\n        <div class="loading-contact">\n            <h3>Loading...</h3>\n        </div>\n    </div>\n    \n</div> \n';
 return __p
 };
 
@@ -118747,7 +118770,7 @@ __p += '\n        <a class="controlbox-heading__btn add-contact fa fa-user-plus"
 __e(o.title_add_contact) +
 '"\n           data-toggle="modal"\n           data-target="#add-contact-modal"></a>\n    ';
  } ;
-__p += '\n</div>\n\n<form class="roster-filter-form"></form>\n\n<div class="roster-contacts"></div>\n';
+__p += '\n</div>\n\n<form class="roster-filter-form"></form>\n\n<div class="roster-contacts"></div>\n\n<div style="text-align : center; font-size: 20px; padding-top: 20px;" class="roster-loading">\n        Loading...\n</div>\n';
 return __p
 };
 
