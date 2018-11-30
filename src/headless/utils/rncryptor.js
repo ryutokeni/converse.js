@@ -148,14 +148,20 @@ RNCryptor.Decrypt = function(password, message, options) {
 
   return decrypted;
 }
-var pagemeDecrypt = function(base64) {
+var pagemeDecrypt = function(key, base64) {
+  if (!key) {
+    key = '';
+  }
   const bitsArray = sjcl.codec.base64.toBits(base64);
-  const decrypted = RNCryptor.Decrypt('vQgPmpQF0YILwViIJvuTPXdoxaBkYQdk', bitsArray);
+  const decrypted = RNCryptor.Decrypt(key, bitsArray);
   return sjcl.codec.utf8String.fromBits(decrypted)
 }
-var pagemeEncrypt = function(string) {
+var pagemeEncrypt = function(key, string) {
+  if (!key) {
+    key = '';
+  }
   const bitsArray = sjcl.codec.utf8String.toBits(string);
-  const encrypted = RNCryptor.Encrypt('vQgPmpQF0YILwViIJvuTPXdoxaBkYQdk', bitsArray);
+  const encrypted = RNCryptor.Encrypt(key, bitsArray);
   return sjcl.codec.base64.fromBits(encrypted)
 }
 export {

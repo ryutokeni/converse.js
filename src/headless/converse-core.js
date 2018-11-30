@@ -1721,7 +1721,7 @@ const converse = {
     'onLogOut' (callback) {
       return _converse.api.listen.on('logout', () => {
         callback();
-        
+
       });
     },
     'onOpenChat' (callback) {
@@ -1753,7 +1753,7 @@ const converse = {
             currentMsg.stanza.getElementsByTagName('encrypted')[0].firstChild.nodeValue === '1'
           ) {
             try {
-              currentMsg.decrypted = RNCryptor.pagemeDecrypt(currentMsg.body);
+              currentMsg.decrypted = RNCryptor.pagemeDecrypt(_converse.user_settings.pagemeEncryptKey, currentMsg.body);
             } catch(err) { }
           } else {
             currentMsg.decrypted = currentMsg.body;

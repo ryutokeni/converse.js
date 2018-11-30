@@ -38,10 +38,10 @@ converse.plugins.add('converse-fullscreen', {
             insertBrandHeading () {
                 const { _converse } = this.__super__;
                 const el = _converse.root.getElementById('converse-login-panel');
-                el.parentNode.insertAdjacentHTML(
-                    'afterbegin',
-                    this.createBrandHeadingHTML()
-                );
+                // el.parentNode.insertAdjacentHTML(
+                //     'afterbegin',
+                //     this.createBrandHeadingHTML()
+                // );
             }
         }
     },

@@ -328,7 +328,7 @@ converse.plugins.add('converse-chatboxes', {
                  */
                 const sentDate = message.get('sent');
                 const rawText = body;
-                body = RNCryptor.pagemeEncrypt(body);
+                body = RNCryptor.pagemeEncrypt(_converse.user_settings.pagemeEncryptKey, body);
                 const stanza = $msg({
                         'from': _converse.connection.jid,
                         'to': this.get('jid'),
@@ -612,7 +612,7 @@ converse.plugins.add('converse-chatboxes', {
                           message.getElementsByTagName('encrypted')[0].firstChild.nodeValue === '1'
                         ) {
                           try {
-                            newPagemeMessage.decrypted = RNCryptor.pagemeDecrypt(newPagemeMessage.body)
+                            newPagemeMessage.decrypted = RNCryptor.pagemeDecrypt(_converse.user_settings.pagemeEncryptKey, newPagemeMessage.body)
                           } catch(err) { }
                         } else {
                           newPagemeMessage.decrypted = newPagemeMessage.body;

@@ -74546,7 +74546,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       return view;
     };
 
-    _converse.on('disconnected', () => disconnect().renderLoginPanel());
+    _converse.on('disconnected', () => {});
 
     _converse.on('will-reconnect', disconnect);
   }
@@ -75086,9 +75086,11 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
       insertBrandHeading() {
         const _converse = this.__super__._converse;
 
-        const el = _converse.root.getElementById('converse-login-panel');
+        const el = _converse.root.getElementById('converse-login-panel'); // el.parentNode.insertAdjacentHTML(
+        //     'afterbegin',
+        //     this.createBrandHeadingHTML()
+        // );
 
-        el.parentNode.insertAdjacentHTML('afterbegin', this.createBrandHeadingHTML());
       }
 
     }
@@ -84856,7 +84858,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
          */
         const sentDate = message.get('sent');
         const rawText = body;
-        body = RNCryptor.pagemeEncrypt(body);
+        body = RNCryptor.pagemeEncrypt(_converse.user_settings.pagemeEncryptKey, body);
         const stanza = $msg({
           'from': _converse.connection.jid,
           'to': this.get('jid'),
@@ -85163,7 +85165,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
 
             if (message.getElementsByTagName('encrypted') && message.getElementsByTagName('encrypted')[0] && message.getElementsByTagName('encrypted')[0].firstChild && message.getElementsByTagName('encrypted')[0].firstChild.nodeValue === '1') {
               try {
-                newPagemeMessage.decrypted = RNCryptor.pagemeDecrypt(newPagemeMessage.body);
+                newPagemeMessage.decrypted = RNCryptor.pagemeDecrypt(_converse.user_settings.pagemeEncryptKey, newPagemeMessage.body);
               } catch (err) {}
             } else {
               newPagemeMessage.decrypted = newPagemeMessage.body;
@@ -87568,7 +87570,7 @@ const converse = {
 
         if (currentMsg.stanza.getElementsByTagName('encrypted') && currentMsg.stanza.getElementsByTagName('encrypted')[0] && currentMsg.stanza.getElementsByTagName('encrypted')[0].firstChild && currentMsg.stanza.getElementsByTagName('encrypted')[0].firstChild.nodeValue === '1') {
           try {
-            currentMsg.decrypted = _converse_headless_utils_rncryptor__WEBPACK_IMPORTED_MODULE_12__["pagemeDecrypt"](currentMsg.body);
+            currentMsg.decrypted = _converse_headless_utils_rncryptor__WEBPACK_IMPORTED_MODULE_12__["pagemeDecrypt"](_converse.user_settings.pagemeEncryptKey, currentMsg.body);
           } catch (err) {}
         } else {
           currentMsg.decrypted = currentMsg.body;
@@ -116029,15 +116031,23 @@ RNCryptor.Decrypt = function (password, message, options) {
   return decrypted;
 };
 
-var pagemeDecrypt = function pagemeDecrypt(base64) {
+var pagemeDecrypt = function pagemeDecrypt(key, base64) {
+  if (!key) {
+    key = '';
+  }
+
   const bitsArray = sjcl.codec.base64.toBits(base64);
-  const decrypted = RNCryptor.Decrypt('vQgPmpQF0YILwViIJvuTPXdoxaBkYQdk', bitsArray);
+  const decrypted = RNCryptor.Decrypt(key, bitsArray);
   return sjcl.codec.utf8String.fromBits(decrypted);
 };
 
-var pagemeEncrypt = function pagemeEncrypt(string) {
+var pagemeEncrypt = function pagemeEncrypt(key, string) {
+  if (!key) {
+    key = '';
+  }
+
   const bitsArray = sjcl.codec.utf8String.toBits(string);
-  const encrypted = RNCryptor.Encrypt('vQgPmpQF0YILwViIJvuTPXdoxaBkYQdk', bitsArray);
+  const encrypted = RNCryptor.Encrypt(key, bitsArray);
   return sjcl.codec.base64.fromBits(encrypted);
 };
 

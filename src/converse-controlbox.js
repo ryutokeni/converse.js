@@ -617,7 +617,7 @@ converse.plugins.add('converse-controlbox', {
             view.model.set({'connected': false});
             return view;
         };
-        _converse.on('disconnected', () => disconnect().renderLoginPanel());
+        _converse.on('disconnected', () => {});
         _converse.on('will-reconnect', disconnect);
     }
 });
