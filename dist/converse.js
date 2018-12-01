@@ -2627,7 +2627,7 @@ var _extension = {
 
     // Escape special regex characters in id.
     itemRe = new RegExp("^" + this.name.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&") + "-");
-    
+
     // Remove id-tracking item (e.g., "foo").
     local.removeItem(this.name);
 
@@ -2933,7 +2933,7 @@ backbone.nativeview = __webpack_require__(/*! backbone.nativeview */ "./node_mod
  * Backbone.OrderedListView
  *
  * Copyright (c) 2017, JC Brand <jc@opkode.com>
- * Licensed under the Mozilla Public License (MPL) 
+ * Licensed under the Mozilla Public License (MPL)
  */
 (function (root, factory) {
     if (true) {
@@ -3037,10 +3037,10 @@ var backbone = (backbone || {});
 backbone.nativeview = __webpack_require__(/*! backbone.nativeview */ "./node_modules/backbone.nativeview/backbone.nativeview.js");
 
 /*!
- * Backbone.Overview 
+ * Backbone.Overview
  *
  * Copyright (c) 2018, JC Brand <jc@opkode.com>
- * Licensed under the Mozilla Public License (MPL) 
+ * Licensed under the Mozilla Public License (MPL)
  */
 (function (root, factory) {
     if (true) {
@@ -8874,25 +8874,25 @@ function fromByteArray (uint8) {
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
   } else { var bsn; }
 }(this, function () {
-  
+
   /* Native Javascript for Bootstrap 4 | Internal Utility Functions
   ----------------------------------------------------------------*/
   "use strict";
-  
+
   // globals
   var globalObject = typeof global !== 'undefined' ? global : this||window,
     DOC = document, HTML = DOC.documentElement, body = 'body', // allow the library to be used in <head>
-  
+
     // Native Javascript for Bootstrap Global Object
     BSN = globalObject.BSN = {},
     supports = BSN.supports = [],
-  
+
     // function toggle attributes
     dataToggle    = 'data-toggle',
     dataDismiss   = 'data-dismiss',
     dataSpy       = 'data-spy',
     dataRide      = 'data-ride',
-  
+
     // components
     stringAlert     = 'Alert',
     stringButton    = 'Button',
@@ -8904,7 +8904,7 @@ function fromByteArray (uint8) {
     stringScrollSpy = 'ScrollSpy',
     stringTab       = 'Tab',
     stringTooltip   = 'Tooltip',
-  
+
     // options DATA API
     databackdrop      = 'data-backdrop',
     dataKeyboard      = 'data-keyboard',
@@ -8923,13 +8923,13 @@ function fromByteArray (uint8) {
     dataDelay         = 'data-delay',
     dataOffsetTop     = 'data-offset-top',
     dataOffsetBottom  = 'data-offset-bottom',
-  
+
     // option keys
     backdrop = 'backdrop', keyboard = 'keyboard', delay = 'delay',
     content = 'content', target = 'target',
     interval = 'interval', pause = 'pause', animation = 'animation',
     placement = 'placement', container = 'container',
-  
+
     // box model
     offsetTop    = 'offsetTop',      offsetBottom   = 'offsetBottom',
     offsetLeft   = 'offsetLeft',
@@ -8938,11 +8938,11 @@ function fromByteArray (uint8) {
     offsetWidth  = 'offsetWidth',    offsetHeight   = 'offsetHeight',
     innerWidth   = 'innerWidth',     innerHeight    = 'innerHeight',
     scrollHeight = 'scrollHeight',   height         = 'height',
-  
+
     // aria
     ariaExpanded = 'aria-expanded',
     ariaHidden   = 'aria-hidden',
-  
+
     // event names
     clickEvent    = 'click',
     hoverEvent    = 'hover',
@@ -8960,7 +8960,7 @@ function fromByteArray (uint8) {
     slidEvent     = 'slid',
     slideEvent    = 'slide',
     changeEvent   = 'change',
-  
+
     // other
     getAttribute           = 'getAttribute',
     setAttribute           = 'setAttribute',
@@ -8973,8 +8973,8 @@ function fromByteArray (uint8) {
     getBoundingClientRect  = 'getBoundingClientRect',
     querySelectorAll       = 'querySelectorAll',
     getElementsByCLASSNAME = 'getElementsByClassName',
-    getComputedStyle       = 'getComputedStyle',  
-  
+    getComputedStyle       = 'getComputedStyle',
+
     indexOf      = 'indexOf',
     parentNode   = 'parentNode',
     length       = 'length',
@@ -8986,7 +8986,7 @@ function fromByteArray (uint8) {
     push         = 'push',
     tabindex     = 'tabindex',
     contains     = 'contains',
-  
+
     active     = 'active',
     showClass  = 'show',
     collapsing = 'collapsing',
@@ -8996,26 +8996,26 @@ function fromByteArray (uint8) {
     right      = 'right',
     top        = 'top',
     bottom     = 'bottom',
-  
+
     // tooltip / popover
     mouseHover = ('onmouseleave' in DOC) ? [ 'mouseenter', 'mouseleave'] : [ 'mouseover', 'mouseout' ],
     tipPositions = /\b(top|bottom|left|right)+/,
-  
+
     // modal
     modalOverlay = 0,
     fixedTop = 'fixed-top',
     fixedBottom = 'fixed-bottom',
-  
+
     // transitionEnd since 2.0.4
     supportTransitions = Webkit+Transition in HTML[style] || Transition[toLowerCase]() in HTML[style],
     transitionEndEvent = Webkit+Transition in HTML[style] ? Webkit[toLowerCase]()+Transition+'End' : Transition[toLowerCase]()+'end',
     transitionDuration = Webkit+Duration in HTML[style] ? Webkit[toLowerCase]()+Transition+Duration : Transition[toLowerCase]()+Duration,
-  
+
     // set new focus element since 2.0.3
     setFocus = function(element){
       element.focus ? element.focus() : element.setActive();
     },
-  
+
     // class manipulation, since 2.0.0 requires polyfill.js
     addClass = function(element,classNAME) {
       element.classList.add(classNAME);
@@ -9026,7 +9026,7 @@ function fromByteArray (uint8) {
     hasClass = function(element,classNAME){ // since 2.0.0
       return element.classList[contains](classNAME);
     },
-  
+
     // selection methods
     getElementsByClassName = function(element,classNAME) { // returns Array
       return [].slice.call(element[getElementsByCLASSNAME]( classNAME ));
@@ -9049,7 +9049,7 @@ function fromByteArray (uint8) {
       }
       return false;
     },
-  
+
     // event attach jQuery style / trigger  since 1.2.0
     on = function (element, event, handler) {
       element.addEventListener(event, handler, false);
@@ -9079,7 +9079,7 @@ function fromByteArray (uint8) {
       OriginalCustomEvent.relatedTarget = related;
       this.dispatchEvent(OriginalCustomEvent);
     },
-  
+
     // tooltip / popover stuff
     getScroll = function() { // also Affix and ScrollSpy uses it
       return {
@@ -9096,10 +9096,10 @@ function fromByteArray (uint8) {
           linkDimensions = { w: rect[right] - rect[left], h: rect[bottom] - rect[top] },
           isPopover = hasClass(element,'popover'),
           topPosition, leftPosition,
-  
+
           arrow = queryElement('.arrow',element),
           arrowTop, arrowLeft, arrowWidth, arrowHeight,
-  
+
           halfTopExceed = rect[top] + linkDimensions.h/2 - elementDimensions.h/2 < 0,
           halfLeftExceed = rect[left] + linkDimensions.w/2 - elementDimensions.w/2 < 0,
           halfRightExceed = rect[left] + elementDimensions.w/2 + linkDimensions.w/2 >= windowWidth,
@@ -9108,20 +9108,20 @@ function fromByteArray (uint8) {
           leftExceed = rect[left] - elementDimensions.w < 0,
           bottomExceed = rect[top] + elementDimensions.h + linkDimensions.h >= windowHeight,
           rightExceed = rect[left] + elementDimensions.w + linkDimensions.w >= windowWidth;
-  
+
       // recompute position
       position = (position === left || position === right) && leftExceed && rightExceed ? top : position; // first, when both left and right limits are exceeded, we fall back to top|bottom
       position = position === top && topExceed ? bottom : position;
       position = position === bottom && bottomExceed ? top : position;
       position = position === left && leftExceed ? right : position;
       position = position === right && rightExceed ? left : position;
-  
+
       // update tooltip/popover class
       element.className[indexOf](position) === -1 && (element.className = element.className.replace(tipPositions,position));
-  
+
       // we check the computed width & height and update here
       arrowWidth = arrow[offsetWidth]; arrowHeight = arrow[offsetHeight];
-  
+
       // apply styling to tooltip or popover
       if ( position === left || position === right ) { // secondary|side positions
         if ( position === left ) { // LEFT
@@ -9129,7 +9129,7 @@ function fromByteArray (uint8) {
         } else { // RIGHT
           leftPosition = rect[left] + scroll.x + linkDimensions.w;
         }
-  
+
         // adjust top and arrow
         if (halfTopExceed) {
           topPosition = rect[top] + scroll.y;
@@ -9159,27 +9159,27 @@ function fromByteArray (uint8) {
           arrowLeft = elementDimensions.w/2 - arrowWidth/2;
         }
       }
-  
+
       // apply style to tooltip/popover and its arrow
       element[style][top] = topPosition + 'px';
       element[style][left] = leftPosition + 'px';
-  
+
       arrowTop && (arrow[style][top] = arrowTop + 'px');
       arrowLeft && (arrow[style][left] = arrowLeft + 'px');
     };
-  
+
   BSN.version = '2.0.23';
-  
+
   /* Native Javascript for Bootstrap 4 | Alert
   -------------------------------------------*/
-  
+
   // ALERT DEFINITION
   // ================
   var Alert = function( element ) {
-    
+
     // initialization element
     element = queryElement(element);
-  
+
     // bind, target alert, duration and stuff
     var self = this, component = 'alert',
       alert = getClosest(element,'.'+component),
@@ -9195,7 +9195,7 @@ function fromByteArray (uint8) {
         off(element, clickEvent, clickHandler); // detach it's listener
         alert[parentNode].removeChild(alert);
       };
-    
+
     // public method
     this.close = function() {
       if ( alert && element && hasClass(alert,showClass) ) {
@@ -9204,59 +9204,59 @@ function fromByteArray (uint8) {
         alert && triggerHandler();
       }
     };
-  
+
     // init
     if ( !(stringAlert in element ) ) { // prevent adding event handlers twice
       on(element, clickEvent, clickHandler);
     }
     element[stringAlert] = self;
   };
-  
+
   // ALERT DATA API
   // ==============
   supports[push]([stringAlert, Alert, '['+dataDismiss+'="alert"]']);
-  
-  
+
+
   /* Native Javascript for Bootstrap 4 | Button
   ---------------------------------------------*/
-  
+
   // BUTTON DEFINITION
   // ===================
   var Button = function( element ) {
-  
+
     // initialization element
     element = queryElement(element);
-  
+
     // constant
     var toggled = false, // toggled makes sure to prevent triggering twice the change.bs.button events
-  
+
         // strings
         component = 'button',
         checked = 'checked',
         reset = 'reset',
         LABEL = 'LABEL',
         INPUT = 'INPUT',
-  
+
       // private methods
-      keyHandler = function(e){ 
+      keyHandler = function(e){
         var key = e.which || e.keyCode;
         key === 32 && e[target] === DOC.activeElement && toggle(e);
       },
-      preventScroll = function(e){ 
+      preventScroll = function(e){
         var key = e.which || e.keyCode;
         key === 32 && e[preventDefault]();
       },
       toggle = function(e) {
         var label = e[target].tagName === LABEL ? e[target] : e[target][parentNode].tagName === LABEL ? e[target][parentNode] : null; // the .btn label
-        
+
         if ( !label ) return; //react if a label or its immediate child is clicked
-  
+
         var eventTarget = e[target], // the button itself, the target of the handler function
           labels = getElementsByClassName(eventTarget[parentNode],'btn'), // all the button group buttons
           input = label[getElementsByTagName](INPUT)[0];
-  
+
         if ( !input ) return; //return if no input found
-  
+
         // manage the dom manipulation
         if ( input.type === 'checkbox' ) { //checkboxes
           if ( !input[checked] ) {
@@ -9270,14 +9270,14 @@ function fromByteArray (uint8) {
             input.removeAttribute(checked);
             input[checked] = false;
           }
-  
+
           if (!toggled) { // prevent triggering the event twice
             toggled = true;
             bootstrapCustomEvent.call(input, changeEvent, component); //trigger the change for the input
             bootstrapCustomEvent.call(element, changeEvent, component); //trigger the change for the btn-group
           }
         }
-  
+
         if ( input.type === 'radio' && !toggled ) { // radio buttons
           if ( !input[checked] ) { // don't trigger if already active
             addClass(label,active);
@@ -9285,7 +9285,7 @@ function fromByteArray (uint8) {
             input[checked] = true;
             bootstrapCustomEvent.call(input, changeEvent, component); //trigger the change for the input
             bootstrapCustomEvent.call(element, changeEvent, component); //trigger the change for the btn-group
-  
+
             toggled = true;
             for (var i = 0, ll = labels[length]; i<ll; i++) {
               var otherLabel = labels[i], otherInput = otherLabel[getElementsByTagName](INPUT)[0];
@@ -9300,72 +9300,72 @@ function fromByteArray (uint8) {
         }
         setTimeout( function() { toggled = false; }, 50 );
       };
-  
+
     // init
     if ( !( stringButton in element ) ) { // prevent adding event handlers twice
       on( element, clickEvent, toggle );
-      queryElement('['+tabindex+']',element) && on( element, keyupEvent, keyHandler ), 
-                                                on( element, keydownEvent, preventScroll );    
+      queryElement('['+tabindex+']',element) && on( element, keyupEvent, keyHandler ),
+                                                on( element, keydownEvent, preventScroll );
     }
-  
+
     // activate items on load
     var labelsToACtivate = getElementsByClassName(element, 'btn'), lbll = labelsToACtivate[length];
     for (var i=0; i<lbll; i++) {
-      !hasClass(labelsToACtivate[i],active) && queryElement('input:checked',labelsToACtivate[i]) 
+      !hasClass(labelsToACtivate[i],active) && queryElement('input:checked',labelsToACtivate[i])
                                             && addClass(labelsToACtivate[i],active);
     }
     element[stringButton] = this;
   };
-  
+
   // BUTTON DATA API
   // =================
   supports[push]( [ stringButton, Button, '['+dataToggle+'="buttons"]' ] );
-  
-  
+
+
   /* Native Javascript for Bootstrap 4 | Carousel
   ----------------------------------------------*/
-  
+
   // CAROUSEL DEFINITION
   // ===================
   var Carousel = function( element, options ) {
-  
+
     // initialization element
     element = queryElement( element );
-  
+
     // set options
     options = options || {};
-  
+
     // DATA API
     var intervalAttribute = element[getAttribute](dataInterval),
         intervalOption = options[interval],
-        intervalData = intervalAttribute === 'false' ? 0 : parseInt(intervalAttribute),  
+        intervalData = intervalAttribute === 'false' ? 0 : parseInt(intervalAttribute),
         pauseData = element[getAttribute](dataPause) === hoverEvent || false,
         keyboardData = element[getAttribute](dataKeyboard) === 'true' || false,
-      
+
         // strings
         component = 'carousel',
         paused = 'paused',
         direction = 'direction',
         carouselItem = 'carousel-item',
-        dataSlideTo = 'data-slide-to'; 
-  
+        dataSlideTo = 'data-slide-to';
+
     this[keyboard] = options[keyboard] === true || keyboardData;
     this[pause] = (options[pause] === hoverEvent || pauseData) ? hoverEvent : false; // false / hover
-  
+
     this[interval] = typeof intervalOption === 'number' ? intervalOption
                    : intervalOption === false || intervalData === 0 || intervalData === false ? 0
                    : 5000; // bootstrap carousel default interval
-  
+
     // bind, event targets
-    var self = this, index = element.index = 0, timer = element.timer = 0, 
+    var self = this, index = element.index = 0, timer = element.timer = 0,
       isSliding = false, // isSliding prevents click event handlers when animation is running
       slides = getElementsByClassName(element,carouselItem), total = slides[length],
       slideDirection = this[direction] = left,
-      leftArrow = getElementsByClassName(element,component+'-control-prev')[0], 
+      leftArrow = getElementsByClassName(element,component+'-control-prev')[0],
       rightArrow = getElementsByClassName(element,component+'-control-next')[0],
       indicator = queryElement( '.'+component+'-indicators', element ),
       indicators = indicator && indicator[getElementsByTagName]( "LI" ) || [];
-  
+
     // handlers
     var pauseHandler = function () {
         if ( self[interval] !==false && !hasClass(element,paused) ) {
@@ -9383,27 +9383,27 @@ function fromByteArray (uint8) {
       indicatorHandler = function(e) {
         e[preventDefault]();
         if (isSliding) return;
-  
+
         var eventTarget = e[target]; // event target | the current active item
-  
+
         if ( eventTarget && !hasClass(eventTarget,active) && eventTarget[getAttribute](dataSlideTo) ) {
           index = parseInt( eventTarget[getAttribute](dataSlideTo), 10 );
         } else { return false; }
-  
+
         self.slideTo( index ); //Do the slide
       },
       controlsHandler = function (e) {
         e[preventDefault]();
         if (isSliding) return;
-  
+
         var eventTarget = e.currentTarget || e.srcElement;
-  
+
         if ( eventTarget === rightArrow ) {
           index++;
         } else if ( eventTarget === leftArrow ) {
           index--;
         }
-  
+
         self.slideTo( index ); //Do the slide
       },
       keyHandler = function (e) {
@@ -9424,15 +9424,15 @@ function fromByteArray (uint8) {
         var rect = element[getBoundingClientRect](),
           viewportHeight = globalObject[innerHeight] || HTML[clientHeight]
         return rect[top] <= viewportHeight && rect[bottom] >= 0; // bottom && top
-      },    
+      },
       setActivePage = function( pageIndex ) { //indicators
         for ( var i = 0, icl = indicators[length]; i < icl; i++ ) {
           removeClass(indicators[i],active);
         }
         if (indicators[pageIndex]) addClass(indicators[pageIndex], active);
       };
-  
-  
+
+
     // public methods
     this.cycle = function() {
       timer = setInterval(function() {
@@ -9440,60 +9440,60 @@ function fromByteArray (uint8) {
       }, this[interval]);
     };
     this.slideTo = function( next ) {
-      if (isSliding) return; // when controled via methods, make sure to check again      
-      
+      if (isSliding) return; // when controled via methods, make sure to check again
+
       var activeItem = this.getActiveIndex(), // the current active
           orientation;
-      
+
       // determine slideDirection first
       if  ( (activeItem < next ) || (activeItem === 0 && next === total -1 ) ) {
         slideDirection = self[direction] = left; // next
       } else if  ( (activeItem > next) || (activeItem === total - 1 && next === 0 ) ) {
         slideDirection = self[direction] = right; // prev
       }
-  
-      // find the right next index 
-      if ( next < 0 ) { next = total - 1; } 
+
+      // find the right next index
+      if ( next < 0 ) { next = total - 1; }
       else if ( next === total ){ next = 0; }
-  
+
       // update index
       index = next;
-  
+
       orientation = slideDirection === left ? 'next' : 'prev'; //determine type
       bootstrapCustomEvent.call(element, slideEvent, component, slides[next]); // here we go with the slide
-  
+
       isSliding = true;
       clearInterval(timer);
       setActivePage( next );
-  
+
       if ( supportTransitions && hasClass(element,'slide') ) {
-  
+
         addClass(slides[next],carouselItem +'-'+ orientation);
         slides[next][offsetWidth];
         addClass(slides[next],carouselItem +'-'+ slideDirection);
         addClass(slides[activeItem],carouselItem +'-'+ slideDirection);
-  
+
         one(slides[next], transitionEndEvent, function(e) {
           var timeout = e[target] !== slides[next] ? e.elapsedTime*1000+100 : 20;
-          
+
           isSliding && setTimeout(function(){
             isSliding = false;
-  
+
             addClass(slides[next],active);
             removeClass(slides[activeItem],active);
-  
+
             removeClass(slides[next],carouselItem +'-'+ orientation);
             removeClass(slides[next],carouselItem +'-'+ slideDirection);
             removeClass(slides[activeItem],carouselItem +'-'+ slideDirection);
-  
+
             bootstrapCustomEvent.call(element, slidEvent, component, slides[next]);
-  
+
             if ( !DOC.hidden && self[interval] && !hasClass(element,paused) ) {
               self.cycle();
             }
           }, timeout);
         });
-  
+
       } else {
         addClass(slides[next],active);
         slides[next][offsetWidth];
@@ -9510,20 +9510,20 @@ function fromByteArray (uint8) {
     this.getActiveIndex = function () {
       return slides[indexOf](getElementsByClassName(element,carouselItem+' active')[0]) || 0;
     };
-  
+
     // init
     if ( !(stringCarousel in element ) ) { // prevent adding event handlers twice
-  
+
       if ( self[pause] && self[interval] ) {
         on( element, mouseHover[0], pauseHandler );
         on( element, mouseHover[1], resumeHandler );
         on( element, 'touchstart', pauseHandler );
         on( element, 'touchend', resumeHandler );
       }
-    
+
       rightArrow && on( rightArrow, clickEvent, controlsHandler );
       leftArrow && on( leftArrow, clickEvent, controlsHandler );
-    
+
       indicator && on( indicator, clickEvent, indicatorHandler );
       self[keyboard] === true && on( globalObject, keydownEvent, keyHandler );
     }
@@ -9531,39 +9531,39 @@ function fromByteArray (uint8) {
       slides[length] && addClass(slides[0],active);
       indicators[length] && setActivePage(0);
     }
-  
+
     if ( self[interval] ){ self.cycle(); }
     element[stringCarousel] = self;
   };
-  
+
   // CAROUSEL DATA API
   // =================
   supports[push]( [ stringCarousel, Carousel, '['+dataRide+'="carousel"]' ] );
-  
-  
+
+
   /* Native Javascript for Bootstrap 4 | Collapse
   -----------------------------------------------*/
-  
+
   // COLLAPSE DEFINITION
   // ===================
   var Collapse = function( element, options ) {
-  
+
     // initialization element
     element = queryElement(element);
-  
+
     // set options
     options = options || {};
-  
+
     // event targets and constants
-    var accordion = null, collapse = null, self = this, 
+    var accordion = null, collapse = null, self = this,
       accordionData = element[getAttribute]('data-parent'),
       activeCollapse, activeElement,
-  
+
       // component strings
       component = 'collapse',
       collapsed = 'collapsed',
       isAnimating = 'isAnimating',
-  
+
       // private methods
       openAction = function(collapseElement,toggle) {
         bootstrapCustomEvent.call(collapseElement, showEvent, component);
@@ -9571,7 +9571,7 @@ function fromByteArray (uint8) {
         addClass(collapseElement,collapsing);
         removeClass(collapseElement,component);
         collapseElement[style][height] = collapseElement[scrollHeight] + 'px';
-        
+
         emulateTransitionEnd(collapseElement, function() {
           collapseElement[isAnimating] = false;
           collapseElement[setAttribute](ariaExpanded,'true');
@@ -9592,7 +9592,7 @@ function fromByteArray (uint8) {
         addClass(collapseElement,collapsing);
         collapseElement[offsetWidth]; // force reflow to enable transition
         collapseElement[style][height] = '0px';
-        
+
         emulateTransitionEnd(collapseElement, function() {
           collapseElement[isAnimating] = false;
           collapseElement[setAttribute](ariaExpanded,'false');
@@ -9609,15 +9609,15 @@ function fromByteArray (uint8) {
           id = href || ( parent && parent.charAt(0) === '#' ) && parent;
         return id && queryElement(id);
       };
-    
+
     // public methods
     this.toggle = function(e) {
       e[preventDefault]();
-      if (!hasClass(collapse,showClass)) { self.show(); } 
+      if (!hasClass(collapse,showClass)) { self.show(); }
       else { self.hide(); }
     };
     this.hide = function() {
-      if ( collapse[isAnimating] ) return;    
+      if ( collapse[isAnimating] ) return;
       closeAction(collapse,element);
       addClass(element,collapsed);
     };
@@ -9627,45 +9627,45 @@ function fromByteArray (uint8) {
         activeElement = activeCollapse && (queryElement('['+dataToggle+'="'+component+'"]['+dataTarget+'="#'+activeCollapse.id+'"]',accordion)
                       || queryElement('['+dataToggle+'="'+component+'"][href="#'+activeCollapse.id+'"]',accordion) );
       }
-  
+
       if ( !collapse[isAnimating] || activeCollapse && !activeCollapse[isAnimating] ) {
         if ( activeElement && activeCollapse !== collapse ) {
-          closeAction(activeCollapse,activeElement); 
+          closeAction(activeCollapse,activeElement);
           addClass(activeElement,collapsed);
         }
         openAction(collapse,element);
         removeClass(element,collapsed);
       }
     };
-  
+
     // init
     if ( !(stringCollapse in element ) ) { // prevent adding event handlers twice
       on(element, clickEvent, self.toggle);
     }
     collapse = getTarget();
-    collapse[isAnimating] = false;  // when true it will prevent click handlers  
+    collapse[isAnimating] = false;  // when true it will prevent click handlers
     accordion = queryElement(options.parent) || accordionData && getClosest(element, accordionData);
     element[stringCollapse] = self;
   };
-  
+
   // COLLAPSE DATA API
   // =================
   supports[push]( [ stringCollapse, Collapse, '['+dataToggle+'="collapse"]' ] );
-  
-  
+
+
   /* Native Javascript for Bootstrap 4 | Dropdown
   ----------------------------------------------*/
-  
+
   // DROPDOWN DEFINITION
   // ===================
   var Dropdown = function( element, option ) {
-      
+
     // initialization element
     element = queryElement(element);
-  
+
     // set option
     this.persist = option === true || element[getAttribute]('data-persist') === 'true' || false;
-  
+
     // constants, event targets, strings
     var self = this, children = 'children',
       parent = element[parentNode],
@@ -9680,21 +9680,21 @@ function fromByteArray (uint8) {
         }
         return newSet;
       })(),
-  
+
       // preventDefault on empty anchor links
       preventEmptyAnchor = function(anchor){
-        (anchor.href && anchor.href.slice(-1) === '#' || anchor[parentNode] && anchor[parentNode].href 
-          && anchor[parentNode].href.slice(-1) === '#') && this[preventDefault]();    
+        (anchor.href && anchor.href.slice(-1) === '#' || anchor[parentNode] && anchor[parentNode].href
+          && anchor[parentNode].href.slice(-1) === '#') && this[preventDefault]();
       },
-  
+
       // toggle dismissible events
       toggleDismiss = function(){
         var type = element[open] ? on : off;
-        type(DOC, clickEvent, dismissHandler); 
+        type(DOC, clickEvent, dismissHandler);
         type(DOC, keydownEvent, preventScroll);
         type(DOC, keyupEvent, keyHandler);
       },
-  
+
       // handlers
       dismissHandler = function(e) {
         var eventTarget = e[target], hasData = eventTarget && (stringDropdown in eventTarget || stringDropdown in eventTarget[parentNode]);
@@ -9720,10 +9720,10 @@ function fromByteArray (uint8) {
           idx = menuItems[indexOf](activeItem),
           isSameElement = activeItem === element,
           isInsideMenu = menu[contains](activeItem),
-          isMenuItem = activeItem[parentNode] === menu || activeItem[parentNode][parentNode] === menu;          
-  
+          isMenuItem = activeItem[parentNode] === menu || activeItem[parentNode][parentNode] === menu;
+
         if ( isMenuItem || isSameElement ) { // navigate up | down
-          idx = isSameElement ? 0 
+          idx = isSameElement ? 0
                               : key === 38 ? (idx>1?idx-1:0)
                               : key === 40 ? (idx<menuItems[length]-1?idx+1:idx) : idx;
           menuItems[idx] && setFocus(menuItems[idx]);
@@ -9737,7 +9737,7 @@ function fromByteArray (uint8) {
           relatedTarget = null;
         }
       },
-  
+
       // private methods
       show = function() {
         bootstrapCustomEvent.call(parent, showEvent, component, relatedTarget);
@@ -9763,72 +9763,72 @@ function fromByteArray (uint8) {
         setFocus(element);
         setTimeout(function(){ on(element, clickEvent, clickHandler); },1);
       };
-  
+
     // set initial state to closed
     element[open] = false;
-  
+
     // public methods
     this.toggle = function() {
-      if (hasClass(parent,showClass) && element[open]) { hide(); } 
+      if (hasClass(parent,showClass) && element[open]) { hide(); }
       else { show(); }
     };
-  
+
     // init
     if ( !(stringDropdown in element) ) { // prevent adding event handlers twice
       !tabindex in menu && menu[setAttribute](tabindex, '0'); // Fix onblur on Chrome | Safari
       on(element, clickEvent, clickHandler);
     }
-  
+
     element[stringDropdown] = self;
   };
-  
+
   // DROPDOWN DATA API
   // =================
   supports[push]( [stringDropdown, Dropdown, '['+dataToggle+'="dropdown"]'] );
-  
-  
+
+
   /* Native Javascript for Bootstrap 4 | Modal
   -------------------------------------------*/
-  
+
   // MODAL DEFINITION
   // ===============
   var Modal = function(element, options) { // element can be the modal/triggering button
-  
+
     // the modal (both JavaScript / DATA API init) / triggering button element (DATA API)
     element = queryElement(element);
-  
+
     // determine modal, triggering element
     var btnCheck = element[getAttribute](dataTarget)||element[getAttribute]('href'),
       checkModal = queryElement( btnCheck ),
       modal = hasClass(element,'modal') ? element : checkModal,
       overlayDelay,
-  
+
       // strings
       component = 'modal',
       staticString = 'static',
       paddingLeft = 'paddingLeft',
       paddingRight = 'paddingRight',
       modalBackdropString = 'modal-backdrop';
-  
+
     if ( hasClass(element,'modal') ) { element = null; } // modal is now independent of it's triggering element
-  
+
     if ( !modal ) { return; } // invalidate
-  
+
     // set options
     options = options || {};
-  
+
     this[keyboard] = options[keyboard] === false || modal[getAttribute](dataKeyboard) === 'false' ? false : true;
     this[backdrop] = options[backdrop] === staticString || modal[getAttribute](databackdrop) === staticString ? staticString : true;
     this[backdrop] = options[backdrop] === false || modal[getAttribute](databackdrop) === 'false' ? false : this[backdrop];
     this[content]  = options[content]; // JavaScript only
-  
+
     // bind, constants, event targets and other vars
     var self = this, relatedTarget = null,
       bodyIsOverflowing, modalIsOverflowing, scrollbarWidth, overlay,
-  
+
       // also find fixed-top / fixed-bottom items
       fixedItems = getElementsByClassName(HTML,fixedTop).concat(getElementsByClassName(HTML,fixedBottom)),
-  
+
       // private methods
       getWindowWidth = function() {
         var htmlRect = HTML[getBoundingClientRect]();
@@ -9877,11 +9877,11 @@ function fromByteArray (uint8) {
         modal[style][paddingRight] = '';
       },
       createOverlay = function() {
-        modalOverlay = 1;        
-        
+        modalOverlay = 1;
+
         var newOverlay = DOC[createElement]('div');
         overlay = queryElement('.'+modalBackdropString);
-  
+
         if ( overlay === null ) {
           newOverlay[setAttribute]('class',modalBackdropString+' fade');
           overlay = newOverlay;
@@ -9891,10 +9891,10 @@ function fromByteArray (uint8) {
       removeOverlay = function() {
         overlay = queryElement('.'+modalBackdropString);
         if ( overlay && overlay !== null && typeof overlay === 'object' ) {
-          modalOverlay = 0;        
+          modalOverlay = 0;
           DOC[body].removeChild(overlay); overlay = null;
         }
-        bootstrapCustomEvent.call(modal, hiddenEvent, component);      
+        bootstrapCustomEvent.call(modal, hiddenEvent, component);
       },
       keydownHandlerToggle = function() {
         if (hasClass(modal,showClass)) {
@@ -9925,15 +9925,15 @@ function fromByteArray (uint8) {
       triggerHide = function() {
         modal[style].display = '';
         element && (setFocus(element));
-        
+
         (function(){
           if (!getElementsByClassName(DOC,component+' '+showClass)[0]) {
             resetAdjustments();
             resetScrollbar();
             removeClass(DOC[body],component+'-open');
-            overlay && hasClass(overlay,'fade') ? (removeClass(overlay,showClass), emulateTransitionEnd(overlay,removeOverlay)) 
+            overlay && hasClass(overlay,'fade') ? (removeClass(overlay,showClass), emulateTransitionEnd(overlay,removeOverlay))
             : removeOverlay();
-  
+
             resizeHandlerToggle();
             dismissHandlerToggle();
             keydownHandlerToggle();
@@ -9965,54 +9965,54 @@ function fromByteArray (uint8) {
           e[preventDefault]();
         }
       };
-  
+
     // public methods
     this.toggle = function() {
       if ( hasClass(modal,showClass) ) {this.hide();} else {this.show();}
     };
     this.show = function() {
       bootstrapCustomEvent.call(modal, showEvent, component, relatedTarget);
-  
+
       // we elegantly hide any opened modal
       var currentOpen = getElementsByClassName(DOC,component+' '+showClass)[0];
       currentOpen && currentOpen !== modal && currentOpen.modalTrigger[stringModal].hide();
-  
+
       if ( this[backdrop] ) {
         !modalOverlay && createOverlay();
       }
-  
+
       if ( overlay && modalOverlay && !hasClass(overlay,showClass)) {
         overlay[offsetWidth]; // force reflow to enable trasition
-        overlayDelay = getTransitionDurationFromElement(overlay);              
+        overlayDelay = getTransitionDurationFromElement(overlay);
         addClass(overlay, showClass);
       }
-  
+
       setTimeout( function() {
         modal[style].display = 'block';
-  
+
         checkScrollbar();
         setScrollbar();
         adjustDialog();
-  
+
         addClass(DOC[body],component+'-open');
         addClass(modal,showClass);
         modal[setAttribute](ariaHidden, false);
-        
+
         resizeHandlerToggle();
         dismissHandlerToggle();
         keydownHandlerToggle();
-  
+
         hasClass(modal,'fade') ? emulateTransitionEnd(modal, triggerShow) : triggerShow();
       }, supportTransitions && overlay ? overlayDelay : 0);
     };
     this.hide = function() {
       bootstrapCustomEvent.call(modal, hideEvent, component);
       overlay = queryElement('.'+modalBackdropString);
-      overlayDelay = overlay && getTransitionDurationFromElement(overlay);    
-  
+      overlayDelay = overlay && getTransitionDurationFromElement(overlay);
+
       removeClass(modal,showClass);
       modal[setAttribute](ariaHidden, true);
-  
+
       setTimeout(function(){
         hasClass(modal,'fade') ? emulateTransitionEnd(modal, triggerHide) : triggerHide();
       }, supportTransitions && overlay ? overlayDelay : 0);
@@ -10027,7 +10027,7 @@ function fromByteArray (uint8) {
         adjustDialog();
       }
     };
-  
+
     // init
     // prevent adding event handlers over and over
     // modal is independent of a triggering element
@@ -10037,23 +10037,23 @@ function fromByteArray (uint8) {
     if ( !!self[content] ) { self.setContent( self[content] ); }
     !!element && (element[stringModal] = self);
   };
-  
+
   // DATA API
   supports[push]( [ stringModal, Modal, '['+dataToggle+'="modal"]' ] );
-  
+
   /* Native Javascript for Bootstrap 4 | Popover
   ----------------------------------------------*/
-  
+
   // POPOVER DEFINITION
   // ==================
   var Popover = function( element, options ) {
-  
+
     // initialization element
     element = queryElement(element);
-  
+
     // set options
     options = options || {};
-  
+
     // DATA API
     var triggerData = element[getAttribute](dataTrigger), // click / hover / focus
         animationData = element[getAttribute](dataAnimation), // true / false
@@ -10061,7 +10061,7 @@ function fromByteArray (uint8) {
         dismissibleData = element[getAttribute](dataDismissible),
         delayData = element[getAttribute](dataDelay),
         containerData = element[getAttribute](dataContainer),
-  
+
         // internal strings
         component = 'popover',
         template = 'template',
@@ -10073,18 +10073,18 @@ function fromByteArray (uint8) {
         dataContent = 'data-content',
         dismissible = 'dismissible',
         closeBtn = '<button type="button" class="close">×</button>',
-  
+
         // check container
         containerElement = queryElement(options[container]),
-        containerDataElement = queryElement(containerData),       
-        
+        containerDataElement = queryElement(containerData),
+
         // maybe the element is inside a modal
         modal = getClosest(element,'.modal'),
-        
+
         // maybe the element is inside a fixed navbar
         navbarFixedTop = getClosest(element,'.'+fixedTop),
         navbarFixedBottom = getClosest(element,'.'+fixedBottom);
-  
+
     // set instance options
     this[template] = options[template] ? options[template] : null; // JavaScript only
     this[trigger] = options[trigger] ? options[trigger] : triggerData || hoverEvent;
@@ -10092,69 +10092,69 @@ function fromByteArray (uint8) {
     this[placement] = options[placement] ? options[placement] : placementData || top;
     this[delay] = parseInt(options[delay] || delayData) || 200;
     this[dismissible] = options[dismissible] || dismissibleData === 'true' ? true : false;
-    this[container] = containerElement ? containerElement 
-                    : containerDataElement ? containerDataElement 
+    this[container] = containerElement ? containerElement
+                    : containerDataElement ? containerDataElement
                     : navbarFixedTop ? navbarFixedTop
                     : navbarFixedBottom ? navbarFixedBottom
                     : modal ? modal : DOC[body];
-    
+
     // bind, content
-    var self = this, 
+    var self = this,
       titleString = element[getAttribute](dataTitle) || null,
       contentString = element[getAttribute](dataContent) || null;
-  
+
     if ( !contentString && !this[template] ) return; // invalidate
-  
+
     // constants, vars
     var popover = null, timer = 0, placementSetting = this[placement],
-      
+
       // handlers
       dismissibleHandler = function(e) {
         if (popover !== null && e[target] === queryElement('.close',popover)) {
           self.hide();
         }
       },
-  
+
       // private methods
       removePopover = function() {
         self[container].removeChild(popover);
-        timer = null; popover = null; 
+        timer = null; popover = null;
       },
       createPopover = function() {
         titleString = element[getAttribute](dataTitle); // check content again
         contentString = element[getAttribute](dataContent);
-  
+
         popover = DOC[createElement](div);
-  
+
         // popover arrow
         var popoverArrow = DOC[createElement](div);
         popoverArrow[setAttribute](classString,'arrow');
         popover[appendChild](popoverArrow);
-  
+
         if ( contentString !== null && self[template] === null ) { //create the popover from data attributes
-  
+
           popover[setAttribute]('role','tooltip');
-  
+
           if (titleString !== null) {
             var popoverTitle = DOC[createElement]('h3');
             popoverTitle[setAttribute](classString,component+'-header');
-  
+
             popoverTitle[innerHTML] = self[dismissible] ? titleString + closeBtn : titleString;
             popover[appendChild](popoverTitle);
           }
-  
+
           //set popover content
           var popoverContent = DOC[createElement](div);
           popoverContent[setAttribute](classString,component+'-body');
           popoverContent[innerHTML] = self[dismissible] && titleString === null ? contentString + closeBtn : contentString;
           popover[appendChild](popoverContent);
-  
+
         } else {  // or create the popover from template
           var popoverTemplate = DOC[createElement](div);
           popoverTemplate[innerHTML] = self[template];
           popover[innerHTML] = popoverTemplate.firstChild[innerHTML];
         }
-  
+
         //append to the container
         self[container][appendChild](popover);
         popover[style].display = 'block';
@@ -10166,16 +10166,16 @@ function fromByteArray (uint8) {
       updatePopover = function() {
         styleTip(element,popover,placementSetting,self[container]);
       },
-  
+
       // event toggle
       dismissHandlerToggle = function(type){
         if (clickEvent == self[trigger] || 'focus' == self[trigger]) {
           !self[dismissible] && type( element, 'blur', self.hide );
         }
-        self[dismissible] && type( DOC, clickEvent, dismissibleHandler );     
+        self[dismissible] && type( DOC, clickEvent, dismissibleHandler );
         type( globalObject, resizeEvent, self.hide );
       },
-  
+
       // triggers
       showTrigger = function() {
         dismissHandlerToggle(on);
@@ -10186,10 +10186,10 @@ function fromByteArray (uint8) {
         removePopover();
         bootstrapCustomEvent.call(element, hiddenEvent, component);
       };
-  
+
     // public methods / handlers
     this.toggle = function() {
-      if (popover === null) { self.show(); } 
+      if (popover === null) { self.show(); }
       else { self.hide(); }
     };
     this.show = function() {
@@ -10215,7 +10215,7 @@ function fromByteArray (uint8) {
         }
       }, self[delay] );
     };
-  
+
     // init
     if ( !(stringPopover in element) ) { // prevent adding event handlers twice
       if (self[trigger] === hoverEvent) {
@@ -10227,48 +10227,48 @@ function fromByteArray (uint8) {
     }
     element[stringPopover] = self;
   };
-  
+
   // POPOVER DATA API
   // ================
   supports[push]( [ stringPopover, Popover, '['+dataToggle+'="popover"]' ] );
-  
-  
+
+
   /* Native Javascript for Bootstrap 4 | ScrollSpy
   -----------------------------------------------*/
-  
+
   // SCROLLSPY DEFINITION
   // ====================
   var ScrollSpy = function(element, options) {
-  
+
     // initialization element, the element we spy on
-    element = queryElement(element); 
-  
+    element = queryElement(element);
+
     // DATA API
     var targetData = queryElement(element[getAttribute](dataTarget)),
         offsetData = element[getAttribute]('data-offset');
-  
+
     // set options
     options = options || {};
     if ( !options[target] && !targetData ) { return; } // invalidate
-  
+
     // event targets, constants
     var self = this, spyTarget = options[target] && queryElement(options[target]) || targetData,
         links = spyTarget && spyTarget[getElementsByTagName]('A'),
-        offset = parseInt(offsetData || options['offset']) || 10,      
+        offset = parseInt(offsetData || options['offset']) || 10,
         items = [], targetItems = [], scrollOffset,
         scrollTarget = element[offsetHeight] < element[scrollHeight] ? element : globalObject, // determine which is the real scrollTarget
-        isWindow = scrollTarget === globalObject;  
-  
+        isWindow = scrollTarget === globalObject;
+
     // populate items and targets
     for (var i=0, il=links[length]; i<il; i++) {
-      var href = links[i][getAttribute]('href'), 
+      var href = links[i][getAttribute]('href'),
           targetItem = href && href.charAt(0) === '#' && href.slice(-1) !== '#' && queryElement(href);
       if ( !!targetItem ) {
         items[push](links[i]);
         targetItems[push](targetItem);
       }
     }
-  
+
     // private methods
     var updateItem = function(index) {
         var item = items[index],
@@ -10276,14 +10276,14 @@ function fromByteArray (uint8) {
           dropdown = item[parentNode][parentNode],
           dropdownLink = hasClass(dropdown,'dropdown') && dropdown[getElementsByTagName]('A')[0],
           targetRect = isWindow && targetItem[getBoundingClientRect](),
-  
+
           isActive = hasClass(item,active) || false,
-  
+
           topEdge = (isWindow ? targetRect[top] + scrollOffset : targetItem[offsetTop]) - offset,
           bottomEdge = isWindow ? targetRect[bottom] + scrollOffset - offset : targetItems[index+1] ? targetItems[index+1][offsetTop] - offset : element[scrollHeight],
-  
+
           inside = scrollOffset >= topEdge && bottomEdge > scrollOffset;
-  
+
         if ( !isActive && inside ) {
           if ( !hasClass(item,active) ) {
             addClass(item,active);
@@ -10309,53 +10309,53 @@ function fromByteArray (uint8) {
           updateItem(index)
         }
       };
-  
+
     // public method
     this.refresh = function () {
       updateItems();
     }
-  
+
     // init
     if ( !(stringScrollSpy in element) ) { // prevent adding event handlers twice
       on( scrollTarget, scrollEvent, self.refresh );
-      on( globalObject, resizeEvent, self.refresh ); 
+      on( globalObject, resizeEvent, self.refresh );
     }
     self.refresh();
     element[stringScrollSpy] = self;
   };
-  
+
   // SCROLLSPY DATA API
   // ==================
   supports[push]( [ stringScrollSpy, ScrollSpy, '['+dataSpy+'="scroll"]' ] );
-  
-  
+
+
   /* Native Javascript for Bootstrap 4 | Tab
   -----------------------------------------*/
-  
+
   // TAB DEFINITION
   // ==============
   var Tab = function( element, options ) {
-  
+
     // initialization element
     element = queryElement(element);
-  
+
     // DATA API
     var heightData = element[getAttribute](dataHeight),
-      
+
         // strings
         component = 'tab', height = 'height', float = 'float', isAnimating = 'isAnimating';
-        
+
     // set options
     options = options || {};
     this[height] = supportTransitions ? (options[height] || heightData === 'true') : false;
-  
+
     // bind, event targets
     var self = this, next,
       tabs = getClosest(element,'.nav'),
       tabsContentContainer = false,
       dropdown = tabs && queryElement('.dropdown-toggle',tabs),
       activeTab, activeContent, nextContent, containerHeight, equalContents, nextHeight,
-      
+
       // trigger
       triggerEnd = function(){
         tabsContentContainer[style][height] = '';
@@ -10374,23 +10374,23 @@ function fromByteArray (uint8) {
             },50);
           }
         } else {
-          tabs[isAnimating] = false; 
+          tabs[isAnimating] = false;
         }
         bootstrapCustomEvent.call(next, shownEvent, component, activeTab);
       },
       triggerHide = function() {
         if (tabsContentContainer) {
           activeContent[style][float] = left;
-          nextContent[style][float] = left;        
+          nextContent[style][float] = left;
           containerHeight = activeContent[scrollHeight];
         }
-          
+
         addClass(nextContent,active);
         bootstrapCustomEvent.call(next, showEvent, component, activeTab);
-  
+
         removeClass(activeContent,active);
         bootstrapCustomEvent.call(activeTab, hiddenEvent, component, next);
-        
+
         if (tabsContentContainer) {
           nextHeight = nextContent[scrollHeight];
           equalContents = nextHeight === containerHeight;
@@ -10400,20 +10400,20 @@ function fromByteArray (uint8) {
           activeContent[style][float] = '';
           nextContent[style][float] = '';
         }
-  
+
         if ( hasClass(nextContent, 'fade') ) {
           setTimeout(function(){
             addClass(nextContent,showClass);
             emulateTransitionEnd(nextContent,triggerShow);
           },20);
-        } else { triggerShow(); }        
+        } else { triggerShow(); }
       };
-  
+
     if (!tabs) return; // invalidate
-  
+
     // set default animation state
-    tabs[isAnimating] = false;    
-          
+    tabs[isAnimating] = false;
+
     // private methods
     var getActiveTab = function() {
         var activeTabs = getElementsByClassName(tabs,active), activeTab;
@@ -10427,7 +10427,7 @@ function fromByteArray (uint8) {
       getActiveContent = function() {
         return queryElement(getActiveTab()[getAttribute]('href'));
       },
-      // handler 
+      // handler
       clickHandler = function(e) {
         var href = e[target][getAttribute]('href');
         e[preventDefault]();
@@ -10435,18 +10435,18 @@ function fromByteArray (uint8) {
              ? e[target] : e[target][parentNode]; // allow for child elements like icons to use the handler
         !tabs[isAnimating] && !hasClass(next,active) && self.show();
       };
-  
+
     // public method
     this.show = function() { // the tab we clicked is now the next tab
       next = next || element;
       nextContent = queryElement(next[getAttribute]('href')); //this is the actual object, the next tab content to activate
-      activeTab = getActiveTab(); 
+      activeTab = getActiveTab();
       activeContent = getActiveContent();
-      
+
       tabs[isAnimating] = true;
       removeClass(activeTab,active);
       addClass(next,active);
-  
+
       if ( dropdown ) {
         if ( !hasClass(element[parentNode],'dropdown-menu') ) {
           if (hasClass(dropdown,active)) removeClass(dropdown,active);
@@ -10454,15 +10454,15 @@ function fromByteArray (uint8) {
           if (!hasClass(dropdown,active)) addClass(dropdown,active);
         }
       }
-      
+
       bootstrapCustomEvent.call(activeTab, hideEvent, component, next);
-  
+
       if (hasClass(activeContent, 'fade')) {
         removeClass(activeContent,showClass);
         emulateTransitionEnd(activeContent, triggerHide);
       } else { triggerHide(); }
     };
-  
+
     // init
     if ( !(stringTab in element) ) { // prevent adding event handlers twice
       on(element, clickEvent, clickHandler);
@@ -10470,65 +10470,65 @@ function fromByteArray (uint8) {
     if (self[height]) { tabsContentContainer = getActiveContent()[parentNode]; }
     element[stringTab] = self;
   };
-  
+
   // TAB DATA API
   // ============
   supports[push]( [ stringTab, Tab, '['+dataToggle+'="tab"]' ] );
-  
-  
+
+
   /* Native Javascript for Bootstrap 4 | Tooltip
   ---------------------------------------------*/
-  
+
   // TOOLTIP DEFINITION
   // ==================
   var Tooltip = function( element,options ) {
-  
+
     // initialization element
     element = queryElement(element);
-  
+
     // set options
     options = options || {};
-  
+
     // DATA API
     var animationData = element[getAttribute](dataAnimation),
         placementData = element[getAttribute](dataPlacement),
         delayData = element[getAttribute](dataDelay),
         containerData = element[getAttribute](dataContainer),
-        
+
         // strings
         component = 'tooltip',
         classString = 'class',
         title = 'title',
         fade = 'fade',
         div = 'div',
-  
+
         // check container
         containerElement = queryElement(options[container]),
-        containerDataElement = queryElement(containerData),      
-  
+        containerDataElement = queryElement(containerData),
+
         // maybe the element is inside a modal
         modal = getClosest(element,'.modal'),
-        
+
         // maybe the element is inside a fixed navbar
         navbarFixedTop = getClosest(element,'.'+fixedTop),
         navbarFixedBottom = getClosest(element,'.'+fixedBottom);
-  
+
     // set instance options
     this[animation] = options[animation] && options[animation] !== fade ? options[animation] : animationData || fade;
     this[placement] = options[placement] ? options[placement] : placementData || top;
     this[delay] = parseInt(options[delay] || delayData) || 200;
-    this[container] = containerElement ? containerElement 
+    this[container] = containerElement ? containerElement
                     : containerDataElement ? containerDataElement
                     : navbarFixedTop ? navbarFixedTop
                     : navbarFixedBottom ? navbarFixedBottom
                     : modal ? modal : DOC[body];
-  
+
     // bind, event targets, title and constants
     var self = this, timer = 0, placementSetting = this[placement], tooltip = null,
       titleString = element[getAttribute](title) || element[getAttribute](dataTitle) || element[getAttribute](dataOriginalTitle);
-  
+
     if ( !titleString || titleString == "" ) return; // invalidate
-  
+
     // private methods
     var removeToolTip = function() {
         self[container].removeChild(tooltip);
@@ -10539,17 +10539,17 @@ function fromByteArray (uint8) {
         if ( !titleString || titleString == "" ) return false; // invalidate
         tooltip = DOC[createElement](div);
         tooltip[setAttribute]('role',component);
-  
+
         // tooltip arrow
         var tooltipArrow = DOC[createElement](div);
         tooltipArrow[setAttribute](classString,'arrow');
         tooltip[appendChild](tooltipArrow);
-    
+
         var tooltipInner = DOC[createElement](div);
         tooltipInner[setAttribute](classString,component+'-inner');
         tooltip[appendChild](tooltipInner);
         tooltipInner[innerHTML] = titleString;
-  
+
         self[container][appendChild](tooltip);
         tooltip[setAttribute](classString, component + ' bs-' + component+'-'+placementSetting + ' ' + self[animation]);
       },
@@ -10569,7 +10569,7 @@ function fromByteArray (uint8) {
         removeToolTip();
         bootstrapCustomEvent.call(element, hiddenEvent, component);
       };
-  
+
     // public methods
     this.show = function() {
       clearTimeout(timer);
@@ -10595,10 +10595,10 @@ function fromByteArray (uint8) {
       }, self[delay]);
     };
     this.toggle = function() {
-      if (!tooltip) { self.show(); } 
+      if (!tooltip) { self.show(); }
       else { self.hide(); }
     };
-  
+
     // init
     if ( !(stringTooltip in element) ) { // prevent adding event handlers twice
       element[setAttribute](dataOriginalTitle,titleString);
@@ -10608,13 +10608,13 @@ function fromByteArray (uint8) {
     }
     element[stringTooltip] = self;
   };
-  
+
   // TOOLTIP DATA API
   // =================
   supports[push]( [ stringTooltip, Tooltip, '['+dataToggle+'="tooltip"]' ] );
-  
-  
-  
+
+
+
   /* Native Javascript for Bootstrap 4 | Initialize Data API
   --------------------------------------------------------*/
   var initializeDataAPI = function( constructor, collection ){
@@ -10628,10 +10628,10 @@ function fromByteArray (uint8) {
         initializeDataAPI( supports[i][1], lookUp[querySelectorAll] (supports[i][2]) );
       }
     };
-  
+
   // bulk initialize all components
   DOC[body] ? initCallback() : on( DOC, 'DOMContentLoaded', function(){ initCallback(); } );
-  
+
   return {
     Alert: Alert,
     Button: Button,
@@ -21114,9 +21114,9 @@ var Promise$2 = function () {
   /**
     `finally` will be invoked regardless of the promise's fate just as native
     try/catch/finally behaves
-  
+
     Synchronous example:
-  
+
     ```js
     findAuthor() {
       if (Math.random() > 0.5) {
@@ -21124,7 +21124,7 @@ var Promise$2 = function () {
       }
       return new Author();
     }
-  
+
     try {
       return findAuthor(); // succeed or fail
     } catch(error) {
@@ -21134,9 +21134,9 @@ var Promise$2 = function () {
       // doesn't affect the return value
     }
     ```
-  
+
     Asynchronous example:
-  
+
     ```js
     findAuthor().catch(function(reason){
       return findOtherAuther();
@@ -21144,7 +21144,7 @@ var Promise$2 = function () {
       // author was either found, or not
     });
     ```
-  
+
     @method finally
     @param {Function} callback
     @return {Promise}
@@ -51600,7 +51600,7 @@ module.exports = function privateDecrypt(private_key, enc, reverse) {
   } else {
     padding = 4;
   }
-  
+
   var key = parseKeys(private_key);
   var k = key.modulus.byteLength();
   if (enc.length > k || new bn(enc).cmp(key.modulus) >= 0) {
@@ -69186,13 +69186,13 @@ Script.prototype.runInContext = function (context) {
     if (!(context instanceof Context)) {
         throw new TypeError("needs a 'context' argument.");
     }
-    
+
     var iframe = document.createElement('iframe');
     if (!iframe.style) iframe.style = {};
     iframe.style.display = 'none';
-    
+
     document.body.appendChild(iframe);
-    
+
     var win = iframe.contentWindow;
     var wEval = win.eval, wExecScript = win.execScript;
 
@@ -69201,7 +69201,7 @@ Script.prototype.runInContext = function (context) {
         wExecScript.call(win, 'null');
         wEval = win.eval;
     }
-    
+
     forEach(Object_keys(context), function (key) {
         win[key] = context[key];
     });
@@ -69210,11 +69210,11 @@ Script.prototype.runInContext = function (context) {
             win[key] = context[key];
         }
     });
-    
+
     var winKeys = Object_keys(win);
 
     var res = wEval.call(win, this.code);
-    
+
     forEach(Object_keys(win), function (key) {
         // Avoid copying circular objects like `top` and `window` by only
         // updating existing context properties or new properties in the `win`
@@ -69229,9 +69229,9 @@ Script.prototype.runInContext = function (context) {
             defineProp(context, key, win[key]);
         }
     });
-    
+
     document.body.removeChild(iframe);
-    
+
     return res;
 };
 
@@ -75402,7 +75402,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       initialize() {
         const countDownModel = new _converse.MessageCountDown({
           msgid: this.model.get('msgid'),
-          expiration: new Date(this.model.get('sent') * 1000).getTime() + parseInt(this.model.get('time_to_read')) * 1000
+          expiration: new Date(this.model.get('time')).getTime() + parseInt(this.model.get('time_to_read')) * 1000
         });
         this.countDown = new _converse.MessageCountDownView({
           'model': countDownModel
@@ -75413,13 +75413,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         }
 
         this.model.on('change', this.onChanged, this);
-        this.model.on('destroy', () => {
-          if (this.countDown) {
-            this.countDown.destroy();
-          }
-
-          this.remove();
-        }, this);
+        this.model.on('destroy', this.remove, this);
 
         _converse.on('rerenderMessage', this.render, this);
       },
@@ -75452,7 +75446,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         }
 
         var countDownEl = this.el.querySelector('.chat-msg__count_down');
-        countDownEl.replaceWith(this.countDown.render());
+        if (countDownEl) {
+          countDownEl.replaceWith(this.countDown.render());
+        }
         return this.el;
       },
 
@@ -75508,10 +75504,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
               moment_time = moment(this.model.get('time')),
               role = this.model.vcard ? this.model.vcard.get('role') : null,
               roles = role ? role.split(',') : [];
-
         if (this.model.get('time_to_read')) {
-          if (this.model.get('sent')) {
-            const expiration = new Date(this.model.get('sent') * 1000).getTime() + parseInt(this.model.get('time_to_read')) * 1000;
+          if (this.model.get('time')) {
+            const expiration = new Date(this.model.get('time')).getTime() + parseInt(this.model.get('time_to_read')) * 1000;
 
             if (expiration - new Date().getTime() <= 0) {
               this.model.destroy();
@@ -84864,8 +84859,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           'to': this.get('jid'),
           'type': this.get('message_type'),
           'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid'),
-          'sent': sentDate,
-          'time_to_read': timeToRead
+          // 'sent': sentDate,
+          // 'time_to_read': timeToRead
         }).c('body').t(body).up().c(_converse.ACTIVE, {
           'xmlns': Strophe.NS.CHATSTATES
         }).up();
@@ -85096,7 +85091,10 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         const archive = sizzle(`result[xmlns="${Strophe.NS.MAM}"]`, original_stanza).pop(),
               spoiler = sizzle(`spoiler[xmlns="${Strophe.NS.SPOILER}"]`, original_stanza).pop(),
               delay = sizzle(`delay[xmlns="${Strophe.NS.DELAY}"]`, original_stanza).pop(),
-              chat_state = stanza.getElementsByTagName(_converse.COMPOSING).length && _converse.COMPOSING || stanza.getElementsByTagName(_converse.PAUSED).length && _converse.PAUSED || stanza.getElementsByTagName(_converse.INACTIVE).length && _converse.INACTIVE || stanza.getElementsByTagName(_converse.ACTIVE).length && _converse.ACTIVE || stanza.getElementsByTagName(_converse.GONE).length && _converse.GONE;
+              chat_state = stanza.getElementsByTagName(_converse.COMPOSING).length && _converse.COMPOSING || stanza.getElementsByTagName(_converse.PAUSED).length && _converse.PAUSED || stanza.getElementsByTagName(_converse.INACTIVE).length && _converse.INACTIVE || stanza.getElementsByTagName(_converse.ACTIVE).length && _converse.ACTIVE || stanza.getElementsByTagName(_converse.GONE).length && _converse.GONE,
+              sendDate = stanza.querySelector('sentDate') && stanza.querySelector('sentDate').innerHTML ?
+                          moment(stanza.querySelector('sentDate').innerHTML * 1000).format() :
+                          moment().format();
 
         const attrs = {
           'chat_state': chat_state,
@@ -85106,10 +85104,10 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           'message': _converse.chatboxes.getMessageBody(stanza) || undefined,
           'references': this.getReferencesFromStanza(stanza),
           'msgid': stanza.getAttribute('id'),
-          'time': delay ? delay.getAttribute('stamp') : stanza.getAttribute('sent') ? moment(stanza.getAttribute('sent') * 1000).format() : moment().format(),
-          'time_to_read': stanza.getAttribute('time_to_read'),
+          'time': delay ? delay.getAttribute('stamp') : sendDate,
+          'sent': sendDate,
+          'time_to_read': stanza.querySelector('timeToRead') ? stanza.querySelector('timeToRead').innerHTML : 84000,
           'type': stanza.getAttribute('type'),
-          'sent': stanza.getAttribute('sent')
         };
 
         if (attrs.type === 'groupchat') {
@@ -85159,7 +85157,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           } else {
             const newPagemeMessage = {
               body: attrs.message,
-              sentDate: attrs.sent,
               stanza: message
             };
 
@@ -85174,7 +85171,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
             if (!_converse.pagemeMessages) {
               _converse.pagemeMessages = [];
             }
-
             _converse.pagemeMessages.push(newPagemeMessage);
 
             delete attrs.message;
@@ -85244,6 +85240,14 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           this.onMessage(stanza);
           return true;
         }, null, 'message', 'chat');
+        //special case for ios receipt
+        _converse.connection.addHandler(stanza => {
+          const receipt = sizzle(`received[xmlns="${Strophe.NS.RECEIPTS}"]`, stanza).pop();
+          if (receipt) {
+            this.onMessage(stanza);
+          }
+          return true;
+        }, null, 'message', null);
 
         _converse.connection.addHandler(stanza => {
           this.onErrorMessage(stanza);
@@ -85414,8 +85418,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
 
         };
         const has_body = sizzle(`body, encrypted[xmlns="${Strophe.NS.OMEMO}"]`).length > 0;
-        const chatbox = this.getChatBox(contact_jid, attrs, has_body);
 
+        const chatbox = this.getChatBox(contact_jid, attrs, has_body);
         if (chatbox && !chatbox.handleMessageCorrection(stanza) && !chatbox.handleReceipt(stanza)) {
           const msgid = stanza.getAttribute('id'),
                 message = msgid && chatbox.messages.findWhere({
@@ -85427,7 +85431,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
             chatbox.createMessage(stanza, original_stanza).then(msg => chatbox.incrementUnreadMsgCounter(msg)).catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
           }
         }
-
         _converse.emit('message', {
           'stanza': original_stanza,
           'chatbox': chatbox
