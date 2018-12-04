@@ -72590,6 +72590,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       },
 
       render() {
+        console.log(_.cloneDeep(this.model.vcard));
         this.el.innerHTML = templates_chatbox_head_html__WEBPACK_IMPORTED_MODULE_8___default()(_.extend(this.model.vcard.toJSON(), this.model.toJSON(), {
           '_converse': _converse,
           'info_close': __('Close this chat box')
@@ -73800,6 +73801,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
       _converse.chatboxes.on('add', item => {
         if (!that.get(item.get('id')) && item.get('type') === _converse.PRIVATE_CHAT_TYPE) {
+          console.log(_.cloneDeep(item.vcard));
           that.add(item.get('id'), new _converse.ChatBoxView({
             model: item
           }));
@@ -75424,7 +75426,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       initialize() {
         const countDownModel = new _converse.MessageCountDown({
           msgid: this.model.get('msgid'),
-          expiration: new Date(this.model.get('sent') * 1000).getTime() + parseInt(this.model.get('time_to_read')) * 1000
+          expiration: new Date(this.model.get('time')).getTime() + parseInt(this.model.get('time_to_read')) * 1000
         });
         this.countDown = new _converse.MessageCountDownView({
           'model': countDownModel
@@ -75435,13 +75437,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         }
 
         this.model.on('change', this.onChanged, this);
-        this.model.on('destroy', () => {
-          if (this.countDown) {
-            this.countDown.destroy();
-          }
-
-          this.remove();
-        }, this);
+        this.model.on('destroy', this.remove, this);
 
         _converse.on('rerenderMessage', this.render, this);
       },
@@ -84898,9 +84894,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           'from': _converse.connection.jid,
           'to': this.get('jid'),
           'type': this.get('message_type'),
-          'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid'),
-          'sent': sentDate,
-          'time_to_read': timeToRead
+          'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid')
         }).c('body').t(body).up().c(_converse.ACTIVE, {
           'xmlns': Strophe.NS.CHATSTATES
         }).up();
@@ -85131,8 +85125,10 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         const archive = sizzle(`result[xmlns="${Strophe.NS.MAM}"]`, original_stanza).pop(),
               spoiler = sizzle(`spoiler[xmlns="${Strophe.NS.SPOILER}"]`, original_stanza).pop(),
               delay = sizzle(`delay[xmlns="${Strophe.NS.DELAY}"]`, original_stanza).pop(),
-              chat_state = stanza.getElementsByTagName(_converse.COMPOSING).length && _converse.COMPOSING || stanza.getElementsByTagName(_converse.PAUSED).length && _converse.PAUSED || stanza.getElementsByTagName(_converse.INACTIVE).length && _converse.INACTIVE || stanza.getElementsByTagName(_converse.ACTIVE).length && _converse.ACTIVE || stanza.getElementsByTagName(_converse.GONE).length && _converse.GONE;
+              chat_state = stanza.getElementsByTagName(_converse.COMPOSING).length && _converse.COMPOSING || stanza.getElementsByTagName(_converse.PAUSED).length && _converse.PAUSED || stanza.getElementsByTagName(_converse.INACTIVE).length && _converse.INACTIVE || stanza.getElementsByTagName(_converse.ACTIVE).length && _converse.ACTIVE || stanza.getElementsByTagName(_converse.GONE).length && _converse.GONE,
+              sendDate = stanza.querySelector('sentDate') && stanza.querySelector('sentDate').innerHTML ? moment(stanza.querySelector('sentDate').innerHTML * 1000).format() : moment().format();
 
+        ;
         const attrs = {
           'chat_state': chat_state,
           'is_archived': !_.isNil(archive),
@@ -85141,10 +85137,10 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           'message': _converse.chatboxes.getMessageBody(stanza) || undefined,
           'references': this.getReferencesFromStanza(stanza),
           'msgid': stanza.getAttribute('id'),
-          'time': delay ? delay.getAttribute('stamp') : stanza.getAttribute('sent') ? moment(stanza.getAttribute('sent') * 1000).format() : moment().format(),
-          'time_to_read': stanza.getAttribute('time_to_read'),
-          'type': stanza.getAttribute('type'),
-          'sent': stanza.getAttribute('sent')
+          'time': delay ? delay.getAttribute('stamp') : sendDate,
+          'time_to_read': stanza.querySelector('timeToRead') ? stanza.querySelector('timeToRead').innerHTML : 84000,
+          'sent': sendDate,
+          'type': stanza.getAttribute('type')
         };
 
         if (attrs.type === 'groupchat') {
@@ -85194,7 +85190,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           } else {
             const newPagemeMessage = {
               body: attrs.message,
-              sentDate: attrs.sent,
               stanza: message
             };
 
@@ -85278,7 +85273,18 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         _converse.connection.addHandler(stanza => {
           this.onMessage(stanza);
           return true;
-        }, null, 'message', 'chat');
+        }, null, 'message', 'chat'); //special case for ios receipt
+
+
+        _converse.connection.addHandler(stanza => {
+          const receipt = sizzle(`received[xmlns="${Strophe.NS.RECEIPTS}"]`, stanza).pop();
+
+          if (receipt) {
+            this.onMessage(stanza);
+          }
+
+          return true;
+        }, null, 'message', null);
 
         _converse.connection.addHandler(stanza => {
           this.onErrorMessage(stanza);
@@ -86099,21 +86105,21 @@ function initClientConfig() {
 _converse.initConnection = function () {
   /* Creates a new Strophe.Connection instance if we don't already have one.
    */
-  if (!_converse.connection) {
-    if (!_converse.bosh_service_url && !_converse.websocket_url) {
-      throw new Error("initConnection: you must supply a value for either the bosh_service_url or websocket_url or both.");
-    }
-
-    if (('WebSocket' in window || 'MozWebSocket' in window) && _converse.websocket_url) {
-      _converse.connection = new strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].Connection(_converse.websocket_url, _converse.connection_options);
-    } else if (_converse.bosh_service_url) {
-      _converse.connection = new strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].Connection(_converse.bosh_service_url, _lodash_noconflict__WEBPACK_IMPORTED_MODULE_4___default.a.assignIn(_converse.connection_options, {
-        'keepalive': _converse.keepalive
-      }));
-    } else {
-      throw new Error("initConnection: this browser does not support websockets and bosh_service_url wasn't specified.");
-    }
+  // if (!_converse.connection) {
+  if (!_converse.bosh_service_url && !_converse.websocket_url) {
+    throw new Error("initConnection: you must supply a value for either the bosh_service_url or websocket_url or both.");
   }
+
+  if (('WebSocket' in window || 'MozWebSocket' in window) && _converse.websocket_url) {
+    _converse.connection = new strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].Connection(_converse.websocket_url, _converse.connection_options);
+  } else if (_converse.bosh_service_url) {
+    _converse.connection = new strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].Connection(_converse.bosh_service_url, _lodash_noconflict__WEBPACK_IMPORTED_MODULE_4___default.a.assignIn(_converse.connection_options, {
+      'keepalive': _converse.keepalive
+    }));
+  } else {
+    throw new Error("initConnection: this browser does not support websockets and bosh_service_url wasn't specified.");
+  } // }
+
 
   _converse.emit('connectionInitialized');
 };
@@ -87567,7 +87573,7 @@ const converse = {
   },
 
   'onLogOut'(callback) {
-    return _converse.api.listen.on('logout', () => {
+    return _converse.on('disconnected', () => {
       callback();
     });
   },
@@ -92400,6 +92406,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins.add('converse-vca
          */
         'update'(model, force) {
           return this.get(model, force).then(vcard => {
+            console.log(model);
             delete vcard['stanza'];
             model.save(vcard);
           });
@@ -116449,7 +116456,7 @@ module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 __p += '<!-- src/templates/chatbox_head.html -->\n<div class="chat-head chat-head-chatbox row no-gutters">\n    <div class="chatbox-navback"><i class="fa fa-arrow-left"></i></div>\n    <div class="chatbox-title">\n        <div class="row no-gutters">\n            <canvas class="avatar" height="36" width="36"></canvas>\n            <div class="col chat-title" title="' +
-__e(o.nickname || o.fullname || 'Loading...') +
+__e(o.nickname || o.fullname) +
 '">\n                ';
  if (o.url) { ;
 __p += '\n                    <a href="' +
@@ -118287,9 +118294,9 @@ var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 __p += '<!-- src/templates/profile_view.html -->\n<div class="userinfo controlbox-padded">\n<div class="controlbox-section profile d-flex">\n    <a class="show-profile" href="#">\n        <canvas class="avatar align-self-center" height="40" width="40"></canvas>\n    </a>\n    <span class="username w-100 align-self-center">' +
 __e(o.fullname) +
-'</span>\n    <a class="controlbox-heading__btn show-client-info fa fa-info-circle align-self-center" title="' +
+'</span>\n    <!-- <a class="controlbox-heading__btn show-client-info fa fa-info-circle align-self-center" title="' +
 __e(o.info_details) +
-'"></a>\n    ';
+'"></a> -->\n    ';
  if (o._converse.allow_logout) { ;
 __p += '\n        <a class="controlbox-heading__btn logout fa fa-sign-out-alt align-self-center" title="' +
 __e(o.title_log_out) +
@@ -118774,9 +118781,9 @@ var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 __p += '<!-- src/templates/roster.html -->\n<div class="d-flex controlbox-padded">\n    <span class="w-100 controlbox-heading">' +
 __e(o.heading_contacts) +
-'</span>\n    <a class="controlbox-heading__btn sync-contacts fa fa-sync" title="' +
+'</span>\n    <!-- <a class="controlbox-heading__btn sync-contacts fa fa-sync" title="' +
 __e(o.title_sync_contacts) +
-'"></a>\n    ';
+'"></a> -->\n    ';
  if (o.allow_contact_requests) { ;
 __p += '\n        <a class="controlbox-heading__btn add-contact fa fa-user-plus"\n           title="' +
 __e(o.title_add_contact) +

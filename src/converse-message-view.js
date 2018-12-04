@@ -96,19 +96,14 @@ converse.plugins.add('converse-message-view', {
             initialize () {
                 const countDownModel = new _converse.MessageCountDown({
                   msgid: this.model.get('msgid'),
-                  expiration: (new Date(this.model.get('sent')*1000)).getTime() + parseInt(this.model.get('time_to_read'))*1000
+                  expiration: new Date(this.model.get('time')).getTime() + parseInt(this.model.get('time_to_read')) * 1000
                 });
                 this.countDown = new _converse.MessageCountDownView({'model': countDownModel});
                 if (this.model.vcard) {
                     this.model.vcard.on('change', this.render, this);
                 }
                 this.model.on('change', this.onChanged, this);
-                this.model.on('destroy', () => {
-                  if (this.countDown) {
-                    this.countDown.destroy();
-                  }
-                  this.remove();
-                }, this);
+                this.model.on('destroy', this.remove, this);
                 _converse.on('rerenderMessage', this.render, this);
             },
 
@@ -135,7 +130,9 @@ converse.plugins.add('converse-message-view', {
                     u.addClass('chat-msg--followup', this.el);
                 }
                 var countDownEl = this.el.querySelector('.chat-msg__count_down');
-                countDownEl.replaceWith(this.countDown.render());
+                if (countDownEl) {
+                    countDownEl.replaceWith(this.countDown.render());
+                }
                 return this.el;
             },
 
@@ -189,8 +186,8 @@ converse.plugins.add('converse-message-view', {
 
 
                 if (this.model.get('time_to_read')) {
-                  if (this.model.get('sent')) {
-                    const expiration = (new Date(this.model.get('sent')*1000)).getTime() + parseInt(this.model.get('time_to_read'))*1000;
+                  if (this.model.get('time')) {
+                    const expiration = new Date(this.model.get('time')).getTime() + parseInt(this.model.get('time_to_read')) * 1000;
                     if (expiration - (new Date()).getTime() <= 0) {
                       this.model.destroy();
                       return;

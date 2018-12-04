@@ -377,7 +377,7 @@ function initClientConfig () {
 _converse.initConnection = function () {
     /* Creates a new Strophe.Connection instance if we don't already have one.
      */
-    if (!_converse.connection) {
+    // if (!_converse.connection) {
         if (!_converse.bosh_service_url && ! _converse.websocket_url) {
             throw new Error("initConnection: you must supply a value for either the bosh_service_url or websocket_url or both.");
         }
@@ -391,7 +391,7 @@ _converse.initConnection = function () {
         } else {
             throw new Error("initConnection: this browser does not support websockets and bosh_service_url wasn't specified.");
         }
-    }
+    // }
     _converse.emit('connectionInitialized');
 }
 
@@ -1719,9 +1719,8 @@ const converse = {
       });
     },
     'onLogOut' (callback) {
-      return _converse.api.listen.on('logout', () => {
+      return _converse.on('disconnected', () => {
         callback();
-
       });
     },
     'onOpenChat' (callback) {
