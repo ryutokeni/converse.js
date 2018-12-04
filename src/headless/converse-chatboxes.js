@@ -333,9 +333,7 @@ converse.plugins.add('converse-chatboxes', {
                         'from': _converse.connection.jid,
                         'to': this.get('jid'),
                         'type': this.get('message_type'),
-                        'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid'),
-                        'sent': sentDate,
-                        'time_to_read': timeToRead
+                        'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid')
                     }).c('body').t(body).up()
                       .c(_converse.ACTIVE, {'xmlns': Strophe.NS.CHATSTATES}).up();
                 if (message.get('type') === 'chat') {
@@ -546,7 +544,10 @@ converse.plugins.add('converse-chatboxes', {
                             stanza.getElementsByTagName(_converse.PAUSED).length && _converse.PAUSED ||
                             stanza.getElementsByTagName(_converse.INACTIVE).length && _converse.INACTIVE ||
                             stanza.getElementsByTagName(_converse.ACTIVE).length && _converse.ACTIVE ||
-                            stanza.getElementsByTagName(_converse.GONE).length && _converse.GONE;
+                            stanza.getElementsByTagName(_converse.GONE).length && _converse.GONE,
+                      sendDate = stanza.querySelector('sentDate') && stanza.querySelector('sentDate').innerHTML ?
+                          moment(stanza.querySelector('sentDate').innerHTML * 1000).format() :
+                          moment().format();;
                 const attrs = {
                     'chat_state': chat_state,
                     'is_archived': !_.isNil(archive),
@@ -555,10 +556,10 @@ converse.plugins.add('converse-chatboxes', {
                     'message': _converse.chatboxes.getMessageBody(stanza) || undefined,
                     'references': this.getReferencesFromStanza(stanza),
                     'msgid': stanza.getAttribute('id'),
-                    'time': delay ? delay.getAttribute('stamp') : (stanza.getAttribute('sent') ? moment(stanza.getAttribute('sent')*1000).format() : moment().format()),
-                    'time_to_read': stanza.getAttribute('time_to_read'),
-                    'type': stanza.getAttribute('type'),
-                    'sent': stanza.getAttribute('sent')
+                    'time': delay ? delay.getAttribute('stamp') : sendDate,
+                    'time_to_read': stanza.querySelector('timeToRead') ? stanza.querySelector('timeToRead').innerHTML : 84000,
+                    'sent': sendDate,
+                    'type': stanza.getAttribute('type')
                 };
                 if (attrs.type === 'groupchat') {
                     attrs.from = stanza.getAttribute('from');
@@ -602,7 +603,6 @@ converse.plugins.add('converse-chatboxes', {
                     } else {
                         const newPagemeMessage = {
                           body: attrs.message,
-                          sentDate: attrs.sent,
                           stanza: message
                         };
                         if (
@@ -678,6 +678,14 @@ converse.plugins.add('converse-chatboxes', {
                     this.onMessage(stanza);
                     return true;
                 }, null, 'message', 'chat');
+                //special case for ios receipt
+                _converse.connection.addHandler(stanza => {
+                    const receipt = sizzle(`received[xmlns="${Strophe.NS.RECEIPTS}"]`, stanza).pop();
+                    if (receipt) {
+                      this.onMessage(stanza);
+                    }
+                    return true;
+                }, null, 'message', null);
                 _converse.connection.addHandler((stanza) => {
                     this.onErrorMessage(stanza);
                     return true;

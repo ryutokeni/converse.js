@@ -95,19 +95,14 @@ converse.plugins.add('converse-message-view', {
             initialize () {
                 const countDownModel = new _converse.MessageCountDown({
                   msgid: this.model.get('msgid'),
-                  expiration: (new Date(this.model.get('sent')*1000)).getTime() + parseInt(this.model.get('time_to_read'))*1000
+                  expiration: new Date(this.model.get('time')).getTime() + parseInt(this.model.get('time_to_read')) * 1000
                 });
                 this.countDown = new _converse.MessageCountDownView({'model': countDownModel});
                 if (this.model.vcard) {
                     this.model.vcard.on('change', this.render, this);
                 }
                 this.model.on('change', this.onChanged, this);
-                this.model.on('destroy', () => {
-                  if (this.countDown) {
-                    this.countDown.destroy();
-                  }
-                  this.remove();
-                }, this);
+                this.model.on('destroy', this.remove, this);
                 _converse.on('rerenderMessage', this.render, this);
             },
 
