@@ -35,7 +35,8 @@ converse.plugins.add('converse-message-view', {
         });
 
         _converse.api.promises.add([
-            'rerenderMessage'
+            'rerenderMessage',
+            'message-rendered'
         ]);
 
         _converse.MessageVersionsModal = _converse.BootstrapModal.extend({
@@ -112,6 +113,7 @@ converse.plugins.add('converse-message-view', {
             },
 
             async render (force) {
+                
                 if (this.rendered && !force) {
                   return;
                 }
@@ -243,7 +245,11 @@ converse.plugins.add('converse-message-view', {
                         u.renderNewLines,
                         _.partial(u.addEmoji, _converse, _)
                     )(text);
+                }   
+                if (text !== null) {
+                    _converse.emit('message-rendered')
                 }
+                   
                 const promise = u.renderImageURLs(_converse, msg_content);
                 if (this.model.get('type') !== 'headline') {
                     this.renderAvatar(msg);
@@ -321,6 +327,7 @@ converse.plugins.add('converse-message-view', {
                     return this.model.get('plaintext') ||
                            (_converse.debug ? __('Unencryptable OMEMO message') : null);
                 }
+                
                 return this.model.get('message');
             },
 

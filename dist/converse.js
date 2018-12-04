@@ -72447,7 +72447,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const ut = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].env.utils;
+const uk = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].env.utils;
 const _converse$env = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].env,
       $msg = _converse$env.$msg,
       Backbone = _converse$env.Backbone,
@@ -72739,6 +72739,12 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         _converse.emit('chatBoxOpened', this);
 
         _converse.emit('chatBoxInitialized', this);
+
+        _converse.on('message-rendered-!', () => {
+          const loading = this.el.querySelector('.chat-loading'); //   console.log(loading);
+
+          uk.hideElement(loading);
+        });
       },
 
       initDebounced() {
@@ -72929,7 +72935,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           'success': this.afterMessagesFetched.bind(this),
           'error': this.afterMessagesFetched.bind(this)
         });
-        ut.hideElement(this.el.querySelector('.chat-loading'));
         return this;
       },
 
@@ -73802,6 +73807,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       });
     });
 
+    _converse.on('message-rendered', () => {
+      _converse.trigger('message-rendered-!');
+    });
+
     _converse.on('connected', () => {
       // Advertise that we support XEP-0382 Message Spoilers
       _converse.api.disco.own.features.add(Strophe.NS.SPOILER);
@@ -74138,12 +74147,11 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
         _converse.api.waitUntil('rosterViewTrulyInitial').then(() => {
           const loading = this.el.querySelector('.loading-contact');
-          console.log('rosterview init');
           u.hideElement(loading);
         });
 
         _converse.api.waitUntil('rosterViewInitialized').then(() => {
-          this.controlbox_pane.el.insertAdjacentElement('beforeEnd', _converse.rosterview.el);
+          this.controlbox_pane.el.insertAdjacentElement('beforeEnd', _converse.rosterview.el); // console.log(u.isVisible(this.el.querySelector('#converse-roster')));
         }).catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
       },
 
@@ -75353,7 +75361,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       'show_images_inline': true
     });
 
-    _converse.api.promises.add(['rerenderMessage']);
+    _converse.api.promises.add(['rerenderMessage', 'message-rendered']);
 
     _converse.MessageVersionsModal = _converse.BootstrapModal.extend({
       toHTML() {
@@ -75577,6 +75585,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
             'whiteList': {}
           });
           msg_content.innerHTML = _.flow(_.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].geoUriToHttp, _, _converse.geouri_replacement), _.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].addMentionsMarkup, _, this.model.get('references'), this.model.collection.chatbox), _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].addHyperlinks, _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderNewLines, _.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].addEmoji, _converse, _))(text);
+        }
+
+        if (text !== null) {
+          _converse.emit('message-rendered');
         }
 
         const promise = _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderImageURLs(_converse, msg_content);
@@ -82631,8 +82643,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       sortEvent: 'presenceChanged',
 
       initialize() {
-        const loading = _converse.rosterview.loading_el;
-        u.hideElement(loading);
+        // const loading = _converse.rosterview.loading_el;
+        // u.hideElement(loading);
         Backbone.OrderedListView.prototype.initialize.apply(this, arguments);
         this.model.contacts.on("change:subscription", this.onContactSubscriptionChange, this);
         this.model.contacts.on("change:requesting", this.onContactRequestChange, this);
@@ -82887,8 +82899,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         });
         const form = this.el.querySelector('.roster-filter-form');
         this.el.replaceChild(this.filter_view.render().el, form);
-        this.roster_el = this.el.querySelector('.roster-contacts');
-        this.loading_el = this.el.querySelector('.roster-loading');
+        this.roster_el = this.el.querySelector('.roster-contacts'); //this.loading_el = this.el.querySelector('.roster-loading');
+
         return this;
       },
 
@@ -82904,8 +82916,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
       createRosterFilter() {
         // Create a model on which we can store filter properties
-        _converse.emit('rosterViewTrulyInitial');
-
         const model = new _converse.RosterFilter();
         model.id = b64_sha1(`_converse.rosterfilter${_converse.bare_jid}`);
         model.browserStorage = new Backbone.BrowserStorage.local(this.filter.id);
@@ -82933,6 +82943,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         }
       }, 100),
       update: _.debounce(function () {
+        _converse.emit('rosterViewTrulyInitial');
+
         if (!u.isVisible(this.roster_el)) {
           u.showElement(this.roster_el);
         }
@@ -117155,7 +117167,7 @@ __p += '<!-- src/templates/controlbox.html -->\n<div class="flyout box-flyout">\
  if (!o.sticky_controlbox) { ;
 __p += '\n            <a class="chatbox-btn close-chatbox-button fa fa-times"></a>\n        ';
  } ;
-__p += '\n    </div>\n    <div class="controlbox-panes">\n        <div class="loading-contact">\n            <h3>Loading...</h3>\n        </div>\n    </div>\n    \n</div> \n';
+__p += '\n    </div>\n    <div class="controlbox-panes">\n        <div style="text-align : center; font-size: 20px; padding-top: 20px;" class="loading-contact">\n            <h3>Loading...</h3>\n        </div>\n    </div>\n    \n</div> \n';
 return __p
 };
 
@@ -118770,7 +118782,7 @@ __p += '\n        <a class="controlbox-heading__btn add-contact fa fa-user-plus"
 __e(o.title_add_contact) +
 '"\n           data-toggle="modal"\n           data-target="#add-contact-modal"></a>\n    ';
  } ;
-__p += '\n</div>\n\n<form class="roster-filter-form"></form>\n\n<div class="roster-contacts"></div>\n\n<div style="text-align : center; font-size: 20px; padding-top: 20px;" class="roster-loading">\n        Loading...\n</div>\n';
+__p += '\n</div>\n\n<form class="roster-filter-form"></form>\n\n<div class="roster-contacts"></div>\n\n<!-- <div style="text-align : center; font-size: 20px; padding-top: 20px;" class="roster-loading">\n        Loading...\n</div> -->\n';
 return __p
 };
 

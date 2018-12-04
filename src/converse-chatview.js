@@ -27,8 +27,7 @@ import tpl_toolbar_fileupload from "templates/toolbar_fileupload.html";
 import tpl_user_details_modal from "templates/user_details_modal.html";
 import u from "@converse/headless/utils/emoji";
 import xss from "xss";
-
-const  ut = converse.env.utils;
+const uk = converse.env.utils;
 const { $msg, Backbone, Promise, Strophe, _, b64_sha1, f, sizzle, moment } = converse.env;
 
 
@@ -317,11 +316,17 @@ converse.plugins.add('converse-chatview', {
 
                 this.model.presence.on('change:show', this.onPresenceChanged, this);
                 this.model.on('showHelpMessages', this.showHelpMessages, this);
+                
                 this.render();
-
                 this.fetchMessages();
+               
                 _converse.emit('chatBoxOpened', this);
                 _converse.emit('chatBoxInitialized', this);
+                _converse.on('message-rendered-!', () => {
+                    const loading = this.el.querySelector('.chat-loading');
+                 //   console.log(loading);
+                    uk.hideElement(loading);
+                })
             },
 
             initDebounced () {
@@ -332,6 +337,7 @@ converse.plugins.add('converse-chatview', {
 
             render () {
                 // XXX: Is this still needed?
+
                 this.el.setAttribute('id', this.model.get('box_id'));
                 this.el.innerHTML = tpl_chatbox(
                     _.extend(this.model.toJSON(), {
@@ -497,9 +503,7 @@ converse.plugins.add('converse-chatview', {
                     'success': this.afterMessagesFetched.bind(this),
                     'error': this.afterMessagesFetched.bind(this),
                 });
-                ut.hideElement(this.el.querySelector('.chat-loading'))
                 return this;
-                
             },
 
             insertIntoDOM () {
@@ -800,6 +804,7 @@ converse.plugins.add('converse-chatview', {
                  * Parameters:
                  *    (Object) message - The message Backbone object that was added.
                  */
+
                 this.showMessage(message);
                 if (message.get('correcting')) {
                     this.insertIntoTextArea(message.get('message'), true, true);
@@ -1314,11 +1319,15 @@ converse.plugins.add('converse-chatview', {
                 }
             });
         });
+         _converse.on('message-rendered', () => {
+           _converse.trigger('message-rendered-!');
+         })
 
         _converse.on('connected', () => {
             // Advertise that we support XEP-0382 Message Spoilers
             _converse.api.disco.own.features.add(Strophe.NS.SPOILER);
         });
+      
 
         /************************ BEGIN API ************************/
         _.extend(_converse.api, {

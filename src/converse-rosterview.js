@@ -571,8 +571,8 @@ converse.plugins.add('converse-rosterview', {
             sortEvent: 'presenceChanged',
 
             initialize () {
-                const loading = _converse.rosterview.loading_el;
-                u.hideElement(loading);
+                // const loading = _converse.rosterview.loading_el;
+                // u.hideElement(loading);
                 Backbone.OrderedListView.prototype.initialize.apply(this, arguments);
                 this.model.contacts.on("change:subscription", this.onContactSubscriptionChange, this);
                 this.model.contacts.on("change:requesting", this.onContactRequestChange, this);
@@ -763,7 +763,6 @@ converse.plugins.add('converse-rosterview', {
 
             initialize () {
                 Backbone.OrderedListView.prototype.initialize.apply(this, arguments);
-
                 _converse.roster.on("add", this.onContactAdded, this);
                 _converse.roster.on('change:groups', this.onContactAdded, this);
                 _converse.roster.on('change', this.onContactChange, this);
@@ -774,7 +773,6 @@ converse.plugins.add('converse-rosterview', {
                     this.updateFilter();
                 });
                 this.model.on("reset", this.reset, this);
-
                 // This event gets triggered once *all* contacts (i.e. not
                 // just this group's) have been fetched from browser
                 // storage or the XMPP server and once they've been
@@ -789,6 +787,7 @@ converse.plugins.add('converse-rosterview', {
                     this.updateFilter();
                     this.trigger('rosterContactsFetchedAndProcessed');
                 });
+            
                 this.createRosterFilter();
             },
 
@@ -802,7 +801,8 @@ converse.plugins.add('converse-rosterview', {
                 const form = this.el.querySelector('.roster-filter-form');
                 this.el.replaceChild(this.filter_view.render().el, form);
                 this.roster_el = this.el.querySelector('.roster-contacts');
-                this.loading_el = this.el.querySelector('.roster-loading');
+                //this.loading_el = this.el.querySelector('.roster-loading');
+              
                 return this;
             },
 
@@ -815,7 +815,6 @@ converse.plugins.add('converse-rosterview', {
 
             createRosterFilter () {
                 // Create a model on which we can store filter properties
-                _converse.emit('rosterViewTrulyInitial');
                 const model = new _converse.RosterFilter();
                 model.id = b64_sha1(`_converse.rosterfilter${_converse.bare_jid}`);
                 model.browserStorage = new Backbone.BrowserStorage.local(this.filter.id);
@@ -841,6 +840,7 @@ converse.plugins.add('converse-rosterview', {
             }, 100),
 
             update: _.debounce(function () {
+                 _converse.emit('rosterViewTrulyInitial');
                 if (!u.isVisible(this.roster_el)) {
                     u.showElement(this.roster_el);
                 }

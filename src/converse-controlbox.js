@@ -245,13 +245,14 @@ converse.plugins.add('converse-controlbox', {
                 /* Place the rosterview inside the "Contacts" panel. */
                 _converse.api.waitUntil('rosterViewTrulyInitial')
                 .then(() => {
-                    const loading = this.el.querySelector('.loading-contact');
-                    console.log('rosterview init');
-                    u.hideElement(loading);
+                        const loading = this.el.querySelector('.loading-contact');
+                         u.hideElement(loading);
                 })
                 _converse.api.waitUntil('rosterViewInitialized')
                     .then(() => {
-                         this.controlbox_pane.el.insertAdjacentElement('beforeEnd', _converse.rosterview.el);
+                         this.controlbox_pane.el.insertAdjacentElement('beforeEnd', _converse.rosterview.el);   
+                        // console.log(u.isVisible(this.el.querySelector('#converse-roster')));
+                        
                     }
                     )
                     .catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
