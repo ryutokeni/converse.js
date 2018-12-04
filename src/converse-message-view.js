@@ -128,7 +128,9 @@ converse.plugins.add('converse-message-view', {
                     u.addClass('chat-msg--followup', this.el);
                 }
                 var countDownEl = this.el.querySelector('.chat-msg__count_down');
-                countDownEl.replaceWith(this.countDown.render());
+                if (countDownEl) {
+                    countDownEl.replaceWith(this.countDown.render());
+                }
                 return this.el;
             },
 
@@ -182,8 +184,8 @@ converse.plugins.add('converse-message-view', {
 
 
                 if (this.model.get('time_to_read')) {
-                  if (this.model.get('sent')) {
-                    const expiration = (new Date(this.model.get('sent')*1000)).getTime() + parseInt(this.model.get('time_to_read'))*1000;
+                  if (this.model.get('time')) {
+                    const expiration = new Date(this.model.get('time')).getTime() + parseInt(this.model.get('time_to_read')) * 1000;
                     if (expiration - (new Date()).getTime() <= 0) {
                       this.model.destroy();
                       return;
