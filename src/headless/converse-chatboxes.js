@@ -699,8 +699,13 @@ converse.plugins.add('converse-chatboxes', {
             onChatBoxesFetched (collection) {
                 /* Show chat boxes upon receiving them from sessionStorage */
                 collection.each((chatbox) => {
+                    if (chatbox.get('type') === _converse.CHATROOMS_TYPE) {
+                        if (_converse.auto_join_rooms.findIndex(room => (room.jid === chatbox.get('jid'))) === -1) {
+                          chatbox.destroy();
+                        }
+                    }
                     if (this.chatBoxMayBeShown(chatbox)) {
-                        chatbox.trigger('show');
+                        // chatbox.trigger('show');
                     }
                 });
                 _converse.emit('chatBoxesFetched');

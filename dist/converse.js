@@ -72589,7 +72589,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       },
 
       render() {
-        console.log(_.cloneDeep(this.model.vcard));
         this.el.innerHTML = templates_chatbox_head_html__WEBPACK_IMPORTED_MODULE_8___default()(_.extend(this.model.vcard.toJSON(), this.model.toJSON(), {
           '_converse': _converse,
           'info_close': __('Close this chat box')
@@ -73794,7 +73793,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
       _converse.chatboxes.on('add', item => {
         if (!that.get(item.get('id')) && item.get('type') === _converse.PRIVATE_CHAT_TYPE) {
-          console.log(_.cloneDeep(item.vcard));
           that.add(item.get('id'), new _converse.ChatBoxView({
             model: item
           }));
@@ -75448,7 +75446,11 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         }
 
         var countDownEl = this.el.querySelector('.chat-msg__count_down');
-        countDownEl.replaceWith(this.countDown.render());
+
+        if (countDownEl) {
+          countDownEl.replaceWith(this.countDown.render());
+        }
+
         return this.el;
       },
 
@@ -75506,8 +75508,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
               roles = role ? role.split(',') : [];
 
         if (this.model.get('time_to_read')) {
-          if (this.model.get('sent')) {
-            const expiration = new Date(this.model.get('sent') * 1000).getTime() + parseInt(this.model.get('time_to_read')) * 1000;
+          if (this.model.get('time')) {
+            const expiration = new Date(this.model.get('time')).getTime() + parseInt(this.model.get('time_to_read')) * 1000;
 
             if (expiration - new Date().getTime() <= 0) {
               this.model.destroy();
@@ -77013,8 +77015,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         this.model.on('change:connection_status', this.afterConnected, this);
         this.model.on('change:jid', this.renderHeading, this);
         this.model.on('change:name', this.renderHeading, this);
-        this.model.on('change:subject', this.renderHeading, this);
-        this.model.on('change:subject', this.setChatRoomSubject, this);
+        this.model.on('change:subject', this.renderHeading, this); // this.model.on('change:subject', this.setChatRoomSubject, this);
+
         this.model.on('configurationNeeded', this.getAndRenderConfigurationForm, this);
         this.model.on('destroy', this.hide, this);
         this.model.on('show', this.show, this);
@@ -78386,13 +78388,11 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       },
 
       showAddRoomModal(ev) {
-        if (_.isUndefined(this.add_room_modal)) {
-          this.add_room_modal = new _converse.AddChatRoomModal({
-            'model': this.model
-          });
-        }
-
-        this.add_room_modal.show(ev);
+        // if (_.isUndefined(this.add_room_modal)) {
+        //     this.add_room_modal = new _converse.AddChatRoomModal({'model': this.model});
+        // }
+        // this.add_room_modal.show(ev);
+        _converse.emit('openCreateGroupModal');
       },
 
       showListRoomsModal(ev) {
@@ -81785,7 +81785,19 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
 
           return bookmark.get('name');
         } else {
-          return this.model.get('name');
+          if (this.model.get('subject') && this.model.get('subject').text) {
+            return this.model.get('subject').text;
+          } else if (this.model.get('name') && this.model.get('name') !== Strophe.getNodeFromJid(this.model.get('jid'))) {
+            return this.model.get('name');
+          } else {
+            const found = _converse.auto_join_rooms.find(room => room.jid === this.model.get('jid'));
+
+            if (found) {
+              return found.groupName || 'Loading...';
+            }
+          }
+
+          return 'Loading...';
         }
       }
 
@@ -83327,6 +83339,7 @@ const updateContacts = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE
 const updateMessageStatus = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].updateMessageStatus;
 const onLogOut = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLogOut;
 const onOpenChat = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenChat;
+const onOpenCreateGroupModal = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenCreateGroupModal;
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].initialize = function (settings, callback) {
   if (_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].env._.isArray(settings.whitelisted_plugins)) {
@@ -83352,6 +83365,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLogO
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenChat = function (callback) {
   return onOpenChat(callback);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenCreateGroupModal = function (callback) {
+  return onOpenCreateGroupModal(callback);
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"]);
@@ -85264,8 +85281,13 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
       onChatBoxesFetched(collection) {
         /* Show chat boxes upon receiving them from sessionStorage */
         collection.each(chatbox => {
-          if (this.chatBoxMayBeShown(chatbox)) {
-            chatbox.trigger('show');
+          if (chatbox.get('type') === _converse.CHATROOMS_TYPE) {
+            if (_converse.auto_join_rooms.findIndex(room => room.jid === chatbox.get('jid')) === -1) {
+              chatbox.destroy();
+            }
+          }
+
+          if (this.chatBoxMayBeShown(chatbox)) {// chatbox.trigger('show');
           }
         });
 
@@ -87546,6 +87568,12 @@ const converse = {
   'onOpenChat'(callback) {
     return _converse.on('chatOpenned', jid => {
       callback(jid, 1, 50);
+    });
+  },
+
+  'onOpenCreateGroupModal'(callback) {
+    return _converse.on('openCreateGroupModal', () => {
+      callback();
     });
   },
 
@@ -90584,7 +90612,11 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         });
 
         if (chatroom.get('connection_status') === _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].ROOMSTATUS.DISCONNECTED) {
-          _converse.chatboxviews.get(room_jid).join();
+          const myVCard = _converse.vcards.findWhere({
+            jid: _converse.bare_jid
+          });
+
+          _converse.chatboxviews.get(room_jid).join(myVCard.get('fullname'));
         }
       }
     };
@@ -92371,7 +92403,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins.add('converse-vca
          */
         'update'(model, force) {
           return this.get(model, force).then(vcard => {
-            console.log(model);
             delete vcard['stanza'];
             model.save(vcard);
           });
@@ -116966,18 +116997,22 @@ module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 __p += '<!-- src/templates/chatroom_head.html -->\n<div class="chatbox-navback"><i class="fa fa-arrow-left"></i></div>\n<div class="chatbox-title">\n    <div class="chat-title" title="' +
-__e(o.nickname || o.fullname || 'Loading...') +
+__e(o.nickname) +
 '">\n        ';
- if (o.name && o.name !== o.Strophe.getNodeFromJid(o.jid)) { ;
+  if (o.subject && o.subject.text) { ;
+__p += '\n          ' +
+__e( o.subject.text ) +
+'\n        ';
+ } else if (o.name && o.name !== o.Strophe.getNodeFromJid(o.jid)) { ;
 __p += '\n            ' +
 __e( o.name ) +
 '\n        ';
  } else { ;
 __p += '\n            Loading...\n        ';
  } ;
-__p += '\n    </div>\n    <!-- Sanitized in converse-muc-views. We want to render links. -->\n    <p class="chatroom-description">' +
+__p += '\n    </div>\n    <!-- Sanitized in converse-muc-views. We want to render links. -->\n    <!-- <p class="chatroom-description">' +
 ((__t = (o.description)) == null ? '' : __t) +
-'</p>\n</div>\n<div class="chatbox-buttons row no-gutters">\n    <a class="chatbox-btn close-chatbox-button fa fa-sign-out-alt" title="' +
+'</p> -->\n</div>\n<div class="chatbox-buttons row no-gutters">\n    <a class="chatbox-btn close-chatbox-button fa fa-sign-out-alt" title="' +
 __e(o.info_close) +
 '"></a>\n    ';
  if (o.affiliation == 'owner') { ;

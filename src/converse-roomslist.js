@@ -140,7 +140,17 @@ converse.plugins.add('converse-roomslist', {
                     const bookmark = _.head(_converse.bookmarksview.model.where({'jid': this.model.get('jid')}));
                     return bookmark.get('name');
                 } else {
-                    return this.model.get('name');
+                    if (this.model.get('subject') && this.model.get('subject').text) {
+                      return this.model.get('subject').text;
+                    } else if (this.model.get('name') && this.model.get('name') !== Strophe.getNodeFromJid(this.model.get('jid'))) {
+                      return this.model.get('name');
+                    } else {
+                      const found = _converse.auto_join_rooms.find(room => room.jid === this.model.get('jid'));
+                      if (found) {
+                        return found.groupName || 'Loading...'
+                      }
+                    }
+                    return 'Loading...';
                 }
             }
         });
@@ -284,4 +294,3 @@ converse.plugins.add('converse-roomslist', {
         _converse.api.listen.on('reconnected', initRoomsListView);
     }
 });
-

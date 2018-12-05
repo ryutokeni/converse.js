@@ -503,7 +503,7 @@ converse.plugins.add('converse-muc-views', {
                 this.model.on('change:jid', this.renderHeading, this);
                 this.model.on('change:name', this.renderHeading, this);
                 this.model.on('change:subject', this.renderHeading, this);
-                this.model.on('change:subject', this.setChatRoomSubject, this);
+                // this.model.on('change:subject', this.setChatRoomSubject, this);
                 this.model.on('configurationNeeded', this.getAndRenderConfigurationForm, this);
                 this.model.on('destroy', this.hide, this);
                 this.model.on('show', this.show, this);
@@ -1770,10 +1770,11 @@ converse.plugins.add('converse-muc-views', {
             },
 
             showAddRoomModal (ev) {
-                if (_.isUndefined(this.add_room_modal)) {
-                    this.add_room_modal = new _converse.AddChatRoomModal({'model': this.model});
-                }
-                this.add_room_modal.show(ev);
+                // if (_.isUndefined(this.add_room_modal)) {
+                //     this.add_room_modal = new _converse.AddChatRoomModal({'model': this.model});
+                // }
+                // this.add_room_modal.show(ev);
+                _converse.emit('openCreateGroupModal');
             },
 
             showListRoomsModal(ev) {

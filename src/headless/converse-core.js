@@ -1728,6 +1728,11 @@ const converse = {
         callback(jid, 1, 50);
       });
     },
+    'onOpenCreateGroupModal' (callback) {
+      return _converse.on('openCreateGroupModal', () => {
+        callback();
+      });
+    },
     'updateMessages' (jid, pagemeMessages) {
       const chatbox = _converse.chatboxes.findWhere({'jid': jid});
       if (!_converse.pagemeMessages) {

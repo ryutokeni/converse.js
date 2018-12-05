@@ -57,6 +57,7 @@ const updateContacts = converse.updateContacts;
 const updateMessageStatus = converse.updateMessageStatus;
 const onLogOut = converse.onLogOut;
 const onOpenChat = converse.onOpenChat;
+const onOpenCreateGroupModal = converse.onOpenCreateGroupModal;
 
 converse.initialize = function (settings, callback) {
     if (converse.env._.isArray(settings.whitelisted_plugins)) {
@@ -80,6 +81,10 @@ converse.onLogOut = function (callback) {
 
 converse.onOpenChat = function (callback) {
     return onOpenChat(callback);
+}
+
+converse.onOpenCreateGroupModal = function (callback) {
+    return onOpenCreateGroupModal(callback);
 }
 
 export default converse;

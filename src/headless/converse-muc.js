@@ -1242,7 +1242,8 @@ converse.plugins.add('converse-muc', {
                     room_jid, {'password': x_el.getAttribute('password') });
 
                 if (chatroom.get('connection_status') === converse.ROOMSTATUS.DISCONNECTED) {
-                    _converse.chatboxviews.get(room_jid).join();
+                    const myVCard = _converse.vcards.findWhere({jid: _converse.bare_jid});
+                    _converse.chatboxviews.get(room_jid).join(myVCard.get('fullname'));
                 }
             }
         };
