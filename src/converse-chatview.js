@@ -166,7 +166,6 @@ converse.plugins.add('converse-chatview', {
             },
 
             render () {
-                console.log(_.cloneDeep(this.model.vcard));
                 this.el.innerHTML = tpl_chatbox_head(
                     _.extend(
                         this.model.vcard.toJSON(),
@@ -325,7 +324,6 @@ converse.plugins.add('converse-chatview', {
                 _converse.emit('chatBoxInitialized', this);
                 _converse.on('message-rendered-!', () => {
                     const loading = this.el.querySelector('.chat-loading');
-                 //   console.log(loading);
                     uk.hideElement(loading);
                 })
             },
@@ -1316,7 +1314,6 @@ converse.plugins.add('converse-chatview', {
             const that = _converse.chatboxviews;
             _converse.chatboxes.on('add', item => {
                 if (!that.get(item.get('id')) && item.get('type') === _converse.PRIVATE_CHAT_TYPE) {
-                    console.log(_.cloneDeep(item.vcard));
                     that.add(item.get('id'), new _converse.ChatBoxView({model: item}));
                 }
             });

@@ -72207,7 +72207,7 @@ const _converse$env = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_
       utils = _converse$env.utils;
 const u = utils;
 const AvatarMixin = {
-  renderAvatar(el) {
+  renderAvatar(el, me, Url) {
     el = el || this.el;
     const canvas_el = el.querySelector('canvas');
 
@@ -72221,7 +72221,7 @@ const AvatarMixin = {
       'classes': canvas_el.getAttribute('class'),
       'width': canvas_el.width,
       'height': canvas_el.height,
-      'image': "data:" + image_type + ";base64," + image
+      'image': me ? Url : "data:" + image_type + ";base64," + image
     });
   }
 
@@ -72590,7 +72590,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       },
 
       render() {
-        console.log(_.cloneDeep(this.model.vcard));
         this.el.innerHTML = templates_chatbox_head_html__WEBPACK_IMPORTED_MODULE_8___default()(_.extend(this.model.vcard.toJSON(), this.model.toJSON(), {
           '_converse': _converse,
           'info_close': __('Close this chat box')
@@ -72742,8 +72741,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         _converse.emit('chatBoxInitialized', this);
 
         _converse.on('message-rendered-!', () => {
-          const loading = this.el.querySelector('.chat-loading'); //   console.log(loading);
-
+          const loading = this.el.querySelector('.chat-loading');
           uk.hideElement(loading);
         });
       },
@@ -73801,7 +73799,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
       _converse.chatboxes.on('add', item => {
         if (!that.get(item.get('id')) && item.get('type') === _converse.PRIVATE_CHAT_TYPE) {
-          console.log(_.cloneDeep(item.vcard));
           that.add(item.get('id'), new _converse.ChatBoxView({
             model: item
           }));
@@ -80461,6 +80458,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
       },
 
       toHTML() {
+        //this.model.vcard.image = _converse.user_settings.userProfile.avatarUrl;
+        this.model.vcard.attributes.image = _converse.user_settings.userProfile.avatarUrl;
         return templates_profile_modal_html__WEBPACK_IMPORTED_MODULE_7___default()(_.extend(this.model.toJSON(), this.model.vcard.toJSON(), {
           '_': _,
           '__': __,
@@ -80637,7 +80636,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
       },
 
       afterRender() {
-        this.renderAvatar();
+        this.renderAvatar(null, true, _converse.user_settings.userProfile.avatarUrl);
       },
 
       showProfileModal(ev) {
@@ -91099,9 +91098,12 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           __ = _converse.__;
     var importedContacts = _converse.user_settings.imported_contacts;
     var organizationContacts = _converse.user_settings.my_organization;
+    var avatarUrl = _converse.user_settings.userProfile.avatarUrl;
     var currentItems = [];
     var rawItems = [];
-    const domain = _converse.user_settings.domain;
+    const domain = _converse.user_settings.domain; // _converse.DEFAULT_IMAGE =  avatarUrl;
+    // _converse.DEFAULT_IMAGE_TYPE = '';
+    // console.log(_converse.DEFAULT_IMAGE);
 
     _converse.api.settings.update({
       'allow_contact_requests': true,
@@ -118189,13 +118191,17 @@ __p += '\n                <ul class="nav nav-pills justify-content-center">\n   
  } ;
 __p += '\n                <div class="tab-content">\n                    <div class="tab-pane fade show active" id="profile-tabpanel" role="tabpanel" aria-labelledby="profile-tab">\n                        <form class="converse-form converse-form--modal profile-form" action="#">\n                            <div class="row">\n                                <div class="col-auto">\n                                    <a class="change-avatar" href="#">\n                                        ';
  if (o.image) { ;
-__p += '\n                                            <img alt="' +
+__p += '\n                                            <!-- <img alt="' +
 __e(o.alt_avatar) +
 '" class="img-thumbnail avatar align-self-center" height="100px" width="100px" src="data:' +
 __e(o.image_type) +
 ';base64,' +
 __e(o.image) +
-'"/>\n                                        ';
+'"/> -->\n                                            <img alt="' +
+__e(o.alt_avatar) +
+'" class="img-thumbnail avatar align-self-center" height="100px" width="100px" src="' +
+__e(o.image) +
+'"/>\n                                            ';
  } ;
 __p += '\n                                        ';
  if (!o.image) { ;

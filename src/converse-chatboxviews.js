@@ -16,7 +16,7 @@ const u = utils;
 
 const AvatarMixin = {
 
-    renderAvatar (el) {
+    renderAvatar (el, me, Url) {
         el = el || this.el;
         const canvas_el = el.querySelector('canvas');
         if (_.isNull(canvas_el)) {
@@ -29,7 +29,7 @@ const AvatarMixin = {
             'classes': canvas_el.getAttribute('class'),
             'width': canvas_el.width,
             'height': canvas_el.height,
-            'image': "data:" + image_type + ";base64," + image,
+            'image': me ?  Url : "data:" + image_type + ";base64," + image,
         });
     },
 };

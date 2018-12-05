@@ -21,10 +21,13 @@ converse.plugins.add('converse-roster', {
               { __ } = _converse;
         var importedContacts = _converse.user_settings.imported_contacts;
         var organizationContacts = _converse.user_settings.my_organization;
+        var avatarUrl = _converse.user_settings.userProfile.avatarUrl;
         var currentItems = [];
         var rawItems = [];
         const domain = _converse.user_settings.domain;
-
+        // _converse.DEFAULT_IMAGE =  avatarUrl;
+        // _converse.DEFAULT_IMAGE_TYPE = '';
+        // console.log(_converse.DEFAULT_IMAGE);
         _converse.api.settings.update({
             'allow_contact_requests': true,
             'auto_subscribe': false,
