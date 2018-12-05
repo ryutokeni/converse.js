@@ -1729,9 +1729,7 @@ const converse = {
       });
     },
     'onOpenCreateGroupModal' (callback) {
-      return _converse.on('openCreateGroupModal', () => {
-        callback();
-      });
+      return _converse.on('openCreateGroupModal', callback);
     },
     'updateMessages' (jid, pagemeMessages) {
       const chatbox = _converse.chatboxes.findWhere({'jid': jid});
