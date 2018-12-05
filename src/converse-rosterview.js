@@ -75,6 +75,7 @@ converse.plugins.add('converse-rosterview', {
             'xhr_user_search_url': null
         });
         _converse.api.promises.add(['rosterViewInitialized']);
+        _converse.api.promises.add(['rosterViewTrulyInitial']);
 
         const STATUSES = {
             'dnd': __('This contact is busy'),
@@ -570,6 +571,8 @@ converse.plugins.add('converse-rosterview', {
             sortEvent: 'presenceChanged',
 
             initialize () {
+                // const loading = _converse.rosterview.loading_el;
+                // u.hideElement(loading);
                 Backbone.OrderedListView.prototype.initialize.apply(this, arguments);
                 this.model.contacts.on("change:subscription", this.onContactSubscriptionChange, this);
                 this.model.contacts.on("change:requesting", this.onContactRequestChange, this);
@@ -742,8 +745,6 @@ converse.plugins.add('converse-rosterview', {
                 }
             }
         });
-
-
         _converse.RosterView = Backbone.OrderedListView.extend({
             tagName: 'div',
             id: 'converse-roster',
@@ -762,7 +763,6 @@ converse.plugins.add('converse-rosterview', {
 
             initialize () {
                 Backbone.OrderedListView.prototype.initialize.apply(this, arguments);
-
                 _converse.roster.on("add", this.onContactAdded, this);
                 _converse.roster.on('change:groups', this.onContactAdded, this);
                 _converse.roster.on('change', this.onContactChange, this);
@@ -772,14 +772,14 @@ converse.plugins.add('converse-rosterview', {
                     this.update();
                     this.updateFilter();
                 });
-
                 this.model.on("reset", this.reset, this);
-
                 // This event gets triggered once *all* contacts (i.e. not
                 // just this group's) have been fetched from browser
                 // storage or the XMPP server and once they've been
                 // assigned to their various groups.
-                _converse.on('rosterGroupsFetched', this.sortAndPositionAllItems.bind(this));
+                _converse.on('rosterGroupsFetched', 
+               
+                this.sortAndPositionAllItems.bind(this));
 
                 _converse.on('rosterContactsFetched', () => {
                     _converse.roster.each((contact) => this.addRosterContact(contact, {'silent': true}));
@@ -787,6 +787,7 @@ converse.plugins.add('converse-rosterview', {
                     this.updateFilter();
                     this.trigger('rosterContactsFetchedAndProcessed');
                 });
+            
                 this.createRosterFilter();
             },
 
@@ -800,6 +801,8 @@ converse.plugins.add('converse-rosterview', {
                 const form = this.el.querySelector('.roster-filter-form');
                 this.el.replaceChild(this.filter_view.render().el, form);
                 this.roster_el = this.el.querySelector('.roster-contacts');
+                //this.loading_el = this.el.querySelector('.roster-loading');
+              
                 return this;
             },
 
@@ -837,6 +840,7 @@ converse.plugins.add('converse-rosterview', {
             }, 100),
 
             update: _.debounce(function () {
+                 _converse.emit('rosterViewTrulyInitial');
                 if (!u.isVisible(this.roster_el)) {
                     u.showElement(this.roster_el);
                 }
@@ -995,6 +999,9 @@ converse.plugins.add('converse-rosterview', {
             _converse.rosterview = new _converse.RosterView({
                 'model': _converse.rostergroups
             });
+            // _converse.rosterGroup = new _converse.RosterGroupView({
+            //     'model': _converse.rostergroups
+            // })
             _converse.rosterview.render();
             _converse.emit('rosterViewInitialized');
         }
