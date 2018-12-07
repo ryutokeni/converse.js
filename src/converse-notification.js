@@ -11,7 +11,6 @@ import converse from "@converse/headless/converse-core";
 const { Strophe, _, sizzle } = converse.env,
       u = converse.env.utils;
 
-
 converse.plugins.add('converse-notification', {
 
     dependencies: ["converse-chatboxes"],
@@ -172,9 +171,26 @@ converse.plugins.add('converse-notification', {
             }
             // TODO: we should suppress notifications if we cannot decrypt
             // the message...
-            const body = sizzle(`encrypted[xmlns="${Strophe.NS.OMEMO}"]`, message).length ?
-                         __('OMEMO Message received') :
-                         _.get(message.querySelector('body'), 'textContent');
+            let body = null;
+            if (
+              message.getElementsByTagName('encrypted') &&
+              message.getElementsByTagName('encrypted')[0] &&
+              message.getElementsByTagName('encrypted')[0].firstChild &&
+              message.getElementsByTagName('encrypted')[0].firstChild.nodeValue === '1'
+            ) {
+              const pagemeMessage = _.find(_converse.pagemeMessages || [], msg => (msg.stanza.id === message['id']));
+              if (pagemeMessage) {
+                body = pagemeMessage.decrypted;
+              } else {
+                body =  null;
+              }
+            } else {
+              body = null;
+            }
+
+            // const body = sizzle(`encrypted[xmlns="${Strophe.NS.OMEMO}"]`, message).length ?
+            //              __('OMEMO Message received') :
+            //              _.get(message.querySelector('body'), 'textContent');
             if (!body) {
                 return;
             }

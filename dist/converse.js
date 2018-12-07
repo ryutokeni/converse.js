@@ -78987,7 +78987,22 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       // the message...
 
 
-      const body = sizzle(`encrypted[xmlns="${Strophe.NS.OMEMO}"]`, message).length ? __('OMEMO Message received') : _.get(message.querySelector('body'), 'textContent');
+      let body = null;
+
+      if (message.getElementsByTagName('encrypted') && message.getElementsByTagName('encrypted')[0] && message.getElementsByTagName('encrypted')[0].firstChild && message.getElementsByTagName('encrypted')[0].firstChild.nodeValue === '1') {
+        const pagemeMessage = _.find(_converse.pagemeMessages || [], msg => msg.stanza.id === message['id']);
+
+        if (pagemeMessage) {
+          body = pagemeMessage.decrypted;
+        } else {
+          body = null;
+        }
+      } else {
+        body = null;
+      } // const body = sizzle(`encrypted[xmlns="${Strophe.NS.OMEMO}"]`, message).length ?
+      //              __('OMEMO Message received') :
+      //              _.get(message.querySelector('body'), 'textContent');
+
 
       if (!body) {
         return;
