@@ -508,11 +508,11 @@ converse.plugins.add('converse-muc-views', {
                 this.model.on('destroy', this.hide, this);
                 this.model.on('show', this.show, this);
 
-                this.model.occupants.on('add', this.onOccupantAdded, this);
-                this.model.occupants.on('remove', this.onOccupantRemoved, this);
-                this.model.occupants.on('change:show', this.showJoinOrLeaveNotification, this);
-                this.model.occupants.on('change:role', this.informOfOccupantsRoleChange, this);
-                this.model.occupants.on('change:affiliation', this.informOfOccupantsAffiliationChange, this);
+                // this.model.occupants.on('add', this.onOccupantAdded, this);
+                // this.model.occupants.on('remove', this.onOccupantRemoved, this);
+                // this.model.occupants.on('change:show', this.showJoinOrLeaveNotification, this);
+                // this.model.occupants.on('change:role', this.informOfOccupantsRoleChange, this);
+                // this.model.occupants.on('change:affiliation', this.informOfOccupantsAffiliationChange, this);
 
                 this.createEmojiPicker();
                 this.createOccupantsView();
@@ -1794,6 +1794,9 @@ converse.plugins.add('converse-muc-views', {
 
             toHTML () {
                 const show = this.model.get('show');
+                // if (this.model.get('nick') === this.model.get('jid') || this.model.get('nick') === Strophe.getNodeFromJid(this.model.get('jid'))) {
+                //
+                // }
                 return tpl_occupant(
                     _.extend(
                         { '_': _, // XXX Normally this should already be included,
@@ -1803,14 +1806,14 @@ converse.plugins.add('converse-muc-views', {
                           'show': show,
                           'hint_show': _converse.PRETTY_CHAT_STATUS[show],
                           'hint_occupant': __('Click to mention %1$s in your message.', this.model.get('nick')),
-                          'desc_moderator': __('This user is a moderator.'),
-                          'desc_participant': __('This user can send messages in this groupchat.'),
-                          'desc_visitor': __('This user can NOT send messages in this groupchat.'),
-                          'label_moderator': __('Moderator'),
-                          'label_visitor': __('Visitor'),
-                          'label_owner': __('Owner'),
-                          'label_member': __('Member'),
-                          'label_admin': __('Admin')
+                          // 'desc_moderator': __('This user is a moderator.'),
+                          // 'desc_participant': __('This user can send messages in this groupchat.'),
+                          // 'desc_visitor': __('This user can NOT send messages in this groupchat.'),
+                          // 'label_moderator': __('Moderator'),
+                          // 'label_visitor': __('Visitor'),
+                          // 'label_owner': __('Owner'),
+                          // 'label_member': __('Member'),
+                          // 'label_admin': __('Admin')
                         }, this.model.toJSON())
                 );
             },

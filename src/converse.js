@@ -58,6 +58,8 @@ const updateMessageStatus = converse.updateMessageStatus;
 const onLogOut = converse.onLogOut;
 const onOpenChat = converse.onOpenChat;
 const onOpenCreateGroupModal = converse.onOpenCreateGroupModal;
+const createNewGroup = converse.createNewGroup;
+const onLeaveGroup = converse.onLeaveGroup;
 
 converse.initialize = function (settings, callback) {
     if (converse.env._.isArray(settings.whitelisted_plugins)) {
@@ -85,6 +87,14 @@ converse.onOpenChat = function (callback) {
 
 converse.onOpenCreateGroupModal = function (callback) {
     return onOpenCreateGroupModal(callback);
+}
+
+converse.createNewGroup = function (jid, attrs, participants) {
+    return createNewGroup(jid, attrs, participants);
+}
+
+converse.onLeaveGroup = function (callback) {
+    return onLeaveGroup(callback);
 }
 
 export default converse;

@@ -1731,6 +1731,20 @@ const converse = {
     'onOpenCreateGroupModal' (callback) {
       return _converse.on('openCreateGroupModal', callback);
     },
+    'onLeaveGroup' (callback) {
+      return _converse.on('leaveGroup', (jid) => callback(jid));
+    },
+    'createNewGroup' (jid, attrs, participants) {
+      const newChatRoom =  _converse.api.rooms.create(jid, attrs);
+      // newChatRoom.sendMessageStanza(converse.env.$msg({
+      //     'to': jid,
+      //     'type': 'groupchat'
+      // }).c('subject').t(attrs.subject.text));
+      participants.forEach(participant => {
+        const invitation = newChatRoom.directInvite(participant);
+        console.log(invitation);
+      });
+    },
     'updateMessages' (jid, pagemeMessages) {
       const chatbox = _converse.chatboxes.findWhere({'jid': jid});
       if (!_converse.pagemeMessages) {

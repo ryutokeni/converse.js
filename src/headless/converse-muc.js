@@ -300,6 +300,7 @@ converse.plugins.add('converse-muc', {
                 }
                 u.safeSave(this, {'connection_status': converse.ROOMSTATUS.DISCONNECTED});
                 this.removeHandlers();
+                _converse.api.emit('leaveGroup', this.get('jid'));
             },
 
             sendUnavailablePresence (exit_msg) {
@@ -462,10 +463,14 @@ converse.plugins.add('converse-muc', {
                 if (this.get('password')) { attrs.password = this.get('password'); }
 
                 const invitation = $msg({
-                    'from': _converse.connection.jid,
-                    'to': recipient,
+                    // 'from': _converse.connection.jid,
+                    'to': attrs.jid,
                     'id': _converse.connection.getUniqueId()
-                }).c('x', attrs);
+                }).c('x', {
+                    'xmlns': 'http://jabber.org/protocol/muc#user'
+                }).c('invite', {
+                  'to': recipient
+                })
                 _converse.api.send(invitation);
                 _converse.api.emit('roomInviteSent', {
                     'room': this,

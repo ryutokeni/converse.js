@@ -336,7 +336,7 @@ converse.plugins.add('converse-chatboxes', {
                         'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid')
                     }).c('body').t(body).up()
                       .c(_converse.ACTIVE, {'xmlns': Strophe.NS.CHATSTATES}).up();
-                if (message.get('type') === 'chat') {
+                if (message.get('type') === 'chat' || message.get('type') === 'groupchat') {
                     stanza.c('data', {'xmlns': 'pageMe.message.data'})
                     .c('sentDate').t(sentDate).up()
                     .c('timeToRead').t(timeToRead).up()
@@ -386,6 +386,7 @@ converse.plugins.add('converse-chatboxes', {
             },
 
             sendMessageStanza (stanza) {
+              console.log(stanza);
                 _converse.api.send(stanza);
                 if (_converse.forward_messages) {
                     // Forward the message, so that other connected resources are also aware of it.

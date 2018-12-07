@@ -77045,12 +77045,12 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
 
         this.model.on('configurationNeeded', this.getAndRenderConfigurationForm, this);
         this.model.on('destroy', this.hide, this);
-        this.model.on('show', this.show, this);
-        this.model.occupants.on('add', this.onOccupantAdded, this);
-        this.model.occupants.on('remove', this.onOccupantRemoved, this);
-        this.model.occupants.on('change:show', this.showJoinOrLeaveNotification, this);
-        this.model.occupants.on('change:role', this.informOfOccupantsRoleChange, this);
-        this.model.occupants.on('change:affiliation', this.informOfOccupantsAffiliationChange, this);
+        this.model.on('show', this.show, this); // this.model.occupants.on('add', this.onOccupantAdded, this);
+        // this.model.occupants.on('remove', this.onOccupantRemoved, this);
+        // this.model.occupants.on('change:show', this.showJoinOrLeaveNotification, this);
+        // this.model.occupants.on('change:role', this.informOfOccupantsRoleChange, this);
+        // this.model.occupants.on('change:affiliation', this.informOfOccupantsAffiliationChange, this);
+
         this.createEmojiPicker();
         this.createOccupantsView();
         this.render().insertIntoDOM();
@@ -78440,7 +78440,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       },
 
       toHTML() {
-        const show = this.model.get('show');
+        const show = this.model.get('show'); // if (this.model.get('nick') === this.model.get('jid') || this.model.get('nick') === Strophe.getNodeFromJid(this.model.get('jid'))) {
+        //
+        // }
+
         return templates_occupant_html__WEBPACK_IMPORTED_MODULE_20___default()(_.extend({
           '_': _,
           // XXX Normally this should already be included,
@@ -78449,15 +78452,15 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
           'jid': '',
           'show': show,
           'hint_show': _converse.PRETTY_CHAT_STATUS[show],
-          'hint_occupant': __('Click to mention %1$s in your message.', this.model.get('nick')),
-          'desc_moderator': __('This user is a moderator.'),
-          'desc_participant': __('This user can send messages in this groupchat.'),
-          'desc_visitor': __('This user can NOT send messages in this groupchat.'),
-          'label_moderator': __('Moderator'),
-          'label_visitor': __('Visitor'),
-          'label_owner': __('Owner'),
-          'label_member': __('Member'),
-          'label_admin': __('Admin')
+          'hint_occupant': __('Click to mention %1$s in your message.', this.model.get('nick')) // 'desc_moderator': __('This user is a moderator.'),
+          // 'desc_participant': __('This user can send messages in this groupchat.'),
+          // 'desc_visitor': __('This user can NOT send messages in this groupchat.'),
+          // 'label_moderator': __('Moderator'),
+          // 'label_visitor': __('Visitor'),
+          // 'label_owner': __('Owner'),
+          // 'label_member': __('Member'),
+          // 'label_admin': __('Admin')
+
         }, this.model.toJSON()));
       },
 
@@ -83375,6 +83378,8 @@ const updateMessageStatus = _converse_headless_converse_core__WEBPACK_IMPORTED_M
 const onLogOut = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLogOut;
 const onOpenChat = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenChat;
 const onOpenCreateGroupModal = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenCreateGroupModal;
+const createNewGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].createNewGroup;
+const onLeaveGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLeaveGroup;
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].initialize = function (settings, callback) {
   if (_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].env._.isArray(settings.whitelisted_plugins)) {
@@ -83404,6 +83409,14 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpen
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenCreateGroupModal = function (callback) {
   return onOpenCreateGroupModal(callback);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].createNewGroup = function (jid, attrs, participants) {
+  return createNewGroup(jid, attrs, participants);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLeaveGroup = function (callback) {
+  return onLeaveGroup(callback);
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"]);
@@ -84916,7 +84929,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           'xmlns': Strophe.NS.CHATSTATES
         }).up();
 
-        if (message.get('type') === 'chat') {
+        if (message.get('type') === 'chat' || message.get('type') === 'groupchat') {
           stanza.c('data', {
             'xmlns': 'pageMe.message.data'
           }).c('sentDate').t(sentDate).up().c('timeToRead').t(timeToRead).up().c('encrypted').t('1').up().up().c('request', {
@@ -84981,6 +84994,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
       },
 
       sendMessageStanza(stanza) {
+        console.log(stanza);
+
         _converse.api.send(stanza);
 
         if (_converse.forward_messages) {
@@ -87610,6 +87625,23 @@ const converse = {
     return _converse.on('openCreateGroupModal', callback);
   },
 
+  'onLeaveGroup'(callback) {
+    return _converse.on('leaveGroup', jid => callback(jid));
+  },
+
+  'createNewGroup'(jid, attrs, participants) {
+    const newChatRoom = _converse.api.rooms.create(jid, attrs); // newChatRoom.sendMessageStanza(converse.env.$msg({
+    //     'to': jid,
+    //     'type': 'groupchat'
+    // }).c('subject').t(attrs.subject.text));
+
+
+    participants.forEach(participant => {
+      const invitation = newChatRoom.directInvite(participant);
+      console.log(invitation);
+    });
+  },
+
   'updateMessages'(jid, pagemeMessages) {
     const chatbox = _converse.chatboxes.findWhere({
       'jid': jid
@@ -89546,6 +89578,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           'connection_status': _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].ROOMSTATUS.DISCONNECTED
         });
         this.removeHandlers();
+
+        _converse.api.emit('leaveGroup', this.get('jid'));
       },
 
       sendUnavailablePresence(exit_msg) {
@@ -89748,10 +89782,14 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         }
 
         const invitation = $msg({
-          'from': _converse.connection.jid,
-          'to': recipient,
+          // 'from': _converse.connection.jid,
+          'to': attrs.jid,
           'id': _converse.connection.getUniqueId()
-        }).c('x', attrs);
+        }).c('x', {
+          'xmlns': 'http://jabber.org/protocol/muc#user'
+        }).c('invite', {
+          'to': recipient
+        });
 
         _converse.api.send(invitation);
 
