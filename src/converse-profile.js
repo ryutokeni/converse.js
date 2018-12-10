@@ -47,7 +47,6 @@ converse.plugins.add('converse-profile', {
             },
 
             toHTML () {
-                
                 //this.model.vcard.image = _converse.user_settings.userProfile.avatarUrl;
                 this.model.vcard.attributes.image = _converse.user_settings.userProfile.avatarUrl;
                 return tpl_profile_modal(_.extend(

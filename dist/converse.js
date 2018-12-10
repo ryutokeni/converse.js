@@ -74068,6 +74068,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
     _converse.api.promises.add('controlboxInitialized');
 
+    _converse.api.promises.add('check-update-loading');
+
     _converse.addControlBox = () => {
       return _converse.chatboxes.add({
         'id': 'controlbox',
@@ -82659,6 +82661,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       },
 
       render() {
+        //  console.log('model roster group view:', this.model);
         this.el.setAttribute('data-group', this.model.get('name'));
         this.el.innerHTML = templates_group_header_html__WEBPACK_IMPORTED_MODULE_7___default()({
           'label_group': this.model.get('name'),
@@ -82667,6 +82670,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           '_converse': _converse
         });
         this.contacts_el = this.el.querySelector('.roster-group-contacts');
+
+        _converse.emit('load-done', this.model.get('name'));
+
+        console.log('hide Loading emit');
         return this;
       },
 
@@ -82900,6 +82907,11 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         this.el.replaceChild(this.filter_view.render().el, form);
         this.roster_el = this.el.querySelector('.roster-contacts'); //this.loading_el = this.el.querySelector('.roster-loading');
 
+        this.loading_contact = this.el.querySelector('.roster-loading-Contacts');
+        this.loading_org = this.el.querySelector('.roster-loading-Organization');
+        console.log('show loading');
+        u.showElement(this.loading_contact);
+        u.showElement(this.loading_org);
         return this;
       },
 
@@ -83133,6 +83145,14 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       _converse.rosterview.render();
 
       _converse.emit('rosterViewInitialized');
+
+      _converse.on('load-done', labelName => {
+        if (labelName === 'Contacts') {
+          u.hideElement(_converse.rosterview.loading_contact);
+        } else {
+          u.hideElement(_converse.rosterview.loading_org);
+        }
+      });
     }
 
     _converse.api.listen.on('rosterInitialized', initRoster);
@@ -117643,7 +117663,7 @@ __p += ' fa-caret-right ';
  } ;
 __p += '">\n    </span> ' +
 __e(o.label_group) +
-'</a>\n<ul class="items-list roster-group-contacts ';
+'</a>\n\n<ul class="items-list roster-group-contacts ';
  if (o.toggle_state === o._converse.CLOSED) { ;
 __p += ' collapsed ';
  } ;
@@ -118799,7 +118819,7 @@ __p += '\n        <a class="controlbox-heading__btn add-contact fa fa-user-plus"
 __e(o.title_add_contact) +
 '"\n           data-toggle="modal"\n           data-target="#add-contact-modal"></a>\n    ';
  } ;
-__p += '\n</div>\n\n<form class="roster-filter-form"></form>\n\n<div class="roster-contacts"></div>\n\n<!-- <div style="text-align : center; font-size: 20px; padding-top: 20px;" class="roster-loading">\n        Loading...\n</div> -->\n';
+__p += '\n</div>\n\n<form class="roster-filter-form"></form>\n<div style="text-align : left; font-size: 15px; padding-top: 20px; color: #18ABFB" class="hidden roster-loading-Contacts">\n  Loading Contacts...\n</div>\n<div style="text-align : left; font-size: 15px; padding-top: 20px; color: #FDAD45" class="hidden roster-loading-Organization">\n  Loading Organization...\n</div>\n\n<div class="roster-contacts">\n   \n</div>\n\n\n\n\n\n\n';
 return __p
 };
 
