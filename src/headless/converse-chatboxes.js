@@ -105,10 +105,11 @@ converse.plugins.add('converse-chatboxes', {
             },
 
             setVCard () {
+              // console.log(this);
                 if (this.get('type') === 'error') {
                     return;
                 } else if (this.get('type') === 'groupchat') {
-                    this.vcard = this.getVCardForChatroomOccupant();
+                    // this.vcard = this.getVCardForChatroomOccupant();
                 } else {
                     const jid = this.get('from');
                     this.vcard = _converse.vcards.findWhere({'jid': jid}) || _converse.vcards.create({'jid': jid});
@@ -236,12 +237,19 @@ converse.plugins.add('converse-chatboxes', {
             },
 
             initialize () {
+                if (!this.get('message_type')) {
+                  return;
+                }
                 _converse.ModelWithVCardAndPresence.prototype.initialize.apply(this, arguments);
 
                 _converse.api.waitUntil('rosterContactsFetched').then(() => {
                     this.addRelatedContact(_converse.roster.findWhere({'jid': this.get('jid')}));
                 });
-                _converse.emit('chatOpenned', this.get('jid'));
+                console.log(this.get('message_type'), this);
+                _converse.emit('chatOpenned', {
+                  jid: this.get('jid'),
+                  messageType: this.get('message_type')
+                });
                 this.messages = new _converse.Messages();
                 const storage = _converse.config.get('storage');
                 this.messages.browserStorage = new Backbone.BrowserStorage[storage](

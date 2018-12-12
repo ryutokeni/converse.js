@@ -1724,8 +1724,8 @@ const converse = {
       });
     },
     'onOpenChat' (callback) {
-      return _converse.on('chatOpenned', (jid) => {
-        callback(jid, 1, 50);
+      return _converse.on('chatOpenned', ({jid, messageType}) => {
+        callback(jid, messageType, 1, 50);
       });
     },
     'onOpenCreateGroupModal' (callback) {
@@ -1742,7 +1742,6 @@ const converse = {
       // }).c('subject').t(attrs.subject.text));
       participants.forEach(participant => {
         const invitation = newChatRoom.directInvite(participant);
-        console.log(invitation);
       });
     },
     'updateMessages' (jid, pagemeMessages) {

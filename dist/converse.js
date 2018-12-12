@@ -84685,10 +84685,10 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
       },
 
       setVCard() {
+        // console.log(this);
         if (this.get('type') === 'error') {
           return;
-        } else if (this.get('type') === 'groupchat') {
-          this.vcard = this.getVCardForChatroomOccupant();
+        } else if (this.get('type') === 'groupchat') {// this.vcard = this.getVCardForChatroomOccupant();
         } else {
           const jid = this.get('from');
           this.vcard = _converse.vcards.findWhere({
@@ -84827,6 +84827,10 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
       },
 
       initialize() {
+        if (!this.get('message_type')) {
+          return;
+        }
+
         _converse.ModelWithVCardAndPresence.prototype.initialize.apply(this, arguments);
 
         _converse.api.waitUntil('rosterContactsFetched').then(() => {
@@ -84835,7 +84839,12 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           }));
         });
 
-        _converse.emit('chatOpenned', this.get('jid'));
+        console.log(this.get('message_type'), this);
+
+        _converse.emit('chatOpenned', {
+          jid: this.get('jid'),
+          messageType: this.get('message_type')
+        });
 
         this.messages = new _converse.Messages();
 
@@ -87631,8 +87640,11 @@ const converse = {
   },
 
   'onOpenChat'(callback) {
-    return _converse.on('chatOpenned', jid => {
-      callback(jid, 1, 50);
+    return _converse.on('chatOpenned', ({
+      jid,
+      messageType
+    }) => {
+      callback(jid, messageType, 1, 50);
     });
   },
 
@@ -87653,7 +87665,6 @@ const converse = {
 
     participants.forEach(participant => {
       const invitation = newChatRoom.directInvite(participant);
-      console.log(invitation);
     });
   },
 
@@ -90744,11 +90755,21 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
        * settings).
        */
       _.each(_converse.auto_join_rooms, function (groupchat) {
-        if (_converse.chatboxes.where({
+        console.log('groupchat', groupchat);
+
+        const boxesExisting = _converse.chatboxes.where({
           'jid': groupchat
-        }).length) {
-          return;
+        });
+
+        if (boxesExisting.length) {
+          const hasGroupChatBox = boxesExisting.filter(box => box.get('message_type') === 'groupchat');
+
+          if (hasGroupChatBox) {
+            return;
+          }
         }
+
+        console.log('passed');
 
         if (_.isString(groupchat)) {
           _converse.api.rooms.open(groupchat);
@@ -90929,6 +90950,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
          * );
          */
         'open': async function open(jids, attrs) {
+          console.log(jids, attrs);
           await _converse.api.waitUntil('chatBoxesFetched');
 
           if (_.isUndefined(jids)) {
@@ -90938,6 +90960,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
             throw new TypeError(err_msg);
           } else if (_.isString(jids)) {
+            console.log('here');
             return _converse.api.rooms.create(jids, attrs).trigger('show');
           } else {
             return _.map(jids, jid => _converse.api.rooms.create(jid, attrs).trigger('show'));

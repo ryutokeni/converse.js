@@ -1287,9 +1287,15 @@ converse.plugins.add('converse-muc', {
              * settings).
              */
             _.each(_converse.auto_join_rooms, function (groupchat) {
-                if (_converse.chatboxes.where({'jid': groupchat}).length) {
+              console.log('groupchat', groupchat);
+                const boxesExisting = _converse.chatboxes.where({'jid': groupchat});
+                if (boxesExisting.length) {
+                  const hasGroupChatBox = boxesExisting.filter(box => box.get('message_type') === 'groupchat');
+                  if (hasGroupChatBox) {
                     return;
+                  }
                 }
+                console.log('passed');
                 if (_.isString(groupchat)) {
                     _converse.api.rooms.open(groupchat);
                 } else if (_.isObject(groupchat)) {
@@ -1458,12 +1464,14 @@ converse.plugins.add('converse-muc', {
                  * );
                  */
                 'open': async function (jids, attrs) {
+                  console.log(jids, attrs);
                     await _converse.api.waitUntil('chatBoxesFetched');
                     if (_.isUndefined(jids)) {
                         const err_msg = 'rooms.open: You need to provide at least one JID';
                         _converse.log(err_msg, Strophe.LogLevel.ERROR);
                         throw(new TypeError(err_msg));
                     } else if (_.isString(jids)) {
+                      console.log('here');
                         return _converse.api.rooms.create(jids, attrs).trigger('show');
                     } else {
                         return _.map(jids, (jid) => _converse.api.rooms.create(jid, attrs).trigger('show'));
