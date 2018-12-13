@@ -105,11 +105,10 @@ converse.plugins.add('converse-chatboxes', {
             },
 
             setVCard () {
-              // console.log(this);
                 if (this.get('type') === 'error') {
                     return;
                 } else if (this.get('type') === 'groupchat') {
-                    // this.vcard = this.getVCardForChatroomOccupant();
+                    this.vcard = this.getVCardForChatroomOccupant();
                 } else {
                     const jid = this.get('from');
                     this.vcard = _converse.vcards.findWhere({'jid': jid}) || _converse.vcards.create({'jid': jid});
@@ -245,7 +244,6 @@ converse.plugins.add('converse-chatboxes', {
                 _converse.api.waitUntil('rosterContactsFetched').then(() => {
                     this.addRelatedContact(_converse.roster.findWhere({'jid': this.get('jid')}));
                 });
-                console.log(this.get('message_type'), this);
                 _converse.emit('chatOpenned', {
                   jid: this.get('jid'),
                   messageType: this.get('message_type')
@@ -394,7 +392,6 @@ converse.plugins.add('converse-chatboxes', {
             },
 
             sendMessageStanza (stanza) {
-              console.log(stanza);
                 _converse.api.send(stanza);
                 if (_converse.forward_messages) {
                     // Forward the message, so that other connected resources are also aware of it.
@@ -708,13 +705,8 @@ converse.plugins.add('converse-chatboxes', {
             onChatBoxesFetched (collection) {
                 /* Show chat boxes upon receiving them from sessionStorage */
                 collection.each((chatbox) => {
-                    if (chatbox.get('type') === _converse.CHATROOMS_TYPE) {
-                        if (_converse.auto_join_rooms.findIndex(room => (room.jid === chatbox.get('jid'))) === -1) {
-                          chatbox.destroy();
-                        }
-                    }
                     if (this.chatBoxMayBeShown(chatbox)) {
-                        // chatbox.trigger('show');
+                        chatbox.trigger('show');
                     }
                 });
                 _converse.emit('chatBoxesFetched');
@@ -898,6 +890,7 @@ converse.plugins.add('converse-chatboxes', {
                         }
                     });
                 }
+
                 return chatbox;
             }
         });

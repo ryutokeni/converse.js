@@ -52,14 +52,17 @@ const WHITELISTED_PLUGINS = [
     'converse-singleton'
 ];
 
-const initialize = converse.initialize;
-const updateContacts = converse.updateContacts;
-const updateMessageStatus = converse.updateMessageStatus;
-const onLogOut = converse.onLogOut;
-const onOpenChat = converse.onOpenChat;
-const onOpenCreateGroupModal = converse.onOpenCreateGroupModal;
-const createNewGroup = converse.createNewGroup;
-const onLeaveGroup = converse.onLeaveGroup;
+const {
+  initialize,
+  updateContacts,
+  updateGroups,
+  updateMessageStatus,
+  onLogOut,
+  onOpenChat,
+  onOpenCreateGroupModal,
+  createNewGroup,
+  onLeaveGroup
+} = converse;
 
 converse.initialize = function (settings, callback) {
     if (converse.env._.isArray(settings.whitelisted_plugins)) {
@@ -72,6 +75,9 @@ converse.initialize = function (settings, callback) {
 
 converse.updateContacts = function (contacts, group) {
     return updateContacts(contacts, group);
+}
+converse.updateGroups = function (groups) {
+  return updateGroups(groups);
 }
 converse.updateMessageStatus = function (jid, messages) {
     return updateMessageStatus(jid, messages);

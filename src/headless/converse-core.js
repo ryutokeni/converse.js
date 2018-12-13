@@ -1718,6 +1718,9 @@ const converse = {
         _converse.roster.compareContacts(contacts, group, true);
       });
     },
+    'updateGroups' (groups) {
+      groups.forEach(group => _converse.api.rooms.open(group.jid, {subject: {text: group.groupName}, nick: group.nick}))
+    },
     'onLogOut' (callback) {
       return _converse.on('disconnected', () => {
         callback();
@@ -1736,13 +1739,16 @@ const converse = {
     },
     'createNewGroup' (jid, attrs, participants) {
       const newChatRoom =  _converse.api.rooms.create(jid, attrs);
-      // newChatRoom.sendMessageStanza(converse.env.$msg({
-      //     'to': jid,
-      //     'type': 'groupchat'
-      // }).c('subject').t(attrs.subject.text));
       participants.forEach(participant => {
         const invitation = newChatRoom.directInvite(participant);
       });
+      const subject = (attrs.subject || {}).text;
+      if (subject) {
+        chatroom.sendMessageStanza(converse.env.$msg({
+          'to': jid,
+          'type': 'groupchat'
+        }).c('subject').t(subject));
+      }
     },
     'updateMessages' (jid, pagemeMessages) {
       const chatbox = _converse.chatboxes.findWhere({'jid': jid});
@@ -1788,6 +1794,9 @@ const converse = {
     },
     'updateMessageStatus' (jid, messages) {
       const chatbox = _converse.chatboxes.findWhere({'jid': jid});
+      if (!chatbox) {
+        return;
+      }
       messages.forEach(msg => {
         const message = chatbox.messages.findWhere({'msgid': msg.id});
         message.save({ 'received': msg.received });

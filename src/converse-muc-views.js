@@ -299,6 +299,7 @@ converse.plugins.add('converse-muc-views', {
                 const jid = ev.target.getAttribute('data-room-jid');
                 const name = ev.target.getAttribute('data-room-name');
                 this.modal.hide();
+                console.log(jid);
                 _converse.api.rooms.open(jid, {'name': name});
             },
 
@@ -503,7 +504,7 @@ converse.plugins.add('converse-muc-views', {
                 this.model.on('change:jid', this.renderHeading, this);
                 this.model.on('change:name', this.renderHeading, this);
                 this.model.on('change:subject', this.renderHeading, this);
-                // this.model.on('change:subject', this.setChatRoomSubject, this);
+                this.model.on('change:subject', this.setChatRoomSubject, this);
                 this.model.on('configurationNeeded', this.getAndRenderConfigurationForm, this);
                 this.model.on('destroy', this.hide, this);
                 this.model.on('show', this.show, this);
@@ -1733,7 +1734,6 @@ converse.plugins.add('converse-muc-views', {
                         'extra_classes': 'chat-event',
                         'message': message
                     }));
-
                 if (subject.text) {
                     this.content.insertAdjacentHTML(
                         'beforeend',
@@ -2052,6 +2052,7 @@ converse.plugins.add('converse-muc-views', {
 
             function openChatRoomFromURIClicked (ev) {
                 ev.preventDefault();
+                console.log(ev.target.href);
                 _converse.api.rooms.open(ev.target.href);
             }
             _converse.chatboxviews.delegate('click', 'a.open-chatroom', openChatRoomFromURIClicked);

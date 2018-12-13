@@ -459,19 +459,27 @@ converse.plugins.add('converse-muc', {
                     'xmlns': 'jabber:x:conference',
                     'jid': this.get('jid')
                 };
+                const subject = (this.get('subject') || {}).text || '';
                 if (reason !== null) { attrs.reason = reason; }
                 if (this.get('password')) { attrs.password = this.get('password'); }
 
-                const invitation = $msg({
+                const pageMeInvitation = $msg({
                     // 'from': _converse.connection.jid,
                     'to': attrs.jid,
                     'id': _converse.connection.getUniqueId()
-                }).c('x', {
-                    'xmlns': 'http://jabber.org/protocol/muc#user'
-                }).c('invite', {
+                }).c('x', attrs).c('invite', {
                   'to': recipient
                 })
-                _converse.api.send(invitation);
+                const converseInvitation = $msg({
+                    'from': _converse.connection.jid,
+                    'to': recipient,
+                    'id': _converse.connection.getUniqueId()
+                })
+                .c('x', attrs)
+                .c('field', { 'var': 'muc#roominfo_subject'})
+                .c('value').t(subject);
+                _converse.api.send(pageMeInvitation);
+                _converse.api.send(converseInvitation);
                 _converse.api.emit('roomInviteSent', {
                     'room': this,
                     'recipient': recipient,
@@ -503,7 +511,7 @@ converse.plugins.add('converse-muc', {
                     }
                     attrs[fieldname.replace('muc_', '')] = true;
                 });
-                attrs.description = _.get(fields.findWhere({'var': "muc#roominfo_description"}), 'attributes.value');
+                attrs.description = _.get(fields.findWhere({'var': "muc#roominfo_description"}), 'attributes.value');                
                 this.save(attrs);
             },
 
@@ -997,6 +1005,7 @@ converse.plugins.add('converse-muc', {
                  * Parameters:
                  *  (XMLElement) pres: The stanza
                  */
+
                 if (pres.getAttribute('type') === 'error') {
                     this.save('connection_status', converse.ROOMSTATUS.DISCONNECTED);
                     return;
@@ -1287,7 +1296,6 @@ converse.plugins.add('converse-muc', {
              * settings).
              */
             _.each(_converse.auto_join_rooms, function (groupchat) {
-              console.log('groupchat', groupchat);
                 const boxesExisting = _converse.chatboxes.where({'jid': groupchat});
                 if (boxesExisting.length) {
                   const hasGroupChatBox = boxesExisting.filter(box => box.get('message_type') === 'groupchat');
@@ -1295,11 +1303,10 @@ converse.plugins.add('converse-muc', {
                     return;
                   }
                 }
-                console.log('passed');
                 if (_.isString(groupchat)) {
                     _converse.api.rooms.open(groupchat);
                 } else if (_.isObject(groupchat)) {
-                    _converse.api.rooms.open(groupchat.jid, groupchat.nick);
+                  _converse.api.rooms.open(jid, {'name': name});
                 } else {
                     _converse.log(
                         'Invalid groupchat criteria specified for "auto_join_rooms"',
@@ -1464,14 +1471,12 @@ converse.plugins.add('converse-muc', {
                  * );
                  */
                 'open': async function (jids, attrs) {
-                  console.log(jids, attrs);
                     await _converse.api.waitUntil('chatBoxesFetched');
                     if (_.isUndefined(jids)) {
                         const err_msg = 'rooms.open: You need to provide at least one JID';
                         _converse.log(err_msg, Strophe.LogLevel.ERROR);
                         throw(new TypeError(err_msg));
                     } else if (_.isString(jids)) {
-                      console.log('here');
                         return _converse.api.rooms.create(jids, attrs).trigger('show');
                     } else {
                         return _.map(jids, (jid) => _converse.api.rooms.create(jid, attrs).trigger('show'));
