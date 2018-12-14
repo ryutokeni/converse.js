@@ -105,7 +105,7 @@ converse.plugins.add('converse-muc-views', {
         const { _converse } = this,
               { __ } = _converse;
 
-        _converse.api.promises.add(['roomsPanelRendered']);
+        _converse.api.promises.add(['roomsPanelRendered', 'loadMoreMessages']);
 
         // Configuration values for this plugin
         // ====================================
@@ -490,7 +490,8 @@ converse.plugins.add('converse-muc-views', {
                 'click .upload-file': 'toggleFileUpload',
                 'keydown .chat-textarea': 'keyPressed',
                 'keyup .chat-textarea': 'keyUp',
-                'input .chat-textarea': 'inputChanged'
+                'input .chat-textarea': 'inputChanged',
+                'click .load-more-messages': 'loadMoreMessages',
             },
 
             initialize () {
@@ -1362,13 +1363,13 @@ converse.plugins.add('converse-muc-views', {
                 const code = stat.getAttribute('code');
                 if (code === '110' || (code === '100' && !is_self)) { return; }
                 if (code in _converse.muc.info_messages) {
-                    return _converse.muc.info_messages[code];
+                    // return _converse.muc.info_messages[code];
                 }
                 let nick;
                 if (!is_self) {
                     if (code in _converse.muc.action_info_messages) {
                         nick = Strophe.getResourceFromJid(stanza.getAttribute('from'));
-                        return __(_converse.muc.action_info_messages[code], nick);
+                        // return __(_converse.muc.action_info_messages[code], nick);
                     }
                 } else if (code in _converse.muc.new_nickname_messages) {
                     if (is_self && code === "210") {
@@ -1376,7 +1377,7 @@ converse.plugins.add('converse-muc-views', {
                     } else if (is_self && code === "303") {
                         nick = stanza.querySelector('x item').getAttribute('nick');
                     }
-                    return __(_converse.muc.new_nickname_messages[code], nick);
+                    // return __(_converse.muc.new_nickname_messages[code], nick);
                 }
                 return;
             },
@@ -1735,16 +1736,24 @@ converse.plugins.add('converse-muc-views', {
                         'message': message
                     }));
                 if (subject.text) {
-                    this.content.insertAdjacentHTML(
-                        'beforeend',
-                        tpl_info({
-                            'isodate': date,
-                            'extra_classes': 'chat-topic',
-                            'message': u.addHyperlinks(xss.filterXSS(_.get(this.model.get('subject'), 'text'), {'whiteList': {}})),
-                            'render_message': true
-                        }));
+                    // this.content.insertAdjacentHTML(
+                    //     'beforeend',
+                    //     tpl_info({
+                    //         'isodate': date,
+                    //         'extra_classes': 'chat-topic',
+                    //         'message': u.addHyperlinks(xss.filterXSS(_.get(this.model.get('subject'), 'text'), {'whiteList': {}})),
+                    //         'render_message': true
+                    //     }));
                 }
                 this.scrollDown();
+            },
+
+            loadMoreMessages () {
+              console.log('loadMoreMessages');
+              _converse.emit('loadMoreMessages', {
+                jid: this.model.get('jid'),
+                messageType: this.model.get('message_type')
+              });
             }
         });
 

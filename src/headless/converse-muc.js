@@ -511,7 +511,7 @@ converse.plugins.add('converse-muc', {
                     }
                     attrs[fieldname.replace('muc_', '')] = true;
                 });
-                attrs.description = _.get(fields.findWhere({'var': "muc#roominfo_description"}), 'attributes.value');                
+                attrs.description = _.get(fields.findWhere({'var': "muc#roominfo_description"}), 'attributes.value');
                 this.save(attrs);
             },
 
@@ -1014,6 +1014,24 @@ converse.plugins.add('converse-muc', {
                 if (is_self && pres.getAttribute('type') !== 'unavailable') {
                     this.onOwnPresence(pres);
                 }
+                const is_just_created = pres.querySelector("status[code='201']");
+                if (is_just_created) {
+                  const participants = this.get('participants');
+                  if (!participants) {
+                    return;
+                  }
+                  (participants || []).forEach(participant => {
+                    const invitation = this.directInvite(participant);
+                  });
+                  const subject = (this.get('subject') || {}).text || '';
+                  if (subject) {
+                    this.sendMessageStanza(converse.env.$msg({
+                      'to': this.get('jid'),
+                      'type': 'groupchat'
+                    }).c('subject').t(subject));
+                  }
+                  this.save('participants', null);
+                }
                 this.updateOccupantsOnPresence(pres);
                 if (this.get('role') !== 'none' && this.get('connection_status') === converse.ROOMSTATUS.CONNECTING) {
                     this.save('connection_status', converse.ROOMSTATUS.CONNECTED);
@@ -1470,14 +1488,16 @@ converse.plugins.add('converse-muc', {
                  *     true
                  * );
                  */
-                'open': async function (jids, attrs) {
+                'open': async function (jids, attrs, participants) {
                     await _converse.api.waitUntil('chatBoxesFetched');
                     if (_.isUndefined(jids)) {
                         const err_msg = 'rooms.open: You need to provide at least one JID';
                         _converse.log(err_msg, Strophe.LogLevel.ERROR);
                         throw(new TypeError(err_msg));
                     } else if (_.isString(jids)) {
-                        return _converse.api.rooms.create(jids, attrs).trigger('show');
+                        const newChatRoom = _converse.api.rooms.create(jids, attrs);
+                        newChatRoom.trigger('show');
+                        newChatRoom.save('participants', participants);                        
                     } else {
                         return _.map(jids, (jid) => _converse.api.rooms.create(jid, attrs).trigger('show'));
                     }

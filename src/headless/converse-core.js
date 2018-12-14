@@ -1726,9 +1726,12 @@ const converse = {
         callback();
       });
     },
-    'onOpenChat' (callback) {
-      return _converse.on('chatOpenned', ({jid, messageType}) => {
-        callback(jid, messageType, 1, 50);
+    'onLoadMessages' (callback) {
+      _converse.on('chatOpenned', ({jid, messageType}) => {
+        callback(jid, messageType, 1, 10);
+      });
+      _converse.on('loadMoreMessages', ({jid, messageType}) => {
+        callback(jid, messageType, null, 10);
       });
     },
     'onOpenCreateGroupModal' (callback) {
@@ -1738,17 +1741,8 @@ const converse = {
       return _converse.on('leaveGroup', (jid) => callback(jid));
     },
     'createNewGroup' (jid, attrs, participants) {
-      const newChatRoom =  _converse.api.rooms.create(jid, attrs);
-      participants.forEach(participant => {
-        const invitation = newChatRoom.directInvite(participant);
-      });
-      const subject = (attrs.subject || {}).text;
-      if (subject) {
-        chatroom.sendMessageStanza(converse.env.$msg({
-          'to': jid,
-          'type': 'groupchat'
-        }).c('subject').t(subject));
-      }
+      _converse.api.rooms.open(jid, attrs, participants);
+      // const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
     },
     'updateMessages' (jid, pagemeMessages) {
       const chatbox = _converse.chatboxes.findWhere({'jid': jid});

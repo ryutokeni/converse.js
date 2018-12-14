@@ -76644,7 +76644,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
     const _converse = this._converse,
           __ = _converse.__;
 
-    _converse.api.promises.add(['roomsPanelRendered']); // Configuration values for this plugin
+    _converse.api.promises.add(['roomsPanelRendered', 'loadMoreMessages']); // Configuration values for this plugin
     // ====================================
     // Refer to docs/source/configuration.rst for explanations of these
     // configuration settings.
@@ -77031,7 +77031,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         'click .upload-file': 'toggleFileUpload',
         'keydown .chat-textarea': 'keyPressed',
         'keyup .chat-textarea': 'keyUp',
-        'input .chat-textarea': 'inputChanged'
+        'input .chat-textarea': 'inputChanged',
+        'click .load-more-messages': 'loadMoreMessages'
       },
 
       initialize() {
@@ -77962,25 +77963,22 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
           return;
         }
 
-        if (code in _converse.muc.info_messages) {
-          return _converse.muc.info_messages[code];
+        if (code in _converse.muc.info_messages) {// return _converse.muc.info_messages[code];
         }
 
         let nick;
 
         if (!is_self) {
           if (code in _converse.muc.action_info_messages) {
-            nick = Strophe.getResourceFromJid(stanza.getAttribute('from'));
-            return __(_converse.muc.action_info_messages[code], nick);
+            nick = Strophe.getResourceFromJid(stanza.getAttribute('from')); // return __(_converse.muc.action_info_messages[code], nick);
           }
         } else if (code in _converse.muc.new_nickname_messages) {
           if (is_self && code === "210") {
             nick = Strophe.getResourceFromJid(stanza.getAttribute('from'));
           } else if (is_self && code === "303") {
             nick = stanza.querySelector('x item').getAttribute('nick');
-          }
+          } // return __(_converse.muc.new_nickname_messages[code], nick);
 
-          return __(_converse.muc.new_nickname_messages[code], nick);
         }
 
         return;
@@ -78379,18 +78377,26 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
           'message': message
         }));
 
-        if (subject.text) {
-          this.content.insertAdjacentHTML('beforeend', templates_info_html__WEBPACK_IMPORTED_MODULE_18___default()({
-            'isodate': date,
-            'extra_classes': 'chat-topic',
-            'message': u.addHyperlinks(xss__WEBPACK_IMPORTED_MODULE_26___default.a.filterXSS(_.get(this.model.get('subject'), 'text'), {
-              'whiteList': {}
-            })),
-            'render_message': true
-          }));
+        if (subject.text) {// this.content.insertAdjacentHTML(
+          //     'beforeend',
+          //     tpl_info({
+          //         'isodate': date,
+          //         'extra_classes': 'chat-topic',
+          //         'message': u.addHyperlinks(xss.filterXSS(_.get(this.model.get('subject'), 'text'), {'whiteList': {}})),
+          //         'render_message': true
+          //     }));
         }
 
         this.scrollDown();
+      },
+
+      loadMoreMessages() {
+        console.log('loadMoreMessages');
+
+        _converse.emit('loadMoreMessages', {
+          jid: this.model.get('jid'),
+          messageType: this.model.get('message_type')
+        });
       }
 
     });
@@ -83394,7 +83400,7 @@ const initialize = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20_
       updateGroups = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].updateGroups,
       updateMessageStatus = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].updateMessageStatus,
       onLogOut = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLogOut,
-      onOpenChat = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenChat,
+      onLoadMessages = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLoadMessages,
       onOpenCreateGroupModal = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenCreateGroupModal,
       createNewGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].createNewGroup,
       onLeaveGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLeaveGroup;
@@ -83425,8 +83431,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLogO
   return onLogOut(callback);
 };
 
-_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenChat = function (callback) {
-  return onOpenChat(callback);
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLoadMessages = function (callback) {
+  return onLoadMessages(callback);
 };
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenCreateGroupModal = function (callback) {
@@ -87646,12 +87652,19 @@ const converse = {
     });
   },
 
-  'onOpenChat'(callback) {
-    return _converse.on('chatOpenned', ({
+  'onLoadMessages'(callback) {
+    _converse.on('chatOpenned', ({
       jid,
       messageType
     }) => {
-      callback(jid, messageType, 1, 50);
+      callback(jid, messageType, 1, 10);
+    });
+
+    _converse.on('loadMoreMessages', ({
+      jid,
+      messageType
+    }) => {
+      callback(jid, messageType, null, 10);
     });
   },
 
@@ -87664,11 +87677,8 @@ const converse = {
   },
 
   'createNewGroup'(jid, attrs, participants) {
-    const newChatRoom = _converse.api.rooms.create(jid, attrs);
+    _converse.api.rooms.open(jid, attrs, participants); // const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
 
-    participants.forEach(participant => {
-      const invitation = newChatRoom.directInvite(participant);
-    });
   },
 
   'updateMessages'(jid, pagemeMessages) {
@@ -90455,6 +90465,30 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           this.onOwnPresence(pres);
         }
 
+        const is_just_created = pres.querySelector("status[code='201']");
+
+        if (is_just_created) {
+          const participants = this.get('participants');
+
+          if (!participants) {
+            return;
+          }
+
+          (participants || []).forEach(participant => {
+            const invitation = this.directInvite(participant);
+          });
+          const subject = (this.get('subject') || {}).text || '';
+
+          if (subject) {
+            this.sendMessageStanza(_converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].env.$msg({
+              'to': this.get('jid'),
+              'type': 'groupchat'
+            }).c('subject').t(subject));
+          }
+
+          this.save('participants', null);
+        }
+
         this.updateOccupantsOnPresence(pres);
 
         if (this.get('role') !== 'none' && this.get('connection_status') === _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].ROOMSTATUS.CONNECTING) {
@@ -90760,17 +90794,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         jid = jid.replace(/^xmpp:/, '').replace(/\?join$/, '');
       }
 
-      const chatroom = getChatRoom(jid, attrs, true);
-      const subject = (attrs.subject || {}).text;
-
-      if (subject) {
-        chatroom.sendMessageStanza(_converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].env.$msg({
-          'to': jid,
-          'type': 'groupchat'
-        }).c('subject').t(subject));
-      }
-
-      return chatroom;
+      return getChatRoom(jid, attrs, true);
     };
 
     function autoJoinRooms() {
@@ -90972,7 +90996,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
          *     true
          * );
          */
-        'open': async function open(jids, attrs) {
+        'open': async function open(jids, attrs, participants) {
           await _converse.api.waitUntil('chatBoxesFetched');
 
           if (_.isUndefined(jids)) {
@@ -90982,7 +91006,10 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
             throw new TypeError(err_msg);
           } else if (_.isString(jids)) {
-            return _converse.api.rooms.create(jids, attrs).trigger('show');
+            const newChatRoom = _converse.api.rooms.create(jids, attrs);
+
+            newChatRoom.trigger('show');
+            newChatRoom.save('participants', participants);
           } else {
             return _.map(jids, jid => _converse.api.rooms.create(jid, attrs).trigger('show'));
           }
@@ -116539,7 +116566,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/chatarea.html -->\n<div class="chat-area col-md-9 col-8">\n    <div class="chat-content ';
+__p += '<!-- src/templates/chatarea.html -->\n<div class="chat-area col-md-9 col-8">\n    <div class="text-center">\n      <button class="load-more-messages">Load more...</button>\n    </div>\n    <div class="chat-content ';
  if (o.show_send_button) { ;
 __p += 'chat-content-sendbutton';
  } ;

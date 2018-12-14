@@ -58,7 +58,7 @@ const {
   updateGroups,
   updateMessageStatus,
   onLogOut,
-  onOpenChat,
+  onLoadMessages,
   onOpenCreateGroupModal,
   createNewGroup,
   onLeaveGroup
@@ -87,8 +87,8 @@ converse.onLogOut = function (callback) {
     return onLogOut(callback);
 }
 
-converse.onOpenChat = function (callback) {
-    return onOpenChat(callback);
+converse.onLoadMessages = function (callback) {
+    return onLoadMessages(callback);
 }
 
 converse.onOpenCreateGroupModal = function (callback) {
