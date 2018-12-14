@@ -72722,7 +72722,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         'input .chat-textarea': 'inputChanged',
         'keydown .chat-textarea': 'keyPressed',
         'dragover .chat-textarea': 'onDragOver',
-        'drop .chat-textarea': 'onDrop'
+        'drop .chat-textarea': 'onDrop',
+        'click .load-more-messages': 'loadMoreMessages'
       },
 
       initialize() {
@@ -73790,6 +73791,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
           _converse.connection.flush();
         }
+      },
+
+      loadMoreMessages() {
+        _converse.emit('loadMoreMessages', {
+          jid: this.model.get('jid'),
+          messageType: this.model.get('message_type')
+        });
       }
 
     });
@@ -78392,8 +78400,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       },
 
       loadMoreMessages() {
-        console.log('loadMoreMessages');
-
         _converse.emit('loadMoreMessages', {
           jid: this.model.get('jid'),
           messageType: this.model.get('message_type')
@@ -116611,7 +116617,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/chatbox.html -->\n<div class="flyout box-flyout">\n    <div class="chat-body">\n        <div class="chat-content ';
+__p += '<!-- src/templates/chatbox.html -->\n<div class="flyout box-flyout">\n    <div class="chat-body">\n      <div class="text-center">\n        <button class="load-more-messages">Load more...</button>\n      </div>\n        <div class="chat-content ';
  if (o.show_send_button) { ;
 __p += 'chat-content-sendbutton';
  } ;

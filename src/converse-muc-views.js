@@ -1749,7 +1749,6 @@ converse.plugins.add('converse-muc-views', {
             },
 
             loadMoreMessages () {
-              console.log('loadMoreMessages');
               _converse.emit('loadMoreMessages', {
                 jid: this.model.get('jid'),
                 messageType: this.model.get('message_type')

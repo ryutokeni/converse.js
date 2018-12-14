@@ -303,6 +303,7 @@ converse.plugins.add('converse-chatview', {
                 'keydown .chat-textarea': 'keyPressed',
                 'dragover .chat-textarea': 'onDragOver',
                 'drop .chat-textarea': 'onDrop',
+                'click .load-more-messages': 'loadMoreMessages',
             },
 
             initialize () {
@@ -316,10 +317,10 @@ converse.plugins.add('converse-chatview', {
 
                 this.model.presence.on('change:show', this.onPresenceChanged, this);
                 this.model.on('showHelpMessages', this.showHelpMessages, this);
-                
+
                 this.render();
                 this.fetchMessages();
-               
+
                 _converse.emit('chatBoxOpened', this);
                 _converse.emit('chatBoxInitialized', this);
                 _converse.on('message-rendered-!', () => {
@@ -1307,6 +1308,13 @@ converse.plugins.add('converse-chatview', {
                     this.model.sendChatState();
                     _converse.connection.flush();
                 }
+            },
+
+            loadMoreMessages () {
+              _converse.emit('loadMoreMessages', {
+                jid: this.model.get('jid'),
+                messageType: this.model.get('message_type')
+              });
             }
         });
 
@@ -1326,7 +1334,7 @@ converse.plugins.add('converse-chatview', {
             // Advertise that we support XEP-0382 Message Spoilers
             _converse.api.disco.own.features.add(Strophe.NS.SPOILER);
         });
-      
+
 
         /************************ BEGIN API ************************/
         _.extend(_converse.api, {
