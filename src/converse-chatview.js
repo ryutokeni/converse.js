@@ -324,7 +324,6 @@ converse.plugins.add('converse-chatview', {
                 _converse.emit('chatBoxInitialized', this);
                 _converse.on('message-rendered-!', () => {
                     const loading = this.el.querySelector('.chat-loading');
-                 //   console.log(loading);
                     uk.hideElement(loading);
                 })
             },

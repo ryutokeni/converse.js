@@ -76,6 +76,7 @@ converse.plugins.add('converse-rosterview', {
         });
         _converse.api.promises.add(['rosterViewInitialized']);
         _converse.api.promises.add(['rosterViewTrulyInitial']);
+        
 
         const STATUSES = {
             'dnd': __('This contact is busy'),
@@ -590,6 +591,7 @@ converse.plugins.add('converse-rosterview', {
             },
 
             render () {
+              //  console.log('model roster group view:', this.model);
                 this.el.setAttribute('data-group', this.model.get('name'));
                 this.el.innerHTML = tpl_group_header({
                     'label_group': this.model.get('name'),
@@ -598,6 +600,8 @@ converse.plugins.add('converse-rosterview', {
                     '_converse': _converse
                 });
                 this.contacts_el = this.el.querySelector('.roster-group-contacts');
+                _converse.emit('load-done', this.model.get('name'));
+                console.log('hide Loading emit');
                 return this;
             },
 
@@ -745,6 +749,7 @@ converse.plugins.add('converse-rosterview', {
                 }
             }
         });
+     
         _converse.RosterView = Backbone.OrderedListView.extend({
             tagName: 'div',
             id: 'converse-roster',
@@ -787,7 +792,6 @@ converse.plugins.add('converse-rosterview', {
                     this.updateFilter();
                     this.trigger('rosterContactsFetchedAndProcessed');
                 });
-            
                 this.createRosterFilter();
             },
 
@@ -802,7 +806,11 @@ converse.plugins.add('converse-rosterview', {
                 this.el.replaceChild(this.filter_view.render().el, form);
                 this.roster_el = this.el.querySelector('.roster-contacts');
                 //this.loading_el = this.el.querySelector('.roster-loading');
-              
+                this.loading_contact = this.el.querySelector('.roster-loading-Contacts');
+                this.loading_org = this.el.querySelector('.roster-loading-Organization');
+                console.log('show loading');
+                u.showElement(this.loading_contact);
+                u.showElement(this.loading_org);
                 return this;
             },
 
@@ -840,7 +848,7 @@ converse.plugins.add('converse-rosterview', {
             }, 100),
 
             update: _.debounce(function () {
-                 _converse.emit('rosterViewTrulyInitial');
+                _converse.emit('rosterViewTrulyInitial');
                 if (!u.isVisible(this.roster_el)) {
                     u.showElement(this.roster_el);
                 }
@@ -1004,7 +1012,16 @@ converse.plugins.add('converse-rosterview', {
             // })
             _converse.rosterview.render();
             _converse.emit('rosterViewInitialized');
+            _converse.on('load-done', labelName=> {
+                if (labelName === 'Contacts') {
+                    u.hideElement(_converse.rosterview.loading_contact);
+                }
+                else {
+                    u.hideElement(_converse.rosterview.loading_org);
+                }
+            })
         }
+        
         _converse.api.listen.on('rosterInitialized', initRoster);
         _converse.api.listen.on('rosterReadyAfterReconnection', initRoster);
     }

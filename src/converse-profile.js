@@ -33,7 +33,6 @@ converse.plugins.add('converse-profile', {
         const { _converse } = this,
               { __ } = _converse;
 
-
         _converse.ProfileModal = _converse.BootstrapModal.extend({
             events: {
                 'change input[type="file"': "updateFilePreview",
@@ -48,6 +47,8 @@ converse.plugins.add('converse-profile', {
             },
 
             toHTML () {
+                //this.model.vcard.image = _converse.user_settings.userProfile.avatarUrl;
+                this.model.vcard.attributes.image = _converse.user_settings.userProfile.avatarUrl;
                 return tpl_profile_modal(_.extend(
                     this.model.toJSON(),
                     this.model.vcard.toJSON(), {
@@ -107,7 +108,6 @@ converse.plugins.add('converse-profile', {
                 const reader = new FileReader(),
                       form_data = new FormData(ev.target),
                       image_file = form_data.get('image');
-
                 const data = {
                     'fn': form_data.get('fn'),
                     'nickname': form_data.get('nickname'),
@@ -220,7 +220,7 @@ converse.plugins.add('converse-profile', {
                 "click .logout": "logOut"
             },
 
-            initialize () {
+            initialize () {                
                 this.model.on("change", this.render, this);
                 this.model.vcard.on("change", this.render, this);
             },
@@ -245,7 +245,7 @@ converse.plugins.add('converse-profile', {
             },
 
             afterRender () {
-                this.renderAvatar();
+                this.renderAvatar(null, true, _converse.user_settings.userProfile.avatarUrl);
             },
 
             showProfileModal (ev) {

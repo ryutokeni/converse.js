@@ -170,7 +170,7 @@ converse.plugins.add('converse-controlbox', {
         });
 
         _converse.api.promises.add('controlboxInitialized');
-
+        _converse.api.promises.add('check-update-loading');
         _converse.addControlBox = () => {
             return _converse.chatboxes.add({
                 'id': 'controlbox',
@@ -244,9 +244,9 @@ converse.plugins.add('converse-controlbox', {
                 }
                 /* Place the rosterview inside the "Contacts" panel. */
                 _converse.api.waitUntil('rosterViewTrulyInitial')
-                .then(() => {
+                .then( () => {
                         const loading = this.el.querySelector('.loading-contact');
-                         u.hideElement(loading);
+                              u.hideElement(loading);
                 })
                 _converse.api.waitUntil('rosterViewInitialized')
                     .then(() => {
