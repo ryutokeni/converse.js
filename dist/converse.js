@@ -85385,13 +85385,17 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
       },
 
       chatBoxMayBeShown(chatbox) {
-        return true;
+        return false;
       },
 
       onChatBoxesFetched(collection) {
         /* Show chat boxes upon receiving them from sessionStorage */
         collection.each(chatbox => {
+          console.log('================');
+          console.log(chatbox);
+
           if (this.chatBoxMayBeShown(chatbox)) {
+            console.log(true);
             chatbox.trigger('show');
           }
         });
@@ -87665,12 +87669,14 @@ const converse = {
   },
 
   'updateGroups'(groups) {
-    groups.forEach(group => _converse.api.rooms.open(group.jid, {
-      subject: {
-        text: group.groupName
-      },
-      nick: group.nick
-    }));
+    groups.forEach(group => {
+      _converse.api.rooms.open(group.jid, {
+        subject: {
+          text: group.groupName
+        },
+        nick: group.nick
+      });
+    });
   },
 
   'onLogOut'(callback) {
@@ -87684,14 +87690,14 @@ const converse = {
       jid,
       messageType
     }) => {
-      callback(jid, messageType, 1, 10);
+      callback(jid, messageType, 1, 20);
     });
 
     _converse.on('loadMoreMessages', ({
       jid,
       messageType
     }) => {
-      callback(jid, messageType, null, 10);
+      callback(jid, messageType, null, 20);
     });
   },
 
@@ -91037,6 +91043,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
             newChatRoom.trigger('show');
             newChatRoom.save('participants', participants);
+            return newChatRoom;
           } else {
             return _.map(jids, jid => _converse.api.rooms.create(jid, attrs).trigger('show'));
           }

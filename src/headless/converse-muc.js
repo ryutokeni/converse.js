@@ -1497,7 +1497,8 @@ converse.plugins.add('converse-muc', {
                     } else if (_.isString(jids)) {
                         const newChatRoom = _converse.api.rooms.create(jids, attrs);
                         newChatRoom.trigger('show');
-                        newChatRoom.save('participants', participants);                        
+                        newChatRoom.save('participants', participants);
+                        return newChatRoom;
                     } else {
                         return _.map(jids, (jid) => _converse.api.rooms.create(jid, attrs).trigger('show'));
                     }

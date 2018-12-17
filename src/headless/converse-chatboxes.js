@@ -699,13 +699,16 @@ converse.plugins.add('converse-chatboxes', {
             },
 
             chatBoxMayBeShown (chatbox) {
-                return true;
+                return false;
             },
 
             onChatBoxesFetched (collection) {
                 /* Show chat boxes upon receiving them from sessionStorage */
                 collection.each((chatbox) => {
+                  console.log('================');
+                  console.log(chatbox);
                     if (this.chatBoxMayBeShown(chatbox)) {
+                      console.log(true);
                         chatbox.trigger('show');
                     }
                 });

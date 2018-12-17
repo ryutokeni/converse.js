@@ -1719,7 +1719,9 @@ const converse = {
       });
     },
     'updateGroups' (groups) {
-      groups.forEach(group => _converse.api.rooms.open(group.jid, {subject: {text: group.groupName}, nick: group.nick}))
+      groups.forEach((group) => {
+        _converse.api.rooms.open(group.jid, {subject: {text: group.groupName}, nick: group.nick});
+      })
     },
     'onLogOut' (callback) {
       return _converse.on('disconnected', () => {
@@ -1728,10 +1730,10 @@ const converse = {
     },
     'onLoadMessages' (callback) {
       _converse.on('chatOpenned', ({jid, messageType}) => {
-        callback(jid, messageType, 1, 10);
+        callback(jid, messageType, 1, 20);
       });
       _converse.on('loadMoreMessages', ({jid, messageType}) => {
-        callback(jid, messageType, null, 10);
+        callback(jid, messageType, null, 20);
       });
     },
     'onOpenCreateGroupModal' (callback) {
