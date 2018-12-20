@@ -69305,41 +69305,6 @@ module.exports = g;
 
 /***/ }),
 
-/***/ "./node_modules/webpack/buildin/harmony-module.js":
-/*!*******************************************!*\
-  !*** (webpack)/buildin/harmony-module.js ***!
-  \*******************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = function(originalModule) {
-	if (!originalModule.webpackPolyfill) {
-		var module = Object.create(originalModule);
-		// module.parent = undefined by default
-		if (!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		Object.defineProperty(module, "exports", {
-			enumerable: true
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
-
-
-/***/ }),
-
 /***/ "./node_modules/webpack/buildin/module.js":
 /*!***********************************!*\
   !*** (webpack)/buildin/module.js ***!
@@ -87732,21 +87697,7 @@ const converse = {
         }
 
         _converse.pagemeMessages.push(msg);
-
-        existed = _converse.pagemeMessages.length - 1;
       } else {}
-
-      if (!_converse.pagemeMessages[existed].decrypted) {
-        const currentMsg = _converse.pagemeMessages[existed];
-
-        if (currentMsg.stanza.getElementsByTagName('encrypted') && currentMsg.stanza.getElementsByTagName('encrypted')[0] && currentMsg.stanza.getElementsByTagName('encrypted')[0].firstChild && currentMsg.stanza.getElementsByTagName('encrypted')[0].firstChild.nodeValue === '1') {
-          try {
-            currentMsg.decrypted = _converse_headless_utils_rncryptor__WEBPACK_IMPORTED_MODULE_12__["pagemeDecrypt"](_converse.user_settings.pagemeEncryptKey, currentMsg.body);
-          } catch (err) {}
-        } else {
-          currentMsg.decrypted = currentMsg.body;
-        }
-      }
 
       _converse.chatboxes.onMessage(msg.stanza);
     });
@@ -115180,11 +115131,126 @@ _core__WEBPACK_IMPORTED_MODULE_1__["default"].parseMemberListIQ = function parse
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* WEBPACK VAR INJECTION */(function(module) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pagemeDecrypt", function() { return pagemeDecrypt; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pagemeDecrypt", function() { return pagemeDecrypt; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pagemeEncrypt", function() { return pagemeEncrypt; });
-/* harmony import */ var _core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./core */ "./src/headless/utils/core.js");
+const sjcl = __webpack_require__(/*! ./sjcl */ "./src/headless/utils/sjcl.js");
+
+var RNCryptor = {};
+/*
+    Takes password string and salt WordArray
+    Returns key bitArray
+*/
+
+RNCryptor.KeyForPassword = function (password, salt) {
+  var hmacSHA1 = function hmacSHA1(key) {
+    var hasher = new sjcl.misc.hmac(key, sjcl.hash.sha1);
+
+    this.encrypt = function () {
+      return hasher.encrypt.apply(hasher, arguments);
+    };
+  };
+
+  return sjcl.misc.pbkdf2(password, salt, 10000, 32 * 8, hmacSHA1);
+};
+/*
+  Takes password string and plaintext bitArray
+  options:
+    iv
+    encryption_salt
+    html_salt
+  Returns ciphertext bitArray
+*/
+
+
+RNCryptor.Encrypt = function (password, plaintext, options) {
+  options = options || {};
+  var encryption_salt = options["encryption_salt"] || sjcl.random.randomWords(8 / 4); // FIXME: Need to seed PRNG
+
+  var encryption_key = RNCryptor.KeyForPassword(password, encryption_salt);
+  var hmac_salt = options["hmac_salt"] || sjcl.random.randomWords(8 / 4);
+  var hmac_key = RNCryptor.KeyForPassword(password, hmac_salt);
+  var iv = options["iv"] || sjcl.random.randomWords(16 / 4);
+  var version = sjcl.codec.hex.toBits("03");
+  var options = sjcl.codec.hex.toBits("01");
+  var message = sjcl.bitArray.concat(version, options);
+  message = sjcl.bitArray.concat(message, encryption_salt);
+  message = sjcl.bitArray.concat(message, hmac_salt);
+  message = sjcl.bitArray.concat(message, iv);
+  var aes = new sjcl.cipher.aes(encryption_key);
+  sjcl.beware["CBC mode is dangerous because it doesn't protect message integrity."]();
+  var encrypted = sjcl.mode.cbc.encrypt(aes, plaintext, iv);
+  message = sjcl.bitArray.concat(message, encrypted);
+  var hmac = new sjcl.misc.hmac(hmac_key).encrypt(message);
+  message = sjcl.bitArray.concat(message, hmac);
+  return message;
+};
+/*
+  Takes password string and message (ciphertext) bitArray
+  options:
+    iv
+    encryption_salt
+    html_salt
+  Returns plaintext bitArray
+*/
+
+
+RNCryptor.Decrypt = function (password, message, options) {
+  options = options || {};
+  var version = sjcl.bitArray.extract(message, 0 * 8, 8);
+  var options = sjcl.bitArray.extract(message, 1 * 8, 8);
+  var encryption_salt = sjcl.bitArray.bitSlice(message, 2 * 8, 10 * 8);
+  var encryption_key = RNCryptor.KeyForPassword(password, encryption_salt);
+  var hmac_salt = sjcl.bitArray.bitSlice(message, 10 * 8, 18 * 8);
+  var hmac_key = RNCryptor.KeyForPassword(password, hmac_salt);
+  var iv = sjcl.bitArray.bitSlice(message, 18 * 8, 34 * 8);
+  var ciphertext_end = sjcl.bitArray.bitLength(message) - 32 * 8;
+  var ciphertext = sjcl.bitArray.bitSlice(message, 34 * 8, ciphertext_end);
+  var hmac = sjcl.bitArray.bitSlice(message, ciphertext_end);
+  var expected_hmac = new sjcl.misc.hmac(hmac_key).encrypt(sjcl.bitArray.bitSlice(message, 0, ciphertext_end)); // .equal is of consistent time
+
+  if (!sjcl.bitArray.equal(hmac, expected_hmac)) {
+    throw new sjcl.exception.corrupt("HMAC mismatch or bad password.");
+  }
+
+  var aes = new sjcl.cipher.aes(encryption_key);
+  sjcl.beware["CBC mode is dangerous because it doesn't protect message integrity."]();
+  var decrypted = sjcl.mode.cbc.decrypt(aes, ciphertext, iv);
+  return decrypted;
+};
+
+var pagemeDecrypt = function pagemeDecrypt(key, base64) {
+  if (!key) {
+    key = '';
+  }
+
+  const bitsArray = sjcl.codec.base64.toBits(base64);
+  const decrypted = RNCryptor.Decrypt(key, bitsArray);
+  return sjcl.codec.utf8String.fromBits(decrypted);
+};
+
+var pagemeEncrypt = function pagemeEncrypt(key, string) {
+  if (!key) {
+    key = '';
+  }
+
+  const bitsArray = sjcl.codec.utf8String.toBits(string);
+  const encrypted = RNCryptor.Encrypt(key, bitsArray);
+  return sjcl.codec.base64.fromBits(encrypted);
+};
+
+
+
+/***/ }),
+
+/***/ "./src/headless/utils/sjcl.js":
+/*!************************************!*\
+  !*** ./src/headless/utils/sjcl.js ***!
+  \************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
 
 function l(a) {
   throw a;
@@ -116180,111 +116246,7 @@ sjcl.misc.cachedPbkdf2 = function (a, b) {
   };
 };
 
-var RNCryptor = {};
-/*
-    Takes password string and salt WordArray
-    Returns key bitArray
-*/
-
-RNCryptor.KeyForPassword = function (password, salt) {
-  var hmacSHA1 = function hmacSHA1(key) {
-    var hasher = new sjcl.misc.hmac(key, sjcl.hash.sha1);
-
-    this.encrypt = function () {
-      return hasher.encrypt.apply(hasher, arguments);
-    };
-  };
-
-  return sjcl.misc.pbkdf2(password, salt, 10000, 32 * 8, hmacSHA1);
-};
-/*
-  Takes password string and plaintext bitArray
-  options:
-    iv
-    encryption_salt
-    html_salt
-  Returns ciphertext bitArray
-*/
-
-
-RNCryptor.Encrypt = function (password, plaintext, options) {
-  options = options || {};
-  var encryption_salt = options["encryption_salt"] || sjcl.random.randomWords(8 / 4); // FIXME: Need to seed PRNG
-
-  var encryption_key = RNCryptor.KeyForPassword(password, encryption_salt);
-  var hmac_salt = options["hmac_salt"] || sjcl.random.randomWords(8 / 4);
-  var hmac_key = RNCryptor.KeyForPassword(password, hmac_salt);
-  var iv = options["iv"] || sjcl.random.randomWords(16 / 4);
-  var version = sjcl.codec.hex.toBits("03");
-  var options = sjcl.codec.hex.toBits("01");
-  var message = sjcl.bitArray.concat(version, options);
-  message = sjcl.bitArray.concat(message, encryption_salt);
-  message = sjcl.bitArray.concat(message, hmac_salt);
-  message = sjcl.bitArray.concat(message, iv);
-  var aes = new sjcl.cipher.aes(encryption_key);
-  sjcl.beware["CBC mode is dangerous because it doesn't protect message integrity."]();
-  var encrypted = sjcl.mode.cbc.encrypt(aes, plaintext, iv);
-  message = sjcl.bitArray.concat(message, encrypted);
-  var hmac = new sjcl.misc.hmac(hmac_key).encrypt(message);
-  message = sjcl.bitArray.concat(message, hmac);
-  return message;
-};
-/*
-  Takes password string and message (ciphertext) bitArray
-  options:
-    iv
-    encryption_salt
-    html_salt
-  Returns plaintext bitArray
-*/
-
-
-RNCryptor.Decrypt = function (password, message, options) {
-  options = options || {};
-  var version = sjcl.bitArray.extract(message, 0 * 8, 8);
-  var options = sjcl.bitArray.extract(message, 1 * 8, 8);
-  var encryption_salt = sjcl.bitArray.bitSlice(message, 2 * 8, 10 * 8);
-  var encryption_key = RNCryptor.KeyForPassword(password, encryption_salt);
-  var hmac_salt = sjcl.bitArray.bitSlice(message, 10 * 8, 18 * 8);
-  var hmac_key = RNCryptor.KeyForPassword(password, hmac_salt);
-  var iv = sjcl.bitArray.bitSlice(message, 18 * 8, 34 * 8);
-  var ciphertext_end = sjcl.bitArray.bitLength(message) - 32 * 8;
-  var ciphertext = sjcl.bitArray.bitSlice(message, 34 * 8, ciphertext_end);
-  var hmac = sjcl.bitArray.bitSlice(message, ciphertext_end);
-  var expected_hmac = new sjcl.misc.hmac(hmac_key).encrypt(sjcl.bitArray.bitSlice(message, 0, ciphertext_end)); // .equal is of consistent time
-
-  if (!sjcl.bitArray.equal(hmac, expected_hmac)) {
-    throw new sjcl.exception.corrupt("HMAC mismatch or bad password.");
-  }
-
-  var aes = new sjcl.cipher.aes(encryption_key);
-  sjcl.beware["CBC mode is dangerous because it doesn't protect message integrity."]();
-  var decrypted = sjcl.mode.cbc.decrypt(aes, ciphertext, iv);
-  return decrypted;
-};
-
-var pagemeDecrypt = function pagemeDecrypt(key, base64) {
-  if (!key) {
-    key = '';
-  }
-
-  const bitsArray = sjcl.codec.base64.toBits(base64);
-  const decrypted = RNCryptor.Decrypt(key, bitsArray);
-  return sjcl.codec.utf8String.fromBits(decrypted);
-};
-
-var pagemeEncrypt = function pagemeEncrypt(key, string) {
-  if (!key) {
-    key = '';
-  }
-
-  const bitsArray = sjcl.codec.utf8String.toBits(string);
-  const encrypted = RNCryptor.Encrypt(key, bitsArray);
-  return sjcl.codec.base64.fromBits(encrypted);
-};
-
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../node_modules/webpack/buildin/harmony-module.js */ "./node_modules/webpack/buildin/harmony-module.js")(module)))
+exports.sjcl = sjcl;
 
 /***/ }),
 

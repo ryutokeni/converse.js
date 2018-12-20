@@ -1758,23 +1758,7 @@ const converse = {
             _converse.pagemeMessages = [];
           }
           _converse.pagemeMessages.push(msg);
-          existed = _converse.pagemeMessages.length - 1;
         } else {
-        }
-        if (!_converse.pagemeMessages[existed].decrypted) {
-          const currentMsg = _converse.pagemeMessages[existed];
-          if (
-            currentMsg.stanza.getElementsByTagName('encrypted') &&
-            currentMsg.stanza.getElementsByTagName('encrypted')[0] &&
-            currentMsg.stanza.getElementsByTagName('encrypted')[0].firstChild &&
-            currentMsg.stanza.getElementsByTagName('encrypted')[0].firstChild.nodeValue === '1'
-          ) {
-            try {
-              currentMsg.decrypted = RNCryptor.pagemeDecrypt(_converse.user_settings.pagemeEncryptKey, currentMsg.body);
-            } catch(err) { }
-          } else {
-            currentMsg.decrypted = currentMsg.body;
-          }
         }
         _converse.chatboxes.onMessage(msg.stanza);
       });

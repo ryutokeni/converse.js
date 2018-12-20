@@ -87,6 +87,8 @@
   },
   "dependencies": {
     "fast-text-encoding": "^1.0.0",
-    "fs": "0.0.1-security"
+    "fs": "0.0.1-security",
+    "greenlet": "^1.0.1",
+    "sjcl": "^1.0.8"
   }
 }

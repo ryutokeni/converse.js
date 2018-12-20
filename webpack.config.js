@@ -10,7 +10,8 @@ const config = {
     }],
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'converse.js'
+        filename: 'converse.js',
+        globalObject: 'this'
     },
     devtool: 'source-map',
     plugins: [
