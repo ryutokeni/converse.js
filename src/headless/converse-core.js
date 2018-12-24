@@ -1782,6 +1782,18 @@ const converse = {
         message.save({ 'received': msg.received });
       })
     },
+    'onUploadFiles' (callback) {
+      return _converse.on('filesButtonClicked', callback);
+    },
+    'sendFileXMPP' (jid, media) {
+      const chatbox = _converse.chatboxes.findWhere({'jid': jid});
+      console.log(media);
+      const attrs = chatbox.getOutgoingMessageAttributes('');
+      chatbox.sendMessage({
+        ...attrs,
+        ...media
+      });
+    },
     /**
      * Exposes methods for adding and removing plugins. You'll need to write a plugin
      * if you want to have access to the private API methods defined further down below.

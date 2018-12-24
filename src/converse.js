@@ -61,7 +61,9 @@ const {
   onLoadMessages,
   onOpenCreateGroupModal,
   createNewGroup,
-  onLeaveGroup
+  onLeaveGroup,
+  onUploadFiles,
+  sendFileXMPP
 } = converse;
 
 converse.initialize = function (settings, callback) {
@@ -101,6 +103,14 @@ converse.createNewGroup = function (jid, attrs, participants) {
 
 converse.onLeaveGroup = function (callback) {
     return onLeaveGroup(callback);
+}
+
+converse.onUploadFiles = function (callback) {
+    return onUploadFiles(callback);
+}
+
+converse.sendFileXMPP = function(jid, mediaId) {
+    return sendFileXMPP(jid, mediaId);
 }
 
 export default converse;

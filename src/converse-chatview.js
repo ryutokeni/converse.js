@@ -294,6 +294,7 @@ converse.plugins.add('converse-chatview', {
                 'click .show-user-details-modal': 'showUserDetailsModal',
                 'click .spoiler-toggle': 'toggleSpoilerMessage',
                 'click .toggle-call': 'toggleCall',
+                'click .toggle-files': 'toggleFiles',
                 'click .toggle-clear': 'clearMessages',
                 'click .toggle-compose-spoiler': 'toggleComposeSpoilerMessage',
                 'click .toggle-smiley ul.emoji-picker li': 'insertEmoji',
@@ -480,6 +481,7 @@ converse.plugins.add('converse-chatview', {
                     label_toggle_spoiler = __('Click to write your message as a spoiler');
                 }
                 return _.extend(options || {}, {
+                    'label_file_upload': __('Upload image/video'),
                     'label_clear': __('Clear all messages'),
                     'tooltip_insert_smiley': __('Insert emojis'),
                     'tooltip_start_call': __('Start a call'),
@@ -835,6 +837,7 @@ converse.plugins.add('converse-chatview', {
             },
 
             onMessageSubmitted (text, spoiler_hint) {
+              console.log(spoiler_hint);
                 /* This method gets called once the user has typed a message
                  * and then pressed enter in a chat box.
                  *
@@ -1112,6 +1115,11 @@ converse.plugins.add('converse-chatview', {
                     connection: _converse.connection,
                     model: this.model
                 });
+            },
+
+            toggleFiles (ev) {
+                ev.stopPropagation();
+                _converse.emit('filesButtonClicked', this.model.get('jid'));
             },
 
             toggleComposeSpoilerMessage () {

@@ -255,7 +255,7 @@ converse.plugins.add('converse-chatboxes', {
                 this.messages.chatbox = this;
                 this.messages.on('change:upload', (message) => {
                     if (message.get('upload') === _converse.SUCCESS) {
-                        this.sendMessageStanza(this.createMessageStanza(message, message.get('message')));
+                        this.sendMessageStanza(this.createMessageStanza(message, 'text', message.get('message')));
                     }
                 });
 
@@ -325,7 +325,7 @@ converse.plugins.add('converse-chatboxes', {
                 return false;
             },
 
-            createMessageStanza (message, body) {
+            createMessageStanza (message, type, body) {
                 /* Given a _converse.Message Backbone.Model, return the XML
                  * stanza that represents it.
                  *
@@ -333,21 +333,31 @@ converse.plugins.add('converse-chatboxes', {
                  *    (Object) message - The Backbone.Model representing the message
                  */
                 const sentDate = message.get('sent');
-                const rawText = body;
-                body = RNCryptor.pagemeEncrypt(_converse.user_settings.pagemeEncryptKey, body);
+                const rawText = type === 'text' ? body : '';
+                body = (type === 'text' ? RNCryptor.pagemeEncrypt(_converse.user_settings.pagemeEncryptKey, body) : body);
+                body = body || '';
                 const stanza = $msg({
                         'from': _converse.connection.jid,
                         'to': this.get('jid'),
                         'type': this.get('message_type'),
                         'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid')
-                    }).c('body').t(body).up()
+                    }).c('body').t(type === 'text' ? body : '').up()
                       .c(_converse.ACTIVE, {'xmlns': Strophe.NS.CHATSTATES}).up();
                 if (message.get('type') === 'chat' || message.get('type') === 'groupchat') {
                     stanza.c('data', {'xmlns': 'pageMe.message.data'})
                     .c('sentDate').t(sentDate).up()
-                    .c('timeToRead').t(timeToRead).up()
-                    .c('encrypted').t('1').up().up()
-                    .c('request', {'xmlns': Strophe.NS.RECEIPTS}).up();
+                    .c('timeToRead').t(timeToRead).up();
+
+                    if (type === 'file') {
+                      stanza.c('itemType').t(message.get('itemType')).up()
+                      .c('mediaId').t(message.get('mediaId')).up()
+                      .c('fileSize').t(message.get('fileSize')).up();
+                    }
+                    if (type === 'text') {
+                      stanza.c('encrypted').t('1').up();
+                    }
+                    stanza.up();
+                    stanza.c('request', {'xmlns': Strophe.NS.RECEIPTS}).up();
                 }
                 if (message.get('is_spoiler')) {
                     if (message.get('spoiler_hint')) {
@@ -382,7 +392,7 @@ converse.plugins.add('converse-chatboxes', {
                   _converse.pagemeMessages = [];
                 }
                 _converse.pagemeMessages.push({
-                  body: body,
+                  body: type === 'text' ? body : '',
                   decrypted: rawText,
                   sentDate: sentDate,
                   stanza: stanza.node
@@ -430,8 +440,10 @@ converse.plugins.add('converse-chatboxes', {
                  *  Parameters:
                  *    (Message) message - The chat message
                  */
+                 console.log(attrs);
                 attrs.sent = (new Date()).getTime() / 1000;
                 const body = attrs.message;
+                const mediaId = attrs.mediaId
                 let message = this.messages.findWhere('correcting')
                 if (message) {
                     const older_versions = message.get('older_versions') || [];
@@ -448,7 +460,8 @@ converse.plugins.add('converse-chatboxes', {
                     attrs['time_to_read'] = timeToRead;
                     message = this.messages.create(attrs);
                 }
-                return this.sendMessageStanza(this.createMessageStanza(message, body));
+                console.log(message);
+                return this.sendMessageStanza(this.createMessageStanza(message, mediaId ? 'file' : 'text', body || mediaId));
             },
 
             sendChatState () {
@@ -705,10 +718,7 @@ converse.plugins.add('converse-chatboxes', {
             onChatBoxesFetched (collection) {
                 /* Show chat boxes upon receiving them from sessionStorage */
                 collection.each((chatbox) => {
-                  console.log('================');
-                  console.log(chatbox);
                     if (this.chatBoxMayBeShown(chatbox)) {
-                      console.log(true);
                         chatbox.trigger('show');
                     }
                 });

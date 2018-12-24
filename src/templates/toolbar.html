@@ -1,6 +1,6 @@
 {[ if (o.use_emoji)  { ]}
 <li class="toggle-toolbar-menu toggle-smiley dropup">
-    <a class="toggle-smiley far fa-smile" title="{{{o.tooltip_insert_smiley}}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a> 
+    <a class="toggle-smiley far fa-smile" title="{{{o.tooltip_insert_smiley}}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>
     <div class="emoji-picker dropdown-menu toolbar-menu"></div>
 </li>
 {[ } ]}
@@ -11,3 +11,4 @@
 <li class="toggle-occupants fa {[ if (o.hidden_occupants)  { ]} fa-angle-double-left {[ } else { ]} fa-angle-double-right {[ } ]}"
     title="{{{o.label_hide_occupants}}}"></li>
 {[ } ]}
+<li class="toggle-files fa fa-file-upload float-right" title="{{{o.label_file_upload}}}"></li>

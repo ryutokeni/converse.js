@@ -69305,6 +69305,41 @@ module.exports = g;
 
 /***/ }),
 
+/***/ "./node_modules/webpack/buildin/harmony-module.js":
+/*!*******************************************!*\
+  !*** (webpack)/buildin/harmony-module.js ***!
+  \*******************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = function(originalModule) {
+	if (!originalModule.webpackPolyfill) {
+		var module = Object.create(originalModule);
+		// module.parent = undefined by default
+		if (!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		Object.defineProperty(module, "exports", {
+			enumerable: true
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/webpack/buildin/module.js":
 /*!***********************************!*\
   !*** (webpack)/buildin/module.js ***!
@@ -72679,6 +72714,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         'click .show-user-details-modal': 'showUserDetailsModal',
         'click .spoiler-toggle': 'toggleSpoilerMessage',
         'click .toggle-call': 'toggleCall',
+        'click .toggle-files': 'toggleFiles',
         'click .toggle-clear': 'clearMessages',
         'click .toggle-compose-spoiler': 'toggleComposeSpoilerMessage',
         'click .toggle-smiley ul.emoji-picker li': 'insertEmoji',
@@ -72876,6 +72912,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         }
 
         return _.extend(options || {}, {
+          'label_file_upload': __('Upload image/video'),
           'label_clear': __('Clear all messages'),
           'tooltip_insert_smiley': __('Insert emojis'),
           'tooltip_start_call': __('Start a call'),
@@ -73232,6 +73269,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       },
 
       onMessageSubmitted(text, spoiler_hint) {
+        console.log(spoiler_hint);
         /* This method gets called once the user has typed a message
          * and then pressed enter in a chat box.
          *
@@ -73240,6 +73278,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
          *    (String) spoiler_hint - A hint in case the message
          *      text is a hidden/spoiler message. See XEP-0382
          */
+
         if (!_converse.connection.authenticated) {
           return this.showHelpMessages(['Sorry, the connection has been lost, ' + 'and your message could not be sent'], 'error');
         }
@@ -73537,6 +73576,12 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           connection: _converse.connection,
           model: this.model
         });
+      },
+
+      toggleFiles(ev) {
+        ev.stopPropagation();
+
+        _converse.emit('filesButtonClicked', this.model.get('jid'));
       },
 
       toggleComposeSpoilerMessage() {
@@ -75517,7 +75562,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           return;
         }
 
-        let text = this.findPagemeMessage();
+        const mediaId = this.model.get('mediaId');
+        let text = mediaId ? mediaId : this.findPagemeMessage();
         const msg = _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].stringToElement(templates_message_html__WEBPACK_IMPORTED_MODULE_6___default()(_.extend(this.model.toJSON(), {
           '__': __,
           'is_encrypted': text ? true : false,
@@ -83395,7 +83441,9 @@ const initialize = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20_
       onLoadMessages = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLoadMessages,
       onOpenCreateGroupModal = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenCreateGroupModal,
       createNewGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].createNewGroup,
-      onLeaveGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLeaveGroup;
+      onLeaveGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLeaveGroup,
+      onUploadFiles = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onUploadFiles,
+      sendFileXMPP = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].sendFileXMPP;
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].initialize = function (settings, callback) {
   if (_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].env._.isArray(settings.whitelisted_plugins)) {
@@ -83437,6 +83485,14 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].create
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLeaveGroup = function (callback) {
   return onLeaveGroup(callback);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onUploadFiles = function (callback) {
+  return onUploadFiles(callback);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].sendFileXMPP = function (jid, mediaId) {
+  return sendFileXMPP(jid, mediaId);
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"]);
@@ -84857,7 +84913,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         this.messages.chatbox = this;
         this.messages.on('change:upload', message => {
           if (message.get('upload') === _converse.SUCCESS) {
-            this.sendMessageStanza(this.createMessageStanza(message, message.get('message')));
+            this.sendMessageStanza(this.createMessageStanza(message, 'text', message.get('message')));
           }
         });
         this.on('change:chat_state', this.sendChatState, this);
@@ -84937,7 +84993,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         return false;
       },
 
-      createMessageStanza(message, body) {
+      createMessageStanza(message, type, body) {
         /* Given a _converse.Message Backbone.Model, return the XML
          * stanza that represents it.
          *
@@ -84945,21 +85001,33 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
          *    (Object) message - The Backbone.Model representing the message
          */
         const sentDate = message.get('sent');
-        const rawText = body;
-        body = RNCryptor.pagemeEncrypt(_converse.user_settings.pagemeEncryptKey, body);
+        const rawText = type === 'text' ? body : '';
+        body = type === 'text' ? RNCryptor.pagemeEncrypt(_converse.user_settings.pagemeEncryptKey, body) : body;
+        body = body || '';
         const stanza = $msg({
           'from': _converse.connection.jid,
           'to': this.get('jid'),
           'type': this.get('message_type'),
           'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid')
-        }).c('body').t(body).up().c(_converse.ACTIVE, {
+        }).c('body').t(type === 'text' ? body : '').up().c(_converse.ACTIVE, {
           'xmlns': Strophe.NS.CHATSTATES
         }).up();
 
         if (message.get('type') === 'chat' || message.get('type') === 'groupchat') {
           stanza.c('data', {
             'xmlns': 'pageMe.message.data'
-          }).c('sentDate').t(sentDate).up().c('timeToRead').t(timeToRead).up().c('encrypted').t('1').up().up().c('request', {
+          }).c('sentDate').t(sentDate).up().c('timeToRead').t(timeToRead).up();
+
+          if (type === 'file') {
+            stanza.c('itemType').t(message.get('itemType')).up().c('mediaId').t(message.get('mediaId')).up().c('fileSize').t(message.get('fileSize')).up();
+          }
+
+          if (type === 'text') {
+            stanza.c('encrypted').t('1').up();
+          }
+
+          stanza.up();
+          stanza.c('request', {
             'xmlns': Strophe.NS.RECEIPTS
           }).up();
         }
@@ -85009,7 +85077,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         }
 
         _converse.pagemeMessages.push({
-          body: body,
+          body: type === 'text' ? body : '',
           decrypted: rawText,
           sentDate: sentDate,
           stanza: stanza.node
@@ -85058,8 +85126,10 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
          *  Parameters:
          *    (Message) message - The chat message
          */
+        console.log(attrs);
         attrs.sent = new Date().getTime() / 1000;
         const body = attrs.message;
+        const mediaId = attrs.mediaId;
         let message = this.messages.findWhere('correcting');
 
         if (message) {
@@ -85078,7 +85148,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           message = this.messages.create(attrs);
         }
 
-        return this.sendMessageStanza(this.createMessageStanza(message, body));
+        console.log(message);
+        return this.sendMessageStanza(this.createMessageStanza(message, mediaId ? 'file' : 'text', body || mediaId));
       },
 
       sendChatState() {
@@ -85356,11 +85427,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
       onChatBoxesFetched(collection) {
         /* Show chat boxes upon receiving them from sessionStorage */
         collection.each(chatbox => {
-          console.log('================');
-          console.log(chatbox);
-
           if (this.chatBoxMayBeShown(chatbox)) {
-            console.log(true);
             chatbox.trigger('show');
           }
         });
@@ -85809,6 +85876,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var sizzle__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(sizzle__WEBPACK_IMPORTED_MODULE_10__);
 /* harmony import */ var _converse_headless_utils_core__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @converse/headless/utils/core */ "./src/headless/utils/core.js");
 /* harmony import */ var _converse_headless_utils_rncryptor__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @converse/headless/utils/rncryptor */ "./src/headless/utils/rncryptor.js");
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 // Converse.js
 // https://conversejs.org
 //
@@ -87730,6 +87801,20 @@ const converse = {
         'received': msg.received
       });
     });
+  },
+
+  'onUploadFiles'(callback) {
+    return _converse.on('filesButtonClicked', callback);
+  },
+
+  'sendFileXMPP'(jid, media) {
+    const chatbox = _converse.chatboxes.findWhere({
+      'jid': jid
+    });
+
+    console.log(media);
+    const attrs = chatbox.getOutgoingMessageAttributes('');
+    chatbox.sendMessage(_objectSpread({}, attrs, media));
   },
 
   /**
@@ -115131,126 +115216,11 @@ _core__WEBPACK_IMPORTED_MODULE_1__["default"].parseMemberListIQ = function parse
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pagemeDecrypt", function() { return pagemeDecrypt; });
+/* WEBPACK VAR INJECTION */(function(module) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pagemeDecrypt", function() { return pagemeDecrypt; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pagemeEncrypt", function() { return pagemeEncrypt; });
-const sjcl = __webpack_require__(/*! ./sjcl */ "./src/headless/utils/sjcl.js");
-
-var RNCryptor = {};
-/*
-    Takes password string and salt WordArray
-    Returns key bitArray
-*/
-
-RNCryptor.KeyForPassword = function (password, salt) {
-  var hmacSHA1 = function hmacSHA1(key) {
-    var hasher = new sjcl.misc.hmac(key, sjcl.hash.sha1);
-
-    this.encrypt = function () {
-      return hasher.encrypt.apply(hasher, arguments);
-    };
-  };
-
-  return sjcl.misc.pbkdf2(password, salt, 10000, 32 * 8, hmacSHA1);
-};
-/*
-  Takes password string and plaintext bitArray
-  options:
-    iv
-    encryption_salt
-    html_salt
-  Returns ciphertext bitArray
-*/
-
-
-RNCryptor.Encrypt = function (password, plaintext, options) {
-  options = options || {};
-  var encryption_salt = options["encryption_salt"] || sjcl.random.randomWords(8 / 4); // FIXME: Need to seed PRNG
-
-  var encryption_key = RNCryptor.KeyForPassword(password, encryption_salt);
-  var hmac_salt = options["hmac_salt"] || sjcl.random.randomWords(8 / 4);
-  var hmac_key = RNCryptor.KeyForPassword(password, hmac_salt);
-  var iv = options["iv"] || sjcl.random.randomWords(16 / 4);
-  var version = sjcl.codec.hex.toBits("03");
-  var options = sjcl.codec.hex.toBits("01");
-  var message = sjcl.bitArray.concat(version, options);
-  message = sjcl.bitArray.concat(message, encryption_salt);
-  message = sjcl.bitArray.concat(message, hmac_salt);
-  message = sjcl.bitArray.concat(message, iv);
-  var aes = new sjcl.cipher.aes(encryption_key);
-  sjcl.beware["CBC mode is dangerous because it doesn't protect message integrity."]();
-  var encrypted = sjcl.mode.cbc.encrypt(aes, plaintext, iv);
-  message = sjcl.bitArray.concat(message, encrypted);
-  var hmac = new sjcl.misc.hmac(hmac_key).encrypt(message);
-  message = sjcl.bitArray.concat(message, hmac);
-  return message;
-};
-/*
-  Takes password string and message (ciphertext) bitArray
-  options:
-    iv
-    encryption_salt
-    html_salt
-  Returns plaintext bitArray
-*/
-
-
-RNCryptor.Decrypt = function (password, message, options) {
-  options = options || {};
-  var version = sjcl.bitArray.extract(message, 0 * 8, 8);
-  var options = sjcl.bitArray.extract(message, 1 * 8, 8);
-  var encryption_salt = sjcl.bitArray.bitSlice(message, 2 * 8, 10 * 8);
-  var encryption_key = RNCryptor.KeyForPassword(password, encryption_salt);
-  var hmac_salt = sjcl.bitArray.bitSlice(message, 10 * 8, 18 * 8);
-  var hmac_key = RNCryptor.KeyForPassword(password, hmac_salt);
-  var iv = sjcl.bitArray.bitSlice(message, 18 * 8, 34 * 8);
-  var ciphertext_end = sjcl.bitArray.bitLength(message) - 32 * 8;
-  var ciphertext = sjcl.bitArray.bitSlice(message, 34 * 8, ciphertext_end);
-  var hmac = sjcl.bitArray.bitSlice(message, ciphertext_end);
-  var expected_hmac = new sjcl.misc.hmac(hmac_key).encrypt(sjcl.bitArray.bitSlice(message, 0, ciphertext_end)); // .equal is of consistent time
-
-  if (!sjcl.bitArray.equal(hmac, expected_hmac)) {
-    throw new sjcl.exception.corrupt("HMAC mismatch or bad password.");
-  }
-
-  var aes = new sjcl.cipher.aes(encryption_key);
-  sjcl.beware["CBC mode is dangerous because it doesn't protect message integrity."]();
-  var decrypted = sjcl.mode.cbc.decrypt(aes, ciphertext, iv);
-  return decrypted;
-};
-
-var pagemeDecrypt = function pagemeDecrypt(key, base64) {
-  if (!key) {
-    key = '';
-  }
-
-  const bitsArray = sjcl.codec.base64.toBits(base64);
-  const decrypted = RNCryptor.Decrypt(key, bitsArray);
-  return sjcl.codec.utf8String.fromBits(decrypted);
-};
-
-var pagemeEncrypt = function pagemeEncrypt(key, string) {
-  if (!key) {
-    key = '';
-  }
-
-  const bitsArray = sjcl.codec.utf8String.toBits(string);
-  const encrypted = RNCryptor.Encrypt(key, bitsArray);
-  return sjcl.codec.base64.fromBits(encrypted);
-};
-
-
-
-/***/ }),
-
-/***/ "./src/headless/utils/sjcl.js":
-/*!************************************!*\
-  !*** ./src/headless/utils/sjcl.js ***!
-  \************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/* harmony import */ var _core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./core */ "./src/headless/utils/core.js");
 
 "use strict";
-
 
 function l(a) {
   throw a;
@@ -116246,7 +116216,111 @@ sjcl.misc.cachedPbkdf2 = function (a, b) {
   };
 };
 
-exports.sjcl = sjcl;
+var RNCryptor = {};
+/*
+    Takes password string and salt WordArray
+    Returns key bitArray
+*/
+
+RNCryptor.KeyForPassword = function (password, salt) {
+  var hmacSHA1 = function hmacSHA1(key) {
+    var hasher = new sjcl.misc.hmac(key, sjcl.hash.sha1);
+
+    this.encrypt = function () {
+      return hasher.encrypt.apply(hasher, arguments);
+    };
+  };
+
+  return sjcl.misc.pbkdf2(password, salt, 10000, 32 * 8, hmacSHA1);
+};
+/*
+  Takes password string and plaintext bitArray
+  options:
+    iv
+    encryption_salt
+    html_salt
+  Returns ciphertext bitArray
+*/
+
+
+RNCryptor.Encrypt = function (password, plaintext, options) {
+  options = options || {};
+  var encryption_salt = options["encryption_salt"] || sjcl.random.randomWords(8 / 4); // FIXME: Need to seed PRNG
+
+  var encryption_key = RNCryptor.KeyForPassword(password, encryption_salt);
+  var hmac_salt = options["hmac_salt"] || sjcl.random.randomWords(8 / 4);
+  var hmac_key = RNCryptor.KeyForPassword(password, hmac_salt);
+  var iv = options["iv"] || sjcl.random.randomWords(16 / 4);
+  var version = sjcl.codec.hex.toBits("03");
+  var options = sjcl.codec.hex.toBits("01");
+  var message = sjcl.bitArray.concat(version, options);
+  message = sjcl.bitArray.concat(message, encryption_salt);
+  message = sjcl.bitArray.concat(message, hmac_salt);
+  message = sjcl.bitArray.concat(message, iv);
+  var aes = new sjcl.cipher.aes(encryption_key);
+  sjcl.beware["CBC mode is dangerous because it doesn't protect message integrity."]();
+  var encrypted = sjcl.mode.cbc.encrypt(aes, plaintext, iv);
+  message = sjcl.bitArray.concat(message, encrypted);
+  var hmac = new sjcl.misc.hmac(hmac_key).encrypt(message);
+  message = sjcl.bitArray.concat(message, hmac);
+  return message;
+};
+/*
+  Takes password string and message (ciphertext) bitArray
+  options:
+    iv
+    encryption_salt
+    html_salt
+  Returns plaintext bitArray
+*/
+
+
+RNCryptor.Decrypt = function (password, message, options) {
+  options = options || {};
+  var version = sjcl.bitArray.extract(message, 0 * 8, 8);
+  var options = sjcl.bitArray.extract(message, 1 * 8, 8);
+  var encryption_salt = sjcl.bitArray.bitSlice(message, 2 * 8, 10 * 8);
+  var encryption_key = RNCryptor.KeyForPassword(password, encryption_salt);
+  var hmac_salt = sjcl.bitArray.bitSlice(message, 10 * 8, 18 * 8);
+  var hmac_key = RNCryptor.KeyForPassword(password, hmac_salt);
+  var iv = sjcl.bitArray.bitSlice(message, 18 * 8, 34 * 8);
+  var ciphertext_end = sjcl.bitArray.bitLength(message) - 32 * 8;
+  var ciphertext = sjcl.bitArray.bitSlice(message, 34 * 8, ciphertext_end);
+  var hmac = sjcl.bitArray.bitSlice(message, ciphertext_end);
+  var expected_hmac = new sjcl.misc.hmac(hmac_key).encrypt(sjcl.bitArray.bitSlice(message, 0, ciphertext_end)); // .equal is of consistent time
+
+  if (!sjcl.bitArray.equal(hmac, expected_hmac)) {
+    throw new sjcl.exception.corrupt("HMAC mismatch or bad password.");
+  }
+
+  var aes = new sjcl.cipher.aes(encryption_key);
+  sjcl.beware["CBC mode is dangerous because it doesn't protect message integrity."]();
+  var decrypted = sjcl.mode.cbc.decrypt(aes, ciphertext, iv);
+  return decrypted;
+};
+
+var pagemeDecrypt = function pagemeDecrypt(key, base64) {
+  if (!key) {
+    key = '';
+  }
+
+  const bitsArray = sjcl.codec.base64.toBits(base64);
+  const decrypted = RNCryptor.Decrypt(key, bitsArray);
+  return sjcl.codec.utf8String.fromBits(decrypted);
+};
+
+var pagemeEncrypt = function pagemeEncrypt(key, string) {
+  if (!key) {
+    key = '';
+  }
+
+  const bitsArray = sjcl.codec.utf8String.toBits(string);
+  const encrypted = RNCryptor.Encrypt(key, bitsArray);
+  return sjcl.codec.base64.fromBits(encrypted);
+};
+
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../node_modules/webpack/buildin/harmony-module.js */ "./node_modules/webpack/buildin/harmony-module.js")(module)))
 
 /***/ }),
 
@@ -119279,7 +119353,7 @@ __p += '<!-- src/templates/toolbar.html -->\n';
  if (o.use_emoji)  { ;
 __p += '\n<li class="toggle-toolbar-menu toggle-smiley dropup">\n    <a class="toggle-smiley far fa-smile" title="' +
 __e(o.tooltip_insert_smiley) +
-'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a> \n    <div class="emoji-picker dropdown-menu toolbar-menu"></div>\n</li>\n';
+'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>\n    <div class="emoji-picker dropdown-menu toolbar-menu"></div>\n</li>\n';
  } ;
 __p += '\n';
  if (o.show_call_button)  { ;
@@ -119299,7 +119373,9 @@ __p += '"\n    title="' +
 __e(o.label_hide_occupants) +
 '"></li>\n';
  } ;
-__p += '\n';
+__p += '\n<li class="toggle-files fa fa-file-upload float-right" title="' +
+__e(o.label_file_upload) +
+'"></li>\n';
 return __p
 };
 

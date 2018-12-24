@@ -197,7 +197,8 @@ converse.plugins.add('converse-message-view', {
                   this.model.destroy();
                   return;
                 }
-                let text = this.findPagemeMessage();
+                const mediaId = this.model.get('mediaId');
+                let text = mediaId ? mediaId : this.findPagemeMessage();
                 const msg = u.stringToElement(tpl_message(
                     _.extend(
                         this.model.toJSON(), {
