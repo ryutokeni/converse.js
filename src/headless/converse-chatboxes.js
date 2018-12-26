@@ -440,7 +440,6 @@ converse.plugins.add('converse-chatboxes', {
                  *  Parameters:
                  *    (Message) message - The chat message
                  */
-                 console.log(attrs);
                 attrs.sent = (new Date()).getTime() / 1000;
                 const body = attrs.message;
                 const mediaId = attrs.mediaId
@@ -460,7 +459,6 @@ converse.plugins.add('converse-chatboxes', {
                     attrs['time_to_read'] = timeToRead;
                     message = this.messages.create(attrs);
                 }
-                console.log(message);
                 return this.sendMessageStanza(this.createMessageStanza(message, mediaId ? 'file' : 'text', body || mediaId));
             },
 
@@ -646,7 +644,6 @@ converse.plugins.add('converse-chatboxes', {
                           _converse.pagemeMessages.push(newPagemeMessage)
                           delete attrs.message;
                         }
-                        console.log('still here');
                         return that.messages.create(attrs);
                     }
                 }

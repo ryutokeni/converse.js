@@ -837,7 +837,6 @@ converse.plugins.add('converse-chatview', {
             },
 
             onMessageSubmitted (text, spoiler_hint) {
-              console.log(spoiler_hint);
                 /* This method gets called once the user has typed a message
                  * and then pressed enter in a chat box.
                  *
