@@ -85,6 +85,7 @@ u.isOnlyChatStateNotification = function (attrs) {
         !attrs['file'] &&
         !(attrs['is_encrypted'] && attrs['plaintext']) &&
         !attrs['message'] &&
+        !attrs['mediaId'] &&
         !attrs['sent'];
 };
 

@@ -68,8 +68,10 @@ converse.plugins.add('converse-message-view', {
               };
           },
           initialize () {
-            setInterval(() => this.model.save({ 'time_remain':  this.model.get('expiration') - (new Date()).getTime()}), 1000);
             this.model.on('change:time_remain', this.render, this);
+            setInterval(() => {
+              this.model.set('time_remain',  this.model.get('expiration') - (new Date()).getTime())
+            }, 1000);
           },
           render () {
             const tempTime = moment.duration(this.model.get('time_remain'));
@@ -83,7 +85,8 @@ converse.plugins.add('converse-message-view', {
         _converse.MessageView = _converse.ViewWithAvatar.extend({
             countDown: _converse.MessageCountDownView,
             events: {
-                'click .chat-msg__edit-modal': 'showMessageVersionsModal'
+                'click .chat-msg__edit-modal': 'showMessageVersionsModal',
+                'click .pageme-media': 'showPageMeMediaViewer'
             },
 
             defaults () {
@@ -108,7 +111,6 @@ converse.plugins.add('converse-message-view', {
             },
 
             async render (force) {
-
                 if (this.rendered && !force) {
                   return;
                 }
@@ -198,7 +200,7 @@ converse.plugins.add('converse-message-view', {
                   return;
                 }
                 const mediaId = this.model.get('mediaId');
-                let text = mediaId ? mediaId : this.findPagemeMessage();
+                let text = this.findPagemeMessage();
                 const msg = u.stringToElement(tpl_message(
                     _.extend(
                         this.model.toJSON(), {
@@ -213,6 +215,11 @@ converse.plugins.add('converse-message-view', {
                         'username': this.model.getDisplayName()
                     })
                 ));
+                if (mediaId) {
+                    msg.querySelector('.chat-msg__media').innerHTML = _.flow(
+                      _.partial(u.renderPageMeMedia, _converse, this.model.get('itemType'))
+                    )(mediaId);
+                }
                 const url = this.model.get('oob_url');
                 if (url) {
                     msg.querySelector('.chat-msg__media').innerHTML = _.flow(
@@ -221,7 +228,7 @@ converse.plugins.add('converse-message-view', {
                         _.partial(u.renderAudioURL, _converse),
                         _.partial(u.renderImageURL, _converse))(url);
                 }
-                if (text) {
+                if (text || mediaId) {
                   this.rendered = true;
                   const is_hidden = u.hasClass('hidden', msg);
                   if (is_hidden) {
@@ -231,7 +238,7 @@ converse.plugins.add('converse-message-view', {
                   u.addClass('hidden', msg);
                 }
                 const msg_content = msg.querySelector('.chat-msg__text');
-                if (text && text !== url) {
+                if (text && text !== url && text !== mediaId) {
                     if (is_me_message) {
                         text = text.substring(4);
                     }
@@ -310,6 +317,11 @@ converse.plugins.add('converse-message-view', {
                     })));
                 this.replaceElement(msg);
                 this.renderAvatar();
+            },
+
+            showPageMeMediaViewer (ev) {
+              ev.preventDefault();
+              _converse.emit('showPageMeMediaViewer', ev.target.id);
             },
 
             showMessageVersionsModal (ev) {

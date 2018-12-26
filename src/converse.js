@@ -62,6 +62,7 @@ const {
   onOpenCreateGroupModal,
   createNewGroup,
   onLeaveGroup,
+  onShowPageMeMediaViewer,
   onUploadFiles,
   sendFileXMPP
 } = converse;
@@ -95,6 +96,10 @@ converse.onLoadMessages = function (callback) {
 
 converse.onOpenCreateGroupModal = function (callback) {
     return onOpenCreateGroupModal(callback);
+}
+
+converse.onShowPageMeMediaViewer = function (callback) {
+    return onShowPageMeMediaViewer(callback);
 }
 
 converse.createNewGroup = function (jid, attrs, participants) {

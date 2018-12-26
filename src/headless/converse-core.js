@@ -1746,12 +1746,20 @@ const converse = {
       _converse.api.rooms.open(jid, attrs, participants);
       // const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
     },
+    'onShowPageMeMediaViewer' (callback) {
+      _converse.on('showPageMeMediaViewer', callback);
+    },
     'updateMessages' (jid, pagemeMessages) {
       const chatbox = _converse.chatboxes.findWhere({'jid': jid});
       if (!_converse.pagemeMessages) {
         _converse.pagemeMessages = pagemeMessages;
       }
       pagemeMessages.forEach(msg => {
+        console.log(msg);
+        if (!msg.body || msg.mediaId) {
+          _converse.chatboxes.onMessage(msg.stanza);
+          return;
+        }
         var existed = _.findIndex(_converse.pagemeMessages, oldMsg => (oldMsg.stanza.id === msg.stanza.id));
         if (existed === -1) {
           if (!_converse.pagemeMessages) {
@@ -1787,7 +1795,6 @@ const converse = {
     },
     'sendFileXMPP' (jid, media) {
       const chatbox = _converse.chatboxes.findWhere({'jid': jid});
-      console.log(media);
       const attrs = chatbox.getOutgoingMessageAttributes('');
       chatbox.sendMessage({
         ...attrs,

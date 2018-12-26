@@ -341,7 +341,7 @@ converse.plugins.add('converse-chatboxes', {
                         'to': this.get('jid'),
                         'type': this.get('message_type'),
                         'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid')
-                    }).c('body').t(type === 'text' ? body : '').up()
+                    }).c('body').t(body).up()
                       .c(_converse.ACTIVE, {'xmlns': Strophe.NS.CHATSTATES}).up();
                 if (message.get('type') === 'chat' || message.get('type') === 'groupchat') {
                     stanza.c('data', {'xmlns': 'pageMe.message.data'})
@@ -353,9 +353,9 @@ converse.plugins.add('converse-chatboxes', {
                       .c('mediaId').t(message.get('mediaId')).up()
                       .c('fileSize').t(message.get('fileSize')).up();
                     }
-                    if (type === 'text') {
-                      stanza.c('encrypted').t('1').up();
-                    }
+                    // if (type === 'text') {
+                    stanza.c('encrypted').t('1').up();
+                    // }
                     stanza.up();
                     stanza.c('request', {'xmlns': Strophe.NS.RECEIPTS}).up();
                 }
@@ -577,6 +577,9 @@ converse.plugins.add('converse-chatboxes', {
                     'msgid': stanza.getAttribute('id'),
                     'time': delay ? delay.getAttribute('stamp') : sendDate,
                     'time_to_read': stanza.querySelector('timeToRead') ? stanza.querySelector('timeToRead').innerHTML : 84000,
+                    'mediaId': stanza.querySelector('mediaId') ? stanza.querySelector('mediaId').innerHTML : '',
+                    'itemType': stanza.querySelector('itemType') ? stanza.querySelector('itemType').innerHTML : '',
+                    'fileSize': stanza.querySelector('fileSize') ? stanza.querySelector('fileSize').innerHTML : '',
                     'sent': sendDate,
                     'type': stanza.getAttribute('type')
                 };
@@ -616,31 +619,34 @@ converse.plugins.add('converse-chatboxes', {
                         // XXX: MUC leakage
                         // No need showing delayed or our own CSN messages
                         return;
-                    } else if (!is_csn && !attrs.file && !attrs.plaintext && !attrs.message && !attrs.oob_url && attrs.type !== 'error') {
+                    } else if (!is_csn && !attrs.file && !attrs.plaintext && !attrs.message && !attrs.mediaId && !attrs.oob_url && attrs.type !== 'error') {
                         // TODO: handle <subject> messages (currently being done by ChatRoom)
                         return;
                     } else {
-                        const newPagemeMessage = {
-                          body: attrs.message,
-                          stanza: message
-                        };
-                        if (
-                          message.getElementsByTagName('encrypted') &&
-                          message.getElementsByTagName('encrypted')[0] &&
-                          message.getElementsByTagName('encrypted')[0].firstChild &&
-                          message.getElementsByTagName('encrypted')[0].firstChild.nodeValue === '1'
-                        ) {
-                          try {
-                            newPagemeMessage.decrypted = RNCryptor.pagemeDecrypt(_converse.user_settings.pagemeEncryptKey, newPagemeMessage.body)
-                          } catch(err) { }
-                        } else {
-                          newPagemeMessage.decrypted = newPagemeMessage.body;
+                        if (attrs.message) {
+                          const newPagemeMessage = {
+                            body: attrs.message,
+                            stanza: message
+                          };
+                          if (
+                            message.getElementsByTagName('encrypted') &&
+                            message.getElementsByTagName('encrypted')[0] &&
+                            message.getElementsByTagName('encrypted')[0].firstChild &&
+                            message.getElementsByTagName('encrypted')[0].firstChild.nodeValue === '1'
+                          ) {
+                            try {
+                              newPagemeMessage.decrypted = RNCryptor.pagemeDecrypt(_converse.user_settings.pagemeEncryptKey, newPagemeMessage.body)
+                            } catch(err) { }
+                          } else {
+                            newPagemeMessage.decrypted = newPagemeMessage.body;
+                          }
+                          if (!_converse.pagemeMessages) {
+                            _converse.pagemeMessages = [];
+                          }
+                          _converse.pagemeMessages.push(newPagemeMessage)
+                          delete attrs.message;
                         }
-                        if (!_converse.pagemeMessages) {
-                          _converse.pagemeMessages = [];
-                        }
-                        _converse.pagemeMessages.push(newPagemeMessage)
-                        delete attrs.message;
+                        console.log('still here');
                         return that.messages.create(attrs);
                     }
                 }

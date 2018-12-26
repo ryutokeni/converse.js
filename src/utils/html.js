@@ -22,6 +22,7 @@ import tpl_form_username from "../templates/form_username.html";
 import tpl_image from "../templates/image.html";
 import tpl_select_option from "../templates/select_option.html";
 import tpl_video from "../templates/video.html";
+import tpl_pageme_media from "../templates/pageme_media.html";
 import u from "../headless/utils/core";
 
 const URL_REGEX = /\b(https?:\/\/|www\.|https?:\/\/www\.)[^\s<>]{2,200}\b\/?/g;
@@ -122,6 +123,14 @@ u.renderAudioURL = function (_converse, url) {
         })
     }
     return url;
+};
+
+u.renderPageMeMedia = function (_converse, type, mediaId) {
+    const { __ } = _converse;
+    return tpl_pageme_media({
+        'type': type,
+        'mediaId': mediaId
+    })
 };
 
 
