@@ -85543,7 +85543,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
          * Parameters:
          *    (XMLElement) stanza - The incoming message stanza
          */
-        console.log(stanza);
         let to_jid = stanza.getAttribute('to');
         const to_resource = Strophe.getResourceFromJid(to_jid);
 
@@ -87788,7 +87787,7 @@ const converse = {
     }
 
     pagemeMessages.forEach(msg => {
-      if (!msg.body) {
+      if (!msg.body || msg.mediaId) {
         _converse.chatboxes.onMessage(msg.stanza);
 
         return;
@@ -87802,7 +87801,11 @@ const converse = {
         }
 
         _converse.pagemeMessages.push(msg);
-      } else {}
+      } else {
+        if (msg.decrypted) {
+          _converse.pagemeMessages[existed] = msg;
+        }
+      }
 
       _converse.chatboxes.onMessage(msg.stanza);
     });

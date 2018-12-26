@@ -1755,7 +1755,6 @@ const converse = {
         _converse.pagemeMessages = pagemeMessages;
       }
       pagemeMessages.forEach(msg => {
-        console.log(msg);
         if (!msg.body || msg.mediaId) {
           _converse.chatboxes.onMessage(msg.stanza);
           return;
@@ -1767,6 +1766,9 @@ const converse = {
           }
           _converse.pagemeMessages.push(msg);
         } else {
+          if (msg.decrypted) {
+            _converse.pagemeMessages[existed] = msg;
+          }
         }
         _converse.chatboxes.onMessage(msg.stanza);
       });
