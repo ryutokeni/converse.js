@@ -16016,12 +16016,12 @@ readers do not read off random characters that represent icons */
   --roster-height: 194px;
   --roster-group-toggle-hover-color: #585B51;
   --flyout-padding: 1.2em;
-  --chat-head-color: #f0eff5;
+  --chat-head-color: #e9e9e9;
   --chat-head-color-lighten-50-percent: #3e3e3e;
   --chat-head-text-color: #3e3e3e;
   --highlight-color: #DCF9F6;
-  --primary-color: #E7A151;
-  --secondary-color: #387592;
+  --primary-color: #4b92d4;
+  --secondary-color: #e9e9e9;
   --warning-color: #D24E2B;
   --light-background-color: #FCFDFD;
   --error-color: #A53214;
@@ -22692,7 +22692,7 @@ body.reset {
 
 #conversejs .chatbox .chat-title {
   font-family: var(--heading-font);
-  color: white;
+  color: var(--chat-head-text-color);
   display: block;
   line-height: var(--line-height-large);
   overflow: hidden;
@@ -23143,7 +23143,7 @@ body.reset {
   overflow: hidden; }
 
 #conversejs.converse-fullscreen .chatbox .chat-body {
-  height: calc(100% - var(--fullpage-chat-head-height));
+  height: calc(100% - var(--fullpage-chat-head-height) - 30px);
   background-color: var(--chat-head-color);
   border-top-left-radius: var(--chatbox-border-radius);
   border-top-right-radius: var(--chatbox-border-radius); }
@@ -24625,7 +24625,6 @@ body.reset {
   display: flex;
   flex-direction: row;
   overflow: auto;
-  margin-bottom: 50px;
   padding: 0.25rem 1rem; }
 
 #conversejs .message.chat-msg.onload {
