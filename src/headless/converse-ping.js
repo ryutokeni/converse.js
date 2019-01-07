@@ -48,6 +48,21 @@ converse.plugins.add('converse-ping', {
         };
 
         _converse.pong = function (ping) {
+            if (ping.getAttribute('CustomType') === 'VerificationRequest') {
+              const verification = ping.querySelector('VerificationRequest');
+              const chatboxId = `${verification.getAttribute('sender')}${_converse.user_settings.domain}`
+              converse.updateMessage(
+                chatboxId,
+                { medialRequestKey: verification.getAttribute('key') },
+                {
+                  medReqStt: verification.getAttribute('status'),
+                  subject: verification.getAttribute('subject'),
+                  description: verification.getAttribute('description'),
+                  senderSignedMedReq: !!verification.getAttribute('senderSignatureUrl'),
+                  rcvrSignedMedReq: !!verification.getAttribute('recipientSignatureUrl')
+                }
+              )
+            }
             _converse.lastStanzaDate = new Date();
             _converse.connection.ping.pong(ping);
             return true;

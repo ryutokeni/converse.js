@@ -16,7 +16,13 @@ import u from "@converse/headless/utils/emoji";
 import xss from "xss";
 
 const { Backbone, _, moment } = converse.env;
-
+const medReqLabel = {
+  wait4Appro: 'Waiting for Approval',
+  wait4UrAppro: 'Waiting for Your Approval',
+  approved: 'Approved',
+  deleted: 'Deleted',
+  expired: 'Period expired'
+};
 
 converse.plugins.add('converse-message-view', {
 
@@ -86,7 +92,8 @@ converse.plugins.add('converse-message-view', {
             countDown: _converse.MessageCountDownView,
             events: {
                 'click .chat-msg__edit-modal': 'showMessageVersionsModal',
-                'click .pageme-media': 'showPageMeMediaViewer'
+                'click .pageme-media': 'showPageMeMediaViewer',
+                'click .pageme-medical-request': 'showPageMeMedicalRequest'
             },
 
             defaults () {
@@ -200,6 +207,7 @@ converse.plugins.add('converse-message-view', {
                   return;
                 }
                 const mediaId = this.model.get('mediaId');
+                const medialRequestKey = this.model.get('medialRequestKey');
                 let text = this.findPagemeMessage();
                 const msg = u.stringToElement(tpl_message(
                     _.extend(
@@ -220,6 +228,13 @@ converse.plugins.add('converse-message-view', {
                       _.partial(u.renderPageMeMedia, _converse, this.model.get('itemType'))
                     )(mediaId);
                 }
+                if (medialRequestKey) {
+                    msg.querySelector('.chat-msg__medical_request').innerHTML = _.flow(
+                      _.partial(u.renderPageMeMedicalReq, _converse)
+                    )(medialRequestKey);
+                    const status = this.model.get('medReqStt');
+                    text = this.renderMedicalRequestStatus(status);
+                }
                 const url = this.model.get('oob_url');
                 if (url) {
                     msg.querySelector('.chat-msg__media').innerHTML = _.flow(
@@ -228,8 +243,10 @@ converse.plugins.add('converse-message-view', {
                         _.partial(u.renderAudioURL, _converse),
                         _.partial(u.renderImageURL, _converse))(url);
                 }
-                if (text || mediaId) {
-                  this.rendered = true;
+                if (text || mediaId || medialRequestKey) {
+                  if (!medialRequestKey) {
+                    this.rendered = true;
+                  }
                   const is_hidden = u.hasClass('hidden', msg);
                   if (is_hidden) {
                     u.removeClass('hidden', msg);
@@ -264,6 +281,29 @@ converse.plugins.add('converse-message-view', {
                 if (this.model.collection) {
                   this.model.collection.trigger('rendered', this);
                 }
+            },
+
+            renderMedicalRequestStatus(status) {
+              switch (status) {
+                case 'IN_PROGRESS':
+                  return this.model.get('isMedReqSender') ? __(medReqLabel.wait4Appro) : __(medReqLabel.wait4UrAppro);
+                case 'DENIED':
+                  return this.model.get('isMedReqSender') ? __(medReqLabel.wait4UrAppro) : __(medReqLabel.wait4Appro);
+                case 'APPROVED':
+                  if (this.model.get('senderSignedMedReq') && this.model.get('rcvrSignedMedReq')) {
+                    return __(medReqLabel.approved);
+                  } else {
+                    if (this.model.get('isMedReqSender')) {
+                      return this.model.get('senderSignedMedReq') ? __(medReqLabel.wait4Appro) : __(medReqLabel.wait4UrAppro);
+                    } else {
+                      return this.model.get('senderSignedMedReq') ? __(medReqLabel.wait4UrAppro) : __(medReqLabel.wait4Appro);
+                    }
+                  }
+                case 'DELETED':
+                  return __(medReqLabel.deleted);
+                default:
+                  return __(medReqLabel.expired);
+              }
             },
 
             renderErrorMessage () {
@@ -322,6 +362,11 @@ converse.plugins.add('converse-message-view', {
             showPageMeMediaViewer (ev) {
               ev.preventDefault();
               _converse.emit('showPageMeMediaViewer', ev.target.id);
+            },
+
+            showPageMeMedicalRequest (ev) {
+              ev.preventDefault();
+              _converse.emit('showPageMeMedicalRequest', ev.target.id);
             },
 
             showMessageVersionsModal (ev) {

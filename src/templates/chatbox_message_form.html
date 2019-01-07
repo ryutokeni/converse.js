@@ -1,9 +1,6 @@
 <div class="message-form-container">
 <div class="new-msgs-indicator hidden">▼ {{{ o.unread_msgs }}} ▼</div>
 <form class="sendXMPPMessage">
-    {[ if (o.show_toolbar) { ]}
-        <ul class="chat-toolbar no-text-select"></ul>
-    {[ } ]}
     <input type="text" placeholder="{{o.label_spoiler_hint}}" value="{{ o.hint_value }}"
            class="{[ if (!o.composing_spoiler) { ]} hidden {[ } ]} spoiler-hint"/>
 
@@ -21,5 +18,8 @@
             <button type="submit" class="pure-button send-button">{{{ o.label_send }}}</button>
         {[ } ]}
     </div>
+    {[ if (o.show_toolbar) { ]}
+        <ul class="chat-toolbar no-text-select"></ul>
+    {[ } ]}
 </form>
 </div>

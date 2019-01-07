@@ -295,6 +295,7 @@ converse.plugins.add('converse-chatview', {
                 'click .spoiler-toggle': 'toggleSpoilerMessage',
                 'click .toggle-call': 'toggleCall',
                 'click .toggle-files': 'toggleFiles',
+                'click .toggle-medical-requests': 'toggleMedicalRequests',
                 'click .toggle-clear': 'clearMessages',
                 'click .toggle-compose-spoiler': 'toggleComposeSpoilerMessage',
                 'click .toggle-smiley ul.emoji-picker li': 'insertEmoji',
@@ -481,6 +482,7 @@ converse.plugins.add('converse-chatview', {
                     label_toggle_spoiler = __('Click to write your message as a spoiler');
                 }
                 return _.extend(options || {}, {
+                    'label_medical_requests': __('Send medical request'),
                     'label_file_upload': __('Upload image/video'),
                     'label_clear': __('Clear all messages'),
                     'tooltip_insert_smiley': __('Insert emojis'),
@@ -1119,6 +1121,11 @@ converse.plugins.add('converse-chatview', {
             toggleFiles (ev) {
                 ev.stopPropagation();
                 _converse.emit('filesButtonClicked', this.model.get('jid'));
+            },
+
+            toggleMedicalRequests (ev) {
+              ev.stopPropagation();
+              _converse.emit('medicalReqButtonClicked', this.model.get('jid'));
             },
 
             toggleComposeSpoilerMessage () {

@@ -2060,7 +2060,6 @@ converse.plugins.add('converse-muc-views', {
 
             function openChatRoomFromURIClicked (ev) {
                 ev.preventDefault();
-                console.log(ev.target.href);
                 _converse.api.rooms.open(ev.target.href);
             }
             _converse.chatboxviews.delegate('click', 'a.open-chatroom', openChatRoomFromURIClicked);

@@ -63,59 +63,69 @@ const {
   createNewGroup,
   onLeaveGroup,
   onShowPageMeMediaViewer,
+  onShowPageMeMedicalRequest,
   onUploadFiles,
+  onMedicalReqButtonClicked,
   sendFileXMPP
 } = converse;
 
 converse.initialize = function (settings, callback) {
-    if (converse.env._.isArray(settings.whitelisted_plugins)) {
-        settings.whitelisted_plugins = settings.whitelisted_plugins.concat(WHITELISTED_PLUGINS);
-    } else {
-        settings.whitelisted_plugins = WHITELISTED_PLUGINS;
-    }
-    return initialize(settings, callback);
+  if (converse.env._.isArray(settings.whitelisted_plugins)) {
+      settings.whitelisted_plugins = settings.whitelisted_plugins.concat(WHITELISTED_PLUGINS);
+  } else {
+      settings.whitelisted_plugins = WHITELISTED_PLUGINS;
+  }
+  return initialize(settings, callback);
 }
 
 converse.updateContacts = function (contacts, group) {
-    return updateContacts(contacts, group);
+  return updateContacts(contacts, group);
 }
 converse.updateGroups = function (groups) {
   return updateGroups(groups);
 }
 converse.updateMessageStatus = function (jid, messages) {
-    return updateMessageStatus(jid, messages);
+  return updateMessageStatus(jid, messages);
 }
 
 converse.onLogOut = function (callback) {
-    return onLogOut(callback);
+  return onLogOut(callback);
 }
 
 converse.onLoadMessages = function (callback) {
-    return onLoadMessages(callback);
+  return onLoadMessages(callback);
 }
 
 converse.onOpenCreateGroupModal = function (callback) {
-    return onOpenCreateGroupModal(callback);
+  return onOpenCreateGroupModal(callback);
 }
 
 converse.onShowPageMeMediaViewer = function (callback) {
-    return onShowPageMeMediaViewer(callback);
+  return onShowPageMeMediaViewer(callback);
+}
+
+converse.onShowPageMeMedicalRequest = function (callback) {
+  return onShowPageMeMedicalRequest(callback);
 }
 
 converse.createNewGroup = function (jid, attrs, participants) {
-    return createNewGroup(jid, attrs, participants);
+  return createNewGroup(jid, attrs, participants);
 }
 
 converse.onLeaveGroup = function (callback) {
-    return onLeaveGroup(callback);
+  return onLeaveGroup(callback);
 }
 
 converse.onUploadFiles = function (callback) {
-    return onUploadFiles(callback);
+  return onUploadFiles(callback);
+}
+
+converse.onMedicalReqButtonClicked = function (callback) {
+  return onMedicalReqButtonClicked(callback);
 }
 
 converse.sendFileXMPP = function(jid, mediaId) {
-    return sendFileXMPP(jid, mediaId);
+  return sendFileXMPP(jid, mediaId);
 }
 
 export default converse;

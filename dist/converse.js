@@ -72715,6 +72715,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         'click .spoiler-toggle': 'toggleSpoilerMessage',
         'click .toggle-call': 'toggleCall',
         'click .toggle-files': 'toggleFiles',
+        'click .toggle-medical-requests': 'toggleMedicalRequests',
         'click .toggle-clear': 'clearMessages',
         'click .toggle-compose-spoiler': 'toggleComposeSpoilerMessage',
         'click .toggle-smiley ul.emoji-picker li': 'insertEmoji',
@@ -72912,6 +72913,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         }
 
         return _.extend(options || {}, {
+          'label_medical_requests': __('Send medical request'),
           'label_file_upload': __('Upload image/video'),
           'label_clear': __('Clear all messages'),
           'tooltip_insert_smiley': __('Insert emojis'),
@@ -73269,7 +73271,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       },
 
       onMessageSubmitted(text, spoiler_hint) {
-        console.log(spoiler_hint);
         /* This method gets called once the user has typed a message
          * and then pressed enter in a chat box.
          *
@@ -73278,7 +73279,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
          *    (String) spoiler_hint - A hint in case the message
          *      text is a hidden/spoiler message. See XEP-0382
          */
-
         if (!_converse.connection.authenticated) {
           return this.showHelpMessages(['Sorry, the connection has been lost, ' + 'and your message could not be sent'], 'error');
         }
@@ -73582,6 +73582,12 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         ev.stopPropagation();
 
         _converse.emit('filesButtonClicked', this.model.get('jid'));
+      },
+
+      toggleMedicalRequests(ev) {
+        ev.stopPropagation();
+
+        _converse.emit('medicalReqButtonClicked', this.model.get('jid'));
       },
 
       toggleComposeSpoilerMessage() {
@@ -75366,6 +75372,13 @@ const _converse$env = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_
       Backbone = _converse$env.Backbone,
       _ = _converse$env._,
       moment = _converse$env.moment;
+const medReqLabel = {
+  wait4Appro: 'Waiting for Approval',
+  wait4UrAppro: 'Waiting for Your Approval',
+  approved: 'Approved',
+  deleted: 'Deleted',
+  expired: 'Period expired'
+};
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins.add('converse-message-view', {
   dependencies: ["converse-modal"],
 
@@ -75431,7 +75444,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       countDown: _converse.MessageCountDownView,
       events: {
         'click .chat-msg__edit-modal': 'showMessageVersionsModal',
-        'click .pageme-media': 'showPageMeMediaViewer'
+        'click .pageme-media': 'showPageMeMediaViewer',
+        'click .pageme-medical-request': 'showPageMeMedicalRequest'
       },
 
       defaults() {
@@ -75564,6 +75578,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         }
 
         const mediaId = this.model.get('mediaId');
+        const medialRequestKey = this.model.get('medialRequestKey');
         let text = this.findPagemeMessage();
         const msg = _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].stringToElement(templates_message_html__WEBPACK_IMPORTED_MODULE_6___default()(_.extend(this.model.toJSON(), {
           '__': __,
@@ -75581,14 +75596,23 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           msg.querySelector('.chat-msg__media').innerHTML = _.flow(_.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderPageMeMedia, _converse, this.model.get('itemType')))(mediaId);
         }
 
+        if (medialRequestKey) {
+          msg.querySelector('.chat-msg__medical_request').innerHTML = _.flow(_.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderPageMeMedicalReq, _converse))(medialRequestKey);
+          const status = this.model.get('medReqStt');
+          text = this.renderMedicalRequestStatus(status);
+        }
+
         const url = this.model.get('oob_url');
 
         if (url) {
           msg.querySelector('.chat-msg__media').innerHTML = _.flow(_.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderFileURL, _converse), _.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderMovieURL, _converse), _.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderAudioURL, _converse), _.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderImageURL, _converse))(url);
         }
 
-        if (text || mediaId) {
-          this.rendered = true;
+        if (text || mediaId || medialRequestKey) {
+          if (!medialRequestKey) {
+            this.rendered = true;
+          }
+
           const is_hidden = _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].hasClass('hidden', msg);
 
           if (is_hidden) {
@@ -75626,6 +75650,33 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
 
         if (this.model.collection) {
           this.model.collection.trigger('rendered', this);
+        }
+      },
+
+      renderMedicalRequestStatus(status) {
+        switch (status) {
+          case 'IN_PROGRESS':
+            return this.model.get('isMedReqSender') ? __(medReqLabel.wait4Appro) : __(medReqLabel.wait4UrAppro);
+
+          case 'DENIED':
+            return this.model.get('isMedReqSender') ? __(medReqLabel.wait4UrAppro) : __(medReqLabel.wait4Appro);
+
+          case 'APPROVED':
+            if (this.model.get('senderSignedMedReq') && this.model.get('rcvrSignedMedReq')) {
+              return __(medReqLabel.approved);
+            } else {
+              if (this.model.get('isMedReqSender')) {
+                return this.model.get('senderSignedMedReq') ? __(medReqLabel.wait4Appro) : __(medReqLabel.wait4UrAppro);
+              } else {
+                return this.model.get('senderSignedMedReq') ? __(medReqLabel.wait4UrAppro) : __(medReqLabel.wait4Appro);
+              }
+            }
+
+          case 'DELETED':
+            return __(medReqLabel.deleted);
+
+          default:
+            return __(medReqLabel.expired);
         }
       },
 
@@ -75683,6 +75734,12 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         ev.preventDefault();
 
         _converse.emit('showPageMeMediaViewer', ev.target.id);
+      },
+
+      showPageMeMedicalRequest(ev) {
+        ev.preventDefault();
+
+        _converse.emit('showPageMeMedicalRequest', ev.target.id);
       },
 
       showMessageVersionsModal(ev) {
@@ -83455,7 +83512,9 @@ const initialize = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20_
       createNewGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].createNewGroup,
       onLeaveGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLeaveGroup,
       onShowPageMeMediaViewer = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onShowPageMeMediaViewer,
+      onShowPageMeMedicalRequest = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onShowPageMeMedicalRequest,
       onUploadFiles = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onUploadFiles,
+      onMedicalReqButtonClicked = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onMedicalReqButtonClicked,
       sendFileXMPP = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].sendFileXMPP;
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].initialize = function (settings, callback) {
@@ -83496,6 +83555,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onShow
   return onShowPageMeMediaViewer(callback);
 };
 
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onShowPageMeMedicalRequest = function (callback) {
+  return onShowPageMeMedicalRequest(callback);
+};
+
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].createNewGroup = function (jid, attrs, participants) {
   return createNewGroup(jid, attrs, participants);
 };
@@ -83506,6 +83569,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLeav
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onUploadFiles = function (callback) {
   return onUploadFiles(callback);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onMedicalReqButtonClicked = function (callback) {
+  return onMedicalReqButtonClicked(callback);
 };
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].sendFileXMPP = function (jid, mediaId) {
@@ -84640,6 +84707,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _converse_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./converse-core */ "./src/headless/converse-core.js");
 /* harmony import */ var filesize__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! filesize */ "./node_modules/filesize/lib/filesize.js");
 /* harmony import */ var filesize__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(filesize__WEBPACK_IMPORTED_MODULE_3__);
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 // Converse.js
 // http://conversejs.org
 //
@@ -85018,8 +85089,25 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
          *    (Object) message - The Backbone.Model representing the message
          */
         const sentDate = message.get('sent');
-        const rawText = type === 'text' ? body : '';
-        body = type === 'text' ? RNCryptor.pagemeEncrypt(_converse.user_settings.pagemeEncryptKey, body) : body;
+        let rawText = '';
+
+        switch (type) {
+          case 'text':
+            rawText = body;
+            body = RNCryptor.pagemeEncrypt(_converse.user_settings.pagemeEncryptKey, body);
+            break;
+
+          case 'file':
+            break;
+
+          case 'medical_request':
+            rawText = `This application version doesn't support Medical Request`;
+            break;
+
+          default:
+            break;
+        }
+
         body = body || '';
         const stanza = $msg({
           'from': _converse.connection.jid,
@@ -85037,10 +85125,15 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
 
           if (type === 'file') {
             stanza.c('itemType').t(message.get('itemType')).up().c('mediaId').t(message.get('mediaId')).up().c('fileSize').t(message.get('fileSize')).up();
-          } // if (type === 'text') {
+          }
 
+          if (type === 'medical_request') {
+            stanza.c('itemType').t(message.get('itemType')).up().c('medialRequestKey').t(message.get('medialRequestKey')).up().c('subject').t(message.get('subject')).up().c('description').t(message.get('description')).up();
+          }
 
-          stanza.c('encrypted').t('1').up(); // }
+          if (type === 'text') {
+            stanza.c('encrypted').t('1').up();
+          }
 
           stanza.up();
           stanza.c('request', {
@@ -85093,7 +85186,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         }
 
         _converse.pagemeMessages.push({
-          body: type === 'text' ? body : '',
+          body: body,
           decrypted: rawText,
           sentDate: sentDate,
           stanza: stanza.node
@@ -85142,10 +85235,10 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
          *  Parameters:
          *    (Message) message - The chat message
          */
-        console.log(attrs);
         attrs.sent = new Date().getTime() / 1000;
         const body = attrs.message;
         const mediaId = attrs.mediaId;
+        const medialRequestKey = attrs.medialRequestKey;
         let message = this.messages.findWhere('correcting');
 
         if (message) {
@@ -85161,11 +85254,22 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         } else {
           delete attrs.message;
           attrs['time_to_read'] = timeToRead;
+          console.log(attrs);
           message = this.messages.create(attrs);
+          console.log(message);
         }
 
-        console.log(message);
-        return this.sendMessageStanza(this.createMessageStanza(message, mediaId ? 'file' : 'text', body || mediaId));
+        let type = 'text';
+
+        if (mediaId) {
+          type = 'file';
+        }
+
+        if (medialRequestKey) {
+          type = 'medical_request';
+        }
+
+        return this.sendMessageStanza(this.createMessageStanza(message, type, body || mediaId || medialRequestKey));
       },
 
       sendChatState() {
@@ -85254,7 +85358,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         });
       },
 
-      getMessageAttributesFromStanza(stanza, original_stanza) {
+      getMessageAttributesFromStanza(stanza, original_stanza, extraAttrs) {
         /* Parses a passed in message stanza and returns an object
          * of attributes.
          *
@@ -85283,12 +85387,42 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           'msgid': stanza.getAttribute('id'),
           'time': delay ? delay.getAttribute('stamp') : sendDate,
           'time_to_read': stanza.querySelector('timeToRead') ? stanza.querySelector('timeToRead').innerHTML : 84000,
-          'mediaId': stanza.querySelector('mediaId') ? stanza.querySelector('mediaId').innerHTML : '',
           'itemType': stanza.querySelector('itemType') ? stanza.querySelector('itemType').innerHTML : '',
           'fileSize': stanza.querySelector('fileSize') ? stanza.querySelector('fileSize').innerHTML : '',
           'sent': sendDate,
           'type': stanza.getAttribute('type')
         };
+
+        if (!extraAttrs) {
+          extraAttrs = {};
+        }
+
+        switch (attrs.itemType) {
+          case 'video':
+          case 'image':
+            extraAttrs = _objectSpread({}, extraAttrs, {
+              'mediaId': stanza.querySelector('mediaId') ? stanza.querySelector('mediaId').innerHTML : '',
+              'fileSize': stanza.querySelector('fileSize') ? stanza.querySelector('fileSize').innerHTML : ''
+            });
+            break;
+
+          case 'medical_request':
+            if (!extraAttrs.medReqStt) {
+              extraAttrs.medReqStt = 'IN_PROGRESS';
+            }
+
+            extraAttrs = _objectSpread({}, extraAttrs, {
+              'medialRequestKey': stanza.querySelector('medialRequestKey') ? stanza.querySelector('medialRequestKey').innerHTML : '',
+              'subject': stanza.querySelector('subject') ? stanza.querySelector('subject').innerHTML : '',
+              'description': stanza.querySelector('description') ? stanza.querySelector('description').innerHTML : ''
+            });
+            break;
+
+          default:
+            break;
+        }
+
+        Object.assign(attrs, extraAttrs);
 
         if (attrs.type === 'groupchat') {
           attrs.from = stanza.getAttribute('from');
@@ -85318,7 +85452,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         return attrs;
       },
 
-      createMessage(message, original_stanza) {
+      createMessage(message, original_stanza, extraAttrs) {
         /* Create a Backbone.Message object inside this chat box
          * based on the identified message stanza.
          */
@@ -85331,7 +85465,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
             // XXX: MUC leakage
             // No need showing delayed or our own CSN messages
             return;
-          } else if (!is_csn && !attrs.file && !attrs.plaintext && !attrs.message && !attrs.mediaId && !attrs.oob_url && attrs.type !== 'error') {
+          } else if (!is_csn && !attrs.file && !attrs.plaintext && !attrs.message && !attrs.mediaId && !attrs.medialRequestKey && !attrs.oob_url && attrs.type !== 'error') {
             // TODO: handle <subject> messages (currently being done by ChatRoom)
             return;
           } else {
@@ -85358,12 +85492,11 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
               delete attrs.message;
             }
 
-            console.log('still here');
             return that.messages.create(attrs);
           }
         }
 
-        const result = this.getMessageAttributesFromStanza(message, original_stanza);
+        const result = this.getMessageAttributesFromStanza(message, original_stanza, extraAttrs);
 
         if (typeof result.then === "function") {
           return new Promise((resolve, reject) => result.then(attrs => resolve(_create(attrs))));
@@ -85536,12 +85669,13 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         _converse.api.send(receipt_stanza);
       },
 
-      onMessage(stanza) {
+      onMessage(stanza, extraAttrs) {
         /* Handler method for all incoming single-user chat "message"
          * stanzas.
          *
          * Parameters:
-         *    (XMLElement) stanza - The incoming message stanza
+         *    (XMLElement) stanza       - The incoming message stanza
+         *    (Object)     extraAttrs   - Extra params received from pageme app
          */
         let to_jid = stanza.getAttribute('to');
         const to_resource = Strophe.getResourceFromJid(to_jid);
@@ -85616,7 +85750,11 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
 
           if (!message) {
             // Only create the message when we're sure it's not a duplicate
-            chatbox.createMessage(stanza, original_stanza).then(msg => chatbox.incrementUnreadMsgCounter(msg)).catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
+            chatbox.createMessage(stanza, original_stanza, extraAttrs).then(msg => chatbox.incrementUnreadMsgCounter(msg)).catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
+          } else {
+            message.save(extraAttrs);
+
+            _converse.emit('rerenderMessage');
           }
         }
 
@@ -87777,6 +87915,26 @@ const converse = {
     _converse.on('showPageMeMediaViewer', callback);
   },
 
+  'onShowPageMeMedicalRequest'(callback) {
+    _converse.on('showPageMeMedicalRequest', callback);
+  },
+
+  'updateMessage'(chatbox, findCondition, updatedAttrs) {
+    console.log(chatbox, findCondition, updatedAttrs);
+
+    if (typeof chatbox === 'string') {
+      chatbox = _converse.chatboxes.findWhere({
+        'jid': chatbox
+      });
+    }
+
+    const message = chatbox.messages.findWhere(findCondition);
+    console.log(message);
+    message.save(updatedAttrs);
+
+    _converse.api.emit('rerenderMessage');
+  },
+
   'updateMessages'(jid, pagemeMessages) {
     const chatbox = _converse.chatboxes.findWhere({
       'jid': jid
@@ -87787,8 +87945,17 @@ const converse = {
     }
 
     pagemeMessages.forEach(msg => {
-      if (!msg.body || msg.mediaId) {
-        _converse.chatboxes.onMessage(msg.stanza);
+      if (msg.type !== 'text') {
+        if (msg.type === 'medical_request') {
+          _converse.chatboxes.onMessage(msg.stanza, {
+            medReqStt: msg.medReqStt,
+            isMedReqSender: msg.isMedReqSender,
+            senderSignedMedReq: msg.senderSignedMedReq,
+            rcvrSignedMedReq: msg.rcvrSignedMedReq
+          });
+        } else {
+          _converse.chatboxes.onMessage(msg.stanza);
+        }
 
         return;
       }
@@ -87844,6 +88011,10 @@ const converse = {
     return _converse.on('filesButtonClicked', callback);
   },
 
+  'onMedicalReqButtonClicked'(callback) {
+    return _converse.on('medicalReqButtonClicked', callback);
+  },
+
   'sendFileXMPP'(jid, media) {
     const chatbox = _converse.chatboxes.findWhere({
       'jid': jid
@@ -87851,6 +88022,15 @@ const converse = {
 
     const attrs = chatbox.getOutgoingMessageAttributes('');
     chatbox.sendMessage(_objectSpread({}, attrs, media));
+  },
+
+  'sendMedicalRequestXMPP'(jid, medicalRequest) {
+    const chatbox = _converse.chatboxes.findWhere({
+      'jid': jid
+    });
+
+    const attrs = chatbox.getOutgoingMessageAttributes('');
+    chatbox.sendMessage(_objectSpread({}, attrs, medicalRequest));
   },
 
   /**
@@ -91260,6 +91440,20 @@ _converse_core__WEBPACK_IMPORTED_MODULE_1__["default"].plugins.add('converse-pin
     };
 
     _converse.pong = function (ping) {
+      if (ping.getAttribute('CustomType') === 'VerificationRequest') {
+        const verification = ping.querySelector('VerificationRequest');
+        const chatboxId = `${verification.getAttribute('sender')}${_converse.user_settings.domain}`;
+        _converse_core__WEBPACK_IMPORTED_MODULE_1__["default"].updateMessage(chatboxId, {
+          medialRequestKey: verification.getAttribute('key')
+        }, {
+          medReqStt: verification.getAttribute('status'),
+          subject: verification.getAttribute('subject'),
+          description: verification.getAttribute('description'),
+          senderSignedMedReq: !!verification.getAttribute('senderSignatureUrl'),
+          rcvrSignedMedReq: !!verification.getAttribute('recipientSignatureUrl')
+        });
+      }
+
       _converse.lastStanzaDate = new Date();
 
       _converse.connection.ping.pong(ping);
@@ -93193,7 +93387,7 @@ u.isOnlyChatStateNotification = function (attrs) {
     attrs = attrs.attributes;
   }
 
-  return attrs['chat_state'] && !attrs['oob_url'] && !attrs['file'] && !(attrs['is_encrypted'] && attrs['plaintext']) && !attrs['message'] && !attrs['mediaId'] && !attrs['sent'];
+  return attrs['chat_state'] && !attrs['oob_url'] && !attrs['file'] && !(attrs['is_encrypted'] && attrs['plaintext']) && !attrs['message'] && !attrs['mediaId'] && !attrs['medialRequestKey'] && !attrs['sent'];
 };
 
 u.isHeadlineMessage = function (_converse, message) {
@@ -116756,11 +116950,7 @@ var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 __p += '<!-- src/templates/chatbox_message_form.html -->\n<div class="message-form-container">\n<div class="new-msgs-indicator hidden">▼ ' +
 __e( o.unread_msgs ) +
-' ▼</div>\n<form class="sendXMPPMessage">\n    ';
- if (o.show_toolbar) { ;
-__p += '\n        <ul class="chat-toolbar no-text-select"></ul>\n    ';
- } ;
-__p += '\n    <input type="text" placeholder="' +
+' ▼</div>\n<form class="sendXMPPMessage">\n    <input type="text" placeholder="' +
 ((__t = (o.label_spoiler_hint)) == null ? '' : __t) +
 '" value="' +
 ((__t = ( o.hint_value )) == null ? '' : __t) +
@@ -116786,7 +116976,11 @@ __p += '\n            <button type="submit" class="pure-button send-button">' +
 __e( o.label_send ) +
 '</button>\n        ';
  } ;
-__p += '\n    </div>\n</form>\n</div>\n';
+__p += '\n    </div>\n    ';
+ if (o.show_toolbar) { ;
+__p += '\n        <ul class="chat-toolbar no-text-select"></ul>\n    ';
+ } ;
+__p += '\n</form>\n</div>\n';
 return __p
 };
 
@@ -118227,7 +118421,7 @@ __p += '\n                <div class="chat-msg__text';
  if (o.is_spoiler) { ;
 __p += ' spoiler collapsed';
  } ;
-__p += '"><!-- message gets added here via renderMessage --></div>\n                <div class="chat-msg__media"></div>\n                <span class="chat-msg__count_down">time here</span>\n            ';
+__p += '"><!-- message gets added here via renderMessage --></div>\n                <div class="chat-msg__media"></div>\n                <div class="chat-msg__medical_request"></div>\n\n                <span class="chat-msg__count_down">time here</span>\n            ';
  if (!o.is_me_message) { ;
 __p += '</div>';
  } ;
@@ -118416,6 +118610,24 @@ __e(o.type) +
 '" class="pageme-media pageme-' +
 __e(o.type) +
 '">&nbsp;</span>\n';
+return __p
+};
+
+/***/ }),
+
+/***/ "./src/templates/pageme_medical_request.html":
+/*!***************************************************!*\
+  !*** ./src/templates/pageme_medical_request.html ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./node_modules/lodash/escape.js")};
+module.exports = function(o) {
+var __t, __p = '', __e = _.escape;
+__p += '<!-- src/templates/pageme_medical_request.html -->\n<span id="' +
+__e(o.medialRequestKey) +
+'#pageme#medical_request" class="pageme-medical-request">&nbsp;</span>\n';
 return __p
 };
 
@@ -119407,7 +119619,11 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/toolbar.html -->\n';
+__p += '<!-- src/templates/toolbar.html -->\n<li class="toggle-medical-requests fa fa-stethoscope" title="' +
+__e(o.label_medical_requests) +
+'"></li>\n<li class="toggle-files fa fa-file-upload" title="' +
+__e(o.label_file_upload) +
+'"></li>\n';
  if (o.use_emoji)  { ;
 __p += '\n<li class="toggle-toolbar-menu toggle-smiley dropup">\n    <a class="toggle-smiley far fa-smile" title="' +
 __e(o.tooltip_insert_smiley) +
@@ -119431,9 +119647,7 @@ __p += '"\n    title="' +
 __e(o.label_hide_occupants) +
 '"></li>\n';
  } ;
-__p += '\n<li class="toggle-files fa fa-file-upload float-right" title="' +
-__e(o.label_file_upload) +
-'"></li>\n';
+__p += '\n';
 return __p
 };
 
@@ -119732,7 +119946,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _templates_video_html__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(_templates_video_html__WEBPACK_IMPORTED_MODULE_15__);
 /* harmony import */ var _templates_pageme_media_html__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../templates/pageme_media.html */ "./src/templates/pageme_media.html");
 /* harmony import */ var _templates_pageme_media_html__WEBPACK_IMPORTED_MODULE_16___default = /*#__PURE__*/__webpack_require__.n(_templates_pageme_media_html__WEBPACK_IMPORTED_MODULE_16__);
-/* harmony import */ var _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../headless/utils/core */ "./src/headless/utils/core.js");
+/* harmony import */ var _templates_pageme_medical_request_html__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../templates/pageme_medical_request.html */ "./src/templates/pageme_medical_request.html");
+/* harmony import */ var _templates_pageme_medical_request_html__WEBPACK_IMPORTED_MODULE_17___default = /*#__PURE__*/__webpack_require__.n(_templates_pageme_medical_request_html__WEBPACK_IMPORTED_MODULE_17__);
+/* harmony import */ var _headless_utils_core__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../headless/utils/core */ "./src/headless/utils/core.js");
 // Converse.js (A browser based XMPP chat client)
 // http://conversejs.org
 //
@@ -119740,6 +119956,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 // Copyright (c) 2013-2018, Jan-Carel Brand <jc@opkode.com>
 // Licensed under the Mozilla Public License (MPLv2)
+
 
 
 
@@ -119808,7 +120025,7 @@ const isImage = function isImage(url) {
   });
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].isAudioURL = function (url) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].isAudioURL = function (url) {
   if (!(url instanceof urijs__WEBPACK_IMPORTED_MODULE_0___default.a)) {
     url = new urijs__WEBPACK_IMPORTED_MODULE_0___default.a(url);
   }
@@ -119822,7 +120039,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].isAudioURL = funct
   return filename.endsWith('.ogg') || filename.endsWith('.mp3') || filename.endsWith('.m4a');
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].isImageURL = function (url) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].isImageURL = function (url) {
   if (!(url instanceof urijs__WEBPACK_IMPORTED_MODULE_0___default.a)) {
     url = new urijs__WEBPACK_IMPORTED_MODULE_0___default.a(url);
   }
@@ -119836,7 +120053,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].isImageURL = funct
   return filename.endsWith('.jpg') || filename.endsWith('.jpeg') || filename.endsWith('.png') || filename.endsWith('.gif') || filename.endsWith('.bmp') || filename.endsWith('.tiff') || filename.endsWith('.svg');
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].isVideoURL = function (url) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].isVideoURL = function (url) {
   if (!(url instanceof urijs__WEBPACK_IMPORTED_MODULE_0___default.a)) {
     url = new urijs__WEBPACK_IMPORTED_MODULE_0___default.a(url);
   }
@@ -119850,10 +120067,10 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].isVideoURL = funct
   return filename.endsWith('.mp4') || filename.endsWith('.webm');
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].renderAudioURL = function (_converse, url) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].renderAudioURL = function (_converse, url) {
   const uri = new urijs__WEBPACK_IMPORTED_MODULE_0___default.a(url);
 
-  if (_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].isAudioURL(uri)) {
+  if (_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].isAudioURL(uri)) {
     const __ = _converse.__;
     return _templates_audio_html__WEBPACK_IMPORTED_MODULE_3___default()({
       'url': url,
@@ -119864,7 +120081,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].renderAudioURL = f
   return url;
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].renderPageMeMedia = function (_converse, type, mediaId) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].renderPageMeMedia = function (_converse, type, mediaId) {
   const __ = _converse.__;
   return _templates_pageme_media_html__WEBPACK_IMPORTED_MODULE_16___default()({
     'type': type,
@@ -119872,10 +120089,17 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].renderPageMeMedia 
   });
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].renderFileURL = function (_converse, url) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].renderPageMeMedicalReq = function (_converse, medialRequestKey) {
+  const __ = _converse.__;
+  return _templates_pageme_medical_request_html__WEBPACK_IMPORTED_MODULE_17___default()({
+    'medialRequestKey': medialRequestKey
+  });
+};
+
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].renderFileURL = function (_converse, url) {
   const uri = new urijs__WEBPACK_IMPORTED_MODULE_0___default.a(url);
 
-  if (_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].isImageURL(uri) || _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].isVideoURL(uri) || _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].isAudioURL(uri)) {
+  if (_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].isImageURL(uri) || _headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].isVideoURL(uri) || _headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].isAudioURL(uri)) {
     return url;
   }
 
@@ -119887,14 +120111,14 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].renderFileURL = fu
   });
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].renderImageURL = function (_converse, url) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].renderImageURL = function (_converse, url) {
   if (!_converse.show_images_inline) {
-    return _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].addHyperlinks(url);
+    return _headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].addHyperlinks(url);
   }
 
   const uri = new urijs__WEBPACK_IMPORTED_MODULE_0___default.a(url);
 
-  if (_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].isImageURL(uri)) {
+  if (_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].isImageURL(uri)) {
     const __ = _converse.__;
     return _templates_image_html__WEBPACK_IMPORTED_MODULE_13___default()({
       'url': url,
@@ -119905,7 +120129,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].renderImageURL = f
   return url;
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].renderImageURLs = function (_converse, el) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].renderImageURLs = function (_converse, el) {
   /* Returns a Promise which resolves once all images have been loaded.
    */
   if (!_converse.show_images_inline) {
@@ -119915,7 +120139,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].renderImageURLs = 
   const __ = _converse.__;
   const list = el.textContent.match(URL_REGEX) || [];
   return Promise.all(_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.map(list, url => new Promise((resolve, reject) => {
-    if (_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].isImageURL(url)) {
+    if (_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].isImageURL(url)) {
       return isImage(url).then(img => {
         const i = new Image();
         i.src = img.src;
@@ -119938,10 +120162,10 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].renderImageURLs = 
   })));
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].renderMovieURL = function (_converse, url) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].renderMovieURL = function (_converse, url) {
   const uri = new urijs__WEBPACK_IMPORTED_MODULE_0___default.a(url);
 
-  if (_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].isVideoURL(uri)) {
+  if (_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].isVideoURL(uri)) {
     const __ = _converse.__;
     return _templates_video_html__WEBPACK_IMPORTED_MODULE_15___default()({
       'url': url,
@@ -119952,18 +120176,18 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].renderMovieURL = f
   return url;
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].renderNewLines = function (text) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].renderNewLines = function (text) {
   return text.replace(/\n\n+/g, '<br/><br/>').replace(/\n/g, '<br/>');
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].calculateElementHeight = function (el) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].calculateElementHeight = function (el) {
   /* Return the height of the passed in DOM element,
    * based on the heights of its children.
    */
   return _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.reduce(el.children, (result, child) => result + child.offsetHeight, 0);
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].getNextElement = function (el, selector = '*') {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].getNextElement = function (el, selector = '*') {
   let next_el = el.nextElementSibling;
 
   while (!_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.isNull(next_el) && !sizzle__WEBPACK_IMPORTED_MODULE_2___default.a.matchesSelector(next_el, selector)) {
@@ -119973,7 +120197,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].getNextElement = f
   return next_el;
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].getPreviousElement = function (el, selector = '*') {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].getPreviousElement = function (el, selector = '*') {
   let prev_el = el.previousSibling;
 
   while (!_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.isNull(prev_el) && !sizzle__WEBPACK_IMPORTED_MODULE_2___default.a.matchesSelector(prev_el, selector)) {
@@ -119983,7 +120207,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].getPreviousElement
   return prev_el;
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].getFirstChildElement = function (el, selector = '*') {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].getFirstChildElement = function (el, selector = '*') {
   let first_el = el.firstElementChild;
 
   while (!_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.isNull(first_el) && !sizzle__WEBPACK_IMPORTED_MODULE_2___default.a.matchesSelector(first_el, selector)) {
@@ -119993,7 +120217,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].getFirstChildEleme
   return first_el;
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].getLastChildElement = function (el, selector = '*') {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].getLastChildElement = function (el, selector = '*') {
   let last_el = el.lastElementChild;
 
   while (!_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.isNull(last_el) && !sizzle__WEBPACK_IMPORTED_MODULE_2___default.a.matchesSelector(last_el, selector)) {
@@ -120003,17 +120227,17 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].getLastChildElemen
   return last_el;
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].hasClass = function (className, el) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].hasClass = function (className, el) {
   return _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.includes(el.classList, className);
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].addClass = function (className, el) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].addClass = function (className, el) {
   if (el instanceof Element) {
     el.classList.add(className);
   }
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].removeClass = function (className, el) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].removeClass = function (className, el) {
   if (el instanceof Element) {
     el.classList.remove(className);
   }
@@ -120021,15 +120245,15 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].removeClass = func
   return el;
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].removeElement = function (el) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].removeElement = function (el) {
   if (!_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.isNil(el) && !_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.isNil(el.parentNode)) {
     el.parentNode.removeChild(el);
   }
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].showElement = _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.flow(_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.partial(_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].removeClass, 'collapsed'), _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.partial(_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].removeClass, 'hidden'));
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].showElement = _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.flow(_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.partial(_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].removeClass, 'collapsed'), _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.partial(_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].removeClass, 'hidden'));
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].hideElement = function (el) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].hideElement = function (el) {
   if (!_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.isNil(el)) {
     el.classList.add('hidden');
   }
@@ -120037,7 +120261,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].hideElement = func
   return el;
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].ancestor = function (el, selector) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].ancestor = function (el, selector) {
   let parent = el;
 
   while (!_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.isNil(parent) && !sizzle__WEBPACK_IMPORTED_MODULE_2___default.a.matchesSelector(parent, selector)) {
@@ -120047,7 +120271,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].ancestor = functio
   return parent;
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].nextUntil = function (el, selector, include_self = false) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].nextUntil = function (el, selector, include_self = false) {
   /* Return the element's siblings until one matches the selector. */
   const matches = [];
   let sibling_el = el.nextElementSibling;
@@ -120060,7 +120284,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].nextUntil = functi
   return matches;
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].unescapeHTML = function (string) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].unescapeHTML = function (string) {
   /* Helper method that replace HTML-escaped symbols with equivalent characters
    * (e.g. transform occurrences of '&amp;' to '&')
    *
@@ -120072,11 +120296,11 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].unescapeHTML = fun
   return div.innerText;
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].escapeHTML = function (string) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].escapeHTML = function (string) {
   return string.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].addMentionsMarkup = function (text, references, chatbox) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].addMentionsMarkup = function (text, references, chatbox) {
   if (chatbox.get('message_type') !== 'groupchat') {
     return text;
   }
@@ -120095,7 +120319,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].addMentionsMarkup 
   return text;
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].addHyperlinks = function (text) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].addHyperlinks = function (text) {
   return urijs__WEBPACK_IMPORTED_MODULE_0___default.a.withinString(text, url => {
     const uri = new urijs__WEBPACK_IMPORTED_MODULE_0___default.a(url);
     url = uri.normalize()._string;
@@ -120106,28 +120330,28 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].addHyperlinks = fu
     }
 
     if (uri._parts.protocol === 'xmpp' && uri._parts.query === 'join') {
-      return `<a target="_blank" rel="noopener" class="open-chatroom" href="${url}">${_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].escapeHTML(pretty_url)}</a>`;
+      return `<a target="_blank" rel="noopener" class="open-chatroom" href="${url}">${_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].escapeHTML(pretty_url)}</a>`;
     }
 
-    return `<a target="_blank" rel="noopener" href="${url}">${_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].escapeHTML(pretty_url)}</a>`;
+    return `<a target="_blank" rel="noopener" href="${url}">${_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].escapeHTML(pretty_url)}</a>`;
   }, {
     'start': /\b(?:([a-z][a-z0-9.+-]*:\/\/)|xmpp:|mailto:|www\.)/gi
   });
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].slideInAllElements = function (elements, duration = 300) {
-  return Promise.all(_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.map(elements, _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.partial(_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].slideIn, _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a, duration)));
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].slideInAllElements = function (elements, duration = 300) {
+  return Promise.all(_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.map(elements, _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.partial(_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].slideIn, _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a, duration)));
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].slideToggleElement = function (el, duration) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].slideToggleElement = function (el, duration) {
   if (_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.includes(el.classList, 'collapsed') || _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.includes(el.classList, 'hidden')) {
-    return _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].slideOut(el, duration);
+    return _headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].slideOut(el, duration);
   } else {
-    return _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].slideIn(el, duration);
+    return _headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].slideIn(el, duration);
   }
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].slideOut = function (el, duration = 200) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].slideOut = function (el, duration = 200) {
   /* Shows/expands an element by sliding it out of itself
    *
    * Parameters:
@@ -120149,7 +120373,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].slideOut = functio
       window.cancelAnimationFrame(marker);
     }
 
-    const end_height = _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].calculateElementHeight(el);
+    const end_height = _headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].calculateElementHeight(el);
 
     if (window.converse_disable_effects) {
       // Effects are disabled (for tests)
@@ -120159,7 +120383,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].slideOut = functio
       return;
     }
 
-    if (!_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].hasClass('collapsed', el) && !_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].hasClass('hidden', el)) {
+    if (!_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].hasClass('collapsed', el) && !_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].hasClass('hidden', el)) {
       resolve();
       return;
     }
@@ -120179,7 +120403,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].slideOut = functio
         // browser bug where browsers don't know the correct
         // offsetHeight beforehand.
         el.removeAttribute('data-slider-marker');
-        el.style.height = _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].calculateElementHeight(el) + 'px';
+        el.style.height = _headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].calculateElementHeight(el) + 'px';
         el.style.overflow = "";
         el.style.height = "";
         resolve();
@@ -120194,7 +120418,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].slideOut = functio
   });
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].slideIn = function (el, duration = 200) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].slideIn = function (el, duration = 200) {
   /* Hides/collapses an element by sliding it into itself. */
   return new Promise((resolve, reject) => {
     if (_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.isNil(el)) {
@@ -120249,8 +120473,8 @@ function afterAnimationEnds(el, callback) {
   }
 }
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].isVisible = function (el) {
-  if (_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].hasClass('hidden', el)) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].isVisible = function (el) {
+  if (_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].hasClass('hidden', el)) {
     return false;
   } // XXX: Taken from jQuery's "visible" implementation
 
@@ -120258,7 +120482,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].isVisible = functi
   return el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0;
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].fadeIn = function (el, callback) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].fadeIn = function (el, callback) {
   if (_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.isNil(el)) {
     logger.warn("Undefined or null element passed into fadeIn");
   }
@@ -120279,7 +120503,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].fadeIn = function 
   }
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].xForm2webForm = function (field, stanza, domain) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].xForm2webForm = function (field, stanza, domain) {
   /* Takes a field in XMPP XForm (XEP-004: Data Forms) format
    * and turns it into an HTML field.
    *
@@ -120291,9 +120515,9 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].xForm2webForm = fu
    */
   if (field.getAttribute('type')) {
     if (field.getAttribute('type') === 'list-single' || field.getAttribute('type') === 'list-multi') {
-      const values = _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.map(_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].queryChildren(field, 'value'), _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.partial(_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.get, _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a, 'textContent'));
+      const values = _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.map(_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].queryChildren(field, 'value'), _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.partial(_headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.get, _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a, 'textContent'));
 
-      const options = _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.map(_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].queryChildren(field, 'option'), function (option) {
+      const options = _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.map(_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].queryChildren(field, 'option'), function (option) {
         const value = _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.get(option.querySelector('value'), 'textContent');
 
         return _templates_select_option_html__WEBPACK_IMPORTED_MODULE_14___default()({
@@ -120305,7 +120529,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].xForm2webForm = fu
       });
 
       return _templates_form_select_html__WEBPACK_IMPORTED_MODULE_9___default()({
-        'id': _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].getUniqueId(),
+        'id': _headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].getUniqueId(),
         'name': field.getAttribute('var'),
         'label': field.getAttribute('label'),
         'options': options.join(''),
@@ -120325,7 +120549,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].xForm2webForm = fu
       });
     } else if (field.getAttribute('type') === 'boolean') {
       return _templates_form_checkbox_html__WEBPACK_IMPORTED_MODULE_7___default()({
-        'id': _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].getUniqueId(),
+        'id': _headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].getUniqueId(),
         'name': field.getAttribute('var'),
         'label': field.getAttribute('label') || '',
         'checked': _headless_lodash_noconflict__WEBPACK_IMPORTED_MODULE_1___default.a.get(field.querySelector('value'), 'textContent') === "1" && 'checked="1"' || '',
@@ -120347,7 +120571,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].xForm2webForm = fu
       });
     } else {
       return _templates_form_input_html__WEBPACK_IMPORTED_MODULE_8___default()({
-        'id': _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].getUniqueId(),
+        'id': _headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].getUniqueId(),
         'label': field.getAttribute('label') || '',
         'name': field.getAttribute('var'),
         'placeholder': null,
@@ -120372,7 +120596,7 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"].xForm2webForm = fu
   }
 };
 
-/* harmony default export */ __webpack_exports__["default"] = (_headless_utils_core__WEBPACK_IMPORTED_MODULE_17__["default"]);
+/* harmony default export */ __webpack_exports__["default"] = (_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"]);
 
 /***/ }),
 

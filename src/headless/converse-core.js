@@ -1749,14 +1749,34 @@ const converse = {
     'onShowPageMeMediaViewer' (callback) {
       _converse.on('showPageMeMediaViewer', callback);
     },
+    'onShowPageMeMedicalRequest' (callback) {
+      _converse.on('showPageMeMedicalRequest', callback);
+    },
+    'updateMessage' (chatbox, findCondition, updatedAttrs) {
+      if (typeof chatbox === 'string') {
+        chatbox = _converse.chatboxes.findWhere({'jid': chatbox});
+      }
+      const message = chatbox.messages.findWhere(findCondition);
+      message.save(updatedAttrs);
+      _converse.api.emit('rerenderMessage');
+    },
     'updateMessages' (jid, pagemeMessages) {
       const chatbox = _converse.chatboxes.findWhere({'jid': jid});
       if (!_converse.pagemeMessages) {
         _converse.pagemeMessages = pagemeMessages;
       }
       pagemeMessages.forEach(msg => {
-        if (!msg.body || msg.mediaId) {
-          _converse.chatboxes.onMessage(msg.stanza);
+        if (msg.type !== 'text') {
+          if (msg.type === 'medical_request') {
+            _converse.chatboxes.onMessage(msg.stanza, {
+              medReqStt: msg.medReqStt,
+              isMedReqSender: msg.isMedReqSender,
+              senderSignedMedReq: msg.senderSignedMedReq,
+              rcvrSignedMedReq: msg.rcvrSignedMedReq
+            });
+          } else {
+            _converse.chatboxes.onMessage(msg.stanza);
+          }
           return;
         }
         var existed = _.findIndex(_converse.pagemeMessages, oldMsg => (oldMsg.stanza.id === msg.stanza.id));
@@ -1795,12 +1815,23 @@ const converse = {
     'onUploadFiles' (callback) {
       return _converse.on('filesButtonClicked', callback);
     },
+    'onMedicalReqButtonClicked' (callback) {
+      return _converse.on('medicalReqButtonClicked', callback);
+    },
     'sendFileXMPP' (jid, media) {
       const chatbox = _converse.chatboxes.findWhere({'jid': jid});
       const attrs = chatbox.getOutgoingMessageAttributes('');
       chatbox.sendMessage({
         ...attrs,
         ...media
+      });
+    },
+    'sendMedicalRequestXMPP' (jid, medicalRequest) {
+      const chatbox = _converse.chatboxes.findWhere({'jid': jid});
+      const attrs = chatbox.getOutgoingMessageAttributes('');
+      chatbox.sendMessage({
+        ...attrs,
+        ...medicalRequest
       });
     },
     /**

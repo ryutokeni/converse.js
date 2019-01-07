@@ -333,8 +333,17 @@ converse.plugins.add('converse-chatboxes', {
                  *    (Object) message - The Backbone.Model representing the message
                  */
                 const sentDate = message.get('sent');
-                const rawText = type === 'text' ? body : '';
-                body = (type === 'text' ? RNCryptor.pagemeEncrypt(_converse.user_settings.pagemeEncryptKey, body) : body);
+                let rawText = '';
+                switch (type) {
+                  case 'text':
+                    rawText = body;
+                    body = RNCryptor.pagemeEncrypt(_converse.user_settings.pagemeEncryptKey, body);
+                    break;
+                  case 'file': break;
+                  case 'medical_request': rawText = `This application version doesn't support Medical Request`; break;
+                  default: break;
+                }
+
                 body = body || '';
                 const stanza = $msg({
                         'from': _converse.connection.jid,
@@ -353,9 +362,15 @@ converse.plugins.add('converse-chatboxes', {
                       .c('mediaId').t(message.get('mediaId')).up()
                       .c('fileSize').t(message.get('fileSize')).up();
                     }
-                    // if (type === 'text') {
-                    stanza.c('encrypted').t('1').up();
-                    // }
+                    if (type === 'medical_request') {
+                      stanza.c('itemType').t(message.get('itemType')).up()
+                      .c('medialRequestKey').t(message.get('medialRequestKey')).up()
+                      .c('subject').t(message.get('subject')).up()
+                      .c('description').t(message.get('description')).up();
+                    }
+                    if (type === 'text') {
+                      stanza.c('encrypted').t('1').up();
+                    }
                     stanza.up();
                     stanza.c('request', {'xmlns': Strophe.NS.RECEIPTS}).up();
                 }
@@ -392,7 +407,7 @@ converse.plugins.add('converse-chatboxes', {
                   _converse.pagemeMessages = [];
                 }
                 _converse.pagemeMessages.push({
-                  body: type === 'text' ? body : '',
+                  body: body,
                   decrypted: rawText,
                   sentDate: sentDate,
                   stanza: stanza.node
@@ -442,24 +457,32 @@ converse.plugins.add('converse-chatboxes', {
                  */
                 attrs.sent = (new Date()).getTime() / 1000;
                 const body = attrs.message;
-                const mediaId = attrs.mediaId
+                const mediaId = attrs.mediaId;
+                const medialRequestKey = attrs.medialRequestKey;
                 let message = this.messages.findWhere('correcting')
                 if (message) {
-                    const older_versions = message.get('older_versions') || [];
-                    older_versions.push(message.get('message'));
-                    message.save({
-                        'correcting': false,
-                        'edited': moment().format(),
-                        'message': attrs.message,
-                        'older_versions': older_versions,
-                        'references': attrs.references
-                    });
+                  const older_versions = message.get('older_versions') || [];
+                  older_versions.push(message.get('message'));
+                  message.save({
+                      'correcting': false,
+                      'edited': moment().format(),
+                      'message': attrs.message,
+                      'older_versions': older_versions,
+                      'references': attrs.references
+                  });
                 } else {
-                    delete attrs.message;
-                    attrs['time_to_read'] = timeToRead;
-                    message = this.messages.create(attrs);
+                  delete attrs.message;
+                  attrs['time_to_read'] = timeToRead;
+                  message = this.messages.create(attrs);
                 }
-                return this.sendMessageStanza(this.createMessageStanza(message, mediaId ? 'file' : 'text', body || mediaId));
+                let type = 'text';
+                if (mediaId) {
+                  type = 'file';
+                }
+                if (medialRequestKey) {
+                  type = 'medical_request';
+                }
+                return this.sendMessageStanza(this.createMessageStanza(message, type, body || mediaId || medialRequestKey));
             },
 
             sendChatState () {
@@ -542,7 +565,7 @@ converse.plugins.add('converse-chatboxes', {
                 });
             },
 
-            getMessageAttributesFromStanza (stanza, original_stanza) {
+            getMessageAttributesFromStanza (stanza, original_stanza, extraAttrs) {
                 /* Parses a passed in message stanza and returns an object
                  * of attributes.
                  *
@@ -575,12 +598,39 @@ converse.plugins.add('converse-chatboxes', {
                     'msgid': stanza.getAttribute('id'),
                     'time': delay ? delay.getAttribute('stamp') : sendDate,
                     'time_to_read': stanza.querySelector('timeToRead') ? stanza.querySelector('timeToRead').innerHTML : 84000,
-                    'mediaId': stanza.querySelector('mediaId') ? stanza.querySelector('mediaId').innerHTML : '',
+
                     'itemType': stanza.querySelector('itemType') ? stanza.querySelector('itemType').innerHTML : '',
                     'fileSize': stanza.querySelector('fileSize') ? stanza.querySelector('fileSize').innerHTML : '',
                     'sent': sendDate,
                     'type': stanza.getAttribute('type')
                 };
+                if (!extraAttrs) {
+                  extraAttrs = {};
+                }
+                switch (attrs.itemType) {
+                  case 'video':
+                  case 'image':
+                    extraAttrs = {
+                      ...extraAttrs,
+                      'mediaId': stanza.querySelector('mediaId') ? stanza.querySelector('mediaId').innerHTML : '',
+                      'fileSize': stanza.querySelector('fileSize') ? stanza.querySelector('fileSize').innerHTML : '',
+                    };
+                    break;
+                  case 'medical_request':
+                    if (!extraAttrs.medReqStt) {
+                      extraAttrs.medReqStt = 'IN_PROGRESS'
+                    }
+                    extraAttrs = {
+                      ...extraAttrs,
+                      'medialRequestKey': stanza.querySelector('medialRequestKey') ? stanza.querySelector('medialRequestKey').innerHTML : '',
+                      'subject': stanza.querySelector('subject') ? stanza.querySelector('subject').innerHTML : '',
+                      'description': stanza.querySelector('description') ? stanza.querySelector('description').innerHTML : ''
+                    };
+                    break;
+                  default:
+                    break;
+                }
+                Object.assign(attrs, extraAttrs);
                 if (attrs.type === 'groupchat') {
                     attrs.from = stanza.getAttribute('from');
                     attrs.nick = Strophe.unescapeNode(Strophe.getResourceFromJid(attrs.from));
@@ -605,7 +655,7 @@ converse.plugins.add('converse-chatboxes', {
                 return attrs;
             },
 
-            createMessage (message, original_stanza) {
+            createMessage (message, original_stanza, extraAttrs) {
                 /* Create a Backbone.Message object inside this chat box
                  * based on the identified message stanza.
                  */
@@ -617,7 +667,7 @@ converse.plugins.add('converse-chatboxes', {
                         // XXX: MUC leakage
                         // No need showing delayed or our own CSN messages
                         return;
-                    } else if (!is_csn && !attrs.file && !attrs.plaintext && !attrs.message && !attrs.mediaId && !attrs.oob_url && attrs.type !== 'error') {
+                    } else if (!is_csn && !attrs.file && !attrs.plaintext && !attrs.message && !attrs.mediaId && !attrs.medialRequestKey && !attrs.oob_url && attrs.type !== 'error') {
                         // TODO: handle <subject> messages (currently being done by ChatRoom)
                         return;
                     } else {
@@ -647,7 +697,7 @@ converse.plugins.add('converse-chatboxes', {
                         return that.messages.create(attrs);
                     }
                 }
-                const result = this.getMessageAttributesFromStanza(message, original_stanza)
+                const result = this.getMessageAttributesFromStanza(message, original_stanza, extraAttrs)
                 if (typeof result.then === "function") {
                     return new Promise((resolve, reject) => result.then(attrs => resolve(_create(attrs))));
                 } else {
@@ -793,12 +843,13 @@ converse.plugins.add('converse-chatboxes', {
                 _converse.api.send(receipt_stanza);
             },
 
-            onMessage (stanza) {
+            onMessage (stanza, extraAttrs) {
                 /* Handler method for all incoming single-user chat "message"
                  * stanzas.
                  *
                  * Parameters:
-                 *    (XMLElement) stanza - The incoming message stanza
+                 *    (XMLElement) stanza       - The incoming message stanza
+                 *    (Object)     extraAttrs   - Extra params received from pageme app
                  */
                 let to_jid = stanza.getAttribute('to');
                 const to_resource = Strophe.getResourceFromJid(to_jid);
@@ -872,9 +923,12 @@ converse.plugins.add('converse-chatboxes', {
                           message = msgid && chatbox.messages.findWhere({msgid});
                     if (!message) {
                         // Only create the message when we're sure it's not a duplicate
-                        chatbox.createMessage(stanza, original_stanza)
+                        chatbox.createMessage(stanza, original_stanza, extraAttrs)
                             .then(msg => chatbox.incrementUnreadMsgCounter(msg))
                             .catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
+                    } else {
+                      message.save(extraAttrs);
+                      _converse.emit('rerenderMessage');
                     }
                 }
                 _converse.emit('message', {'stanza': original_stanza, 'chatbox': chatbox});
