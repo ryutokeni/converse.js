@@ -1874,7 +1874,7 @@ converse.plugins.add('converse-muc-views', {
                 this.el.innerHTML = tpl_chatroom_sidebar(
                     _.extend(this.chatroomview.model.toJSON(), {
                         'allow_muc_invitations': _converse.allow_muc_invitations,
-                        'label_occupants': __('Participants')
+                        'label_occupants': __('Member list')
                     })
                 );
                 if (_converse.allow_muc_invitations) {
@@ -1882,7 +1882,7 @@ converse.plugins.add('converse-muc-views', {
                         this.renderInviteWidget.bind(this)
                     );
                 }
-                return this.renderRoomFeatures();
+                return this;
             },
 
             renderInviteWidget () {
@@ -1930,9 +1930,7 @@ converse.plugins.add('converse-muc-views', {
                  * sure the features widget gets updated.
                  */
                 if (_.isUndefined(this.debouncedRenderRoomFeatures)) {
-                    this.debouncedRenderRoomFeatures = _.debounce(
-                        this.renderRoomFeatures, 100, {'leading': false}
-                    );
+                    this.debouncedRenderRoomFeatures = _.debounce(() => {});
                 }
                 const changed_features = {};
                 _.each(_.keys(model.changed), function (k) {

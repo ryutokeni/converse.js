@@ -78602,14 +78602,14 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       render() {
         this.el.innerHTML = templates_chatroom_sidebar_html__WEBPACK_IMPORTED_MODULE_17___default()(_.extend(this.chatroomview.model.toJSON(), {
           'allow_muc_invitations': _converse.allow_muc_invitations,
-          'label_occupants': __('Participants')
+          'label_occupants': __('Member list')
         }));
 
         if (_converse.allow_muc_invitations) {
           _converse.api.waitUntil('rosterContactsFetched').then(this.renderInviteWidget.bind(this));
         }
 
-        return this.renderRoomFeatures();
+        return this;
       },
 
       renderInviteWidget() {
@@ -78655,9 +78655,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
          * sure the features widget gets updated.
          */
         if (_.isUndefined(this.debouncedRenderRoomFeatures)) {
-          this.debouncedRenderRoomFeatures = _.debounce(this.renderRoomFeatures, 100, {
-            'leading': false
-          });
+          this.debouncedRenderRoomFeatures = _.debounce(() => {});
         }
 
         const changed_features = {};
@@ -117468,7 +117466,7 @@ __p += '\n            Loading...\n        ';
  } ;
 __p += '\n    </div>\n    <!-- Sanitized in converse-muc-views. We want to render links. -->\n    <!-- <p class="chatroom-description">' +
 ((__t = (o.description)) == null ? '' : __t) +
-'</p> -->\n</div>\n<div class="chatbox-buttons row no-gutters">\n    <a class="chatbox-btn close-chatbox-button fa fa-sign-out-alt" title="' +
+'</p> -->\n</div>\n<!-- <div class="chatbox-buttons row no-gutters">\n    <a class="chatbox-btn close-chatbox-button fa fa-sign-out-alt" title="' +
 __e(o.info_close) +
 '"></a>\n    ';
  if (o.affiliation == 'owner') { ;
@@ -117478,7 +117476,7 @@ __e(o.info_configure) +
  } ;
 __p += '\n    <a class="chatbox-btn show-room-details-modal fa fa-info-circle" title="' +
 __e(o.info_details) +
-'"></a>\n</div>\n';
+'"></a>\n</div> -->\n';
 return __p
 };
 
