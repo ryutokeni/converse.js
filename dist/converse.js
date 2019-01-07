@@ -72921,6 +72921,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           'label_toggle_spoiler': label_toggle_spoiler,
           'show_call_button': _converse.visible_toolbar_buttons.call,
           'show_spoiler_button': _converse.visible_toolbar_buttons.spoiler,
+          'show_medical_request': true,
           'use_emoji': _converse.visible_toolbar_buttons.emoji
         });
       },
@@ -77374,7 +77375,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       getToolbarOptions() {
         return _.extend(_converse.ChatBoxView.prototype.getToolbarOptions.apply(this, arguments), {
           'label_hide_occupants': __('Hide the list of participants'),
-          'show_occupants_toggle': this.is_chatroom && _converse.visible_toolbar_buttons.toggle_occupants
+          'show_occupants_toggle': this.is_chatroom && _converse.visible_toolbar_buttons.toggle_occupants,
+          'show_medical_request': !this.is_chatroom
         });
       },
 
@@ -119613,9 +119615,13 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/toolbar.html -->\n<li class="toggle-medical-requests fa fa-stethoscope" title="' +
+__p += '<!-- src/templates/toolbar.html -->\n';
+ if (o.show_medical_request)  { ;
+__p += '\n  <li class="toggle-medical-requests fa fa-stethoscope" title="' +
 __e(o.label_medical_requests) +
-'"></li>\n<li class="toggle-files fa fa-file-upload" title="' +
+'"></li>\n';
+ } ;
+__p += '\n<li class="toggle-files fa fa-file-upload" title="' +
 __e(o.label_file_upload) +
 '"></li>\n';
  if (o.use_emoji)  { ;

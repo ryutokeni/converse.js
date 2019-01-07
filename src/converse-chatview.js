@@ -490,6 +490,7 @@ converse.plugins.add('converse-chatview', {
                     'label_toggle_spoiler': label_toggle_spoiler,
                     'show_call_button': _converse.visible_toolbar_buttons.call,
                     'show_spoiler_button': _converse.visible_toolbar_buttons.spoiler,
+                    'show_medical_request': true,
                     'use_emoji': _converse.visible_toolbar_buttons.emoji,
                 });
             },

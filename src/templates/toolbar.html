@@ -1,4 +1,6 @@
-<li class="toggle-medical-requests fa fa-stethoscope" title="{{{o.label_medical_requests}}}"></li>
+{[ if (o.show_medical_request)  { ]}
+  <li class="toggle-medical-requests fa fa-stethoscope" title="{{{o.label_medical_requests}}}"></li>
+{[ } ]}
 <li class="toggle-files fa fa-file-upload" title="{{{o.label_file_upload}}}"></li>
 {[ if (o.use_emoji)  { ]}
 <li class="toggle-toolbar-menu toggle-smiley dropup">

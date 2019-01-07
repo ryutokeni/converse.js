@@ -719,7 +719,8 @@ converse.plugins.add('converse-muc-views', {
                     _converse.ChatBoxView.prototype.getToolbarOptions.apply(this, arguments),
                     {
                       'label_hide_occupants': __('Hide the list of participants'),
-                      'show_occupants_toggle': this.is_chatroom && _converse.visible_toolbar_buttons.toggle_occupants
+                      'show_occupants_toggle': this.is_chatroom && _converse.visible_toolbar_buttons.toggle_occupants,
+                      'show_medical_request': !this.is_chatroom
                     }
                 );
             },
