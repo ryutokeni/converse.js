@@ -78800,7 +78800,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
     _converse.on('chatBoxViewsInitialized', () => {
       function openChatRoomFromURIClicked(ev) {
         ev.preventDefault();
-        console.log(ev.target.href);
 
         _converse.api.rooms.open(ev.target.href);
       }
@@ -85254,9 +85253,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         } else {
           delete attrs.message;
           attrs['time_to_read'] = timeToRead;
-          console.log(attrs);
           message = this.messages.create(attrs);
-          console.log(message);
         }
 
         let type = 'text';
@@ -87920,8 +87917,6 @@ const converse = {
   },
 
   'updateMessage'(chatbox, findCondition, updatedAttrs) {
-    console.log(chatbox, findCondition, updatedAttrs);
-
     if (typeof chatbox === 'string') {
       chatbox = _converse.chatboxes.findWhere({
         'jid': chatbox
@@ -87929,7 +87924,6 @@ const converse = {
     }
 
     const message = chatbox.messages.findWhere(findCondition);
-    console.log(message);
     message.save(updatedAttrs);
 
     _converse.api.emit('rerenderMessage');
@@ -116873,7 +116867,7 @@ __p += '<!-- src/templates/chatarea.html -->\n<div class="chat-area col-md-9 col
  if (o.show_send_button) { ;
 __p += 'chat-content-sendbutton';
  } ;
-__p += '"></div>\n    <div class="message-form-container"/>\n</div>\n';
+__p += '"></div>\n    <div class="message-form-container message-form-container-wrap"/>\n</div>\n';
 return __p
 };
 
@@ -116894,7 +116888,7 @@ __p += '<!-- src/templates/chatbox.html -->\n<div class="flyout box-flyout">\n  
  if (o.show_send_button) { ;
 __p += 'chat-content-sendbutton';
  } ;
-__p += '">\n            <div class="chat-loading">\n            <h3>Loading...</h3>\n            </div>\n        </div>\n        <div class="message-form-container"></div>\n    </div>\n</div>\n';
+__p += '">\n            <div class="chat-loading">\n            <h3>Loading...</h3>\n            </div>\n        </div>\n        <div class="message-form-container message-form-container-wrap"></div>\n    </div>\n</div>\n';
 return __p
 };
 

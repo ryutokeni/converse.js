@@ -240,8 +240,8 @@
             -moz-background-clip: padding;
             -webkit-background-clip: padding-box;
             border-bottom-radius: var(--chatbox-border-radius);
+            background-color: #f0eff6;
             background-clip: padding-box;
-            background-color: white;
             border: 0;
             margin: 0;
             padding: 0;
@@ -299,7 +299,6 @@
                 padding: 0.25em;
                 display: block;
                 border-top: 4px solid var(--chat-head-color);
-                background-color: white;
                 color: var(--chat-head-color);
                 .fa, .fa:hover,
                 .far, .far:hover,
@@ -498,7 +497,7 @@
     .emoji-picker {
         height: var(--embedded-emoji-picker-height);
     }
-    
+
     .chatbox {
         min-width: var(--overlayed-chat-width) !important;
         width: var(--overlayed-chat-width);
