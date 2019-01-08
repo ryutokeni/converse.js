@@ -119383,13 +119383,13 @@ __p += ' selected ';
  } ;
 __p += '" data-type="groups" title="' +
 __e(o.title_group_filter) +
-'"></span>\n            <span class="fa fa-circle ';
+'"></span>\n            <!-- <span class="fa fa-circle ';
  if (o.filter_type === 'state') { ;
 __p += ' selected ';
  } ;
 __p += '" data-type="state" title="' +
 __e(o.title_status_filter) +
-'"></span>\n        </div>\n    </div>\n</form>\n';
+'"></span> -->\n        </div>\n    </div>\n</form>\n';
 return __p
 };
 
