@@ -76,7 +76,7 @@ converse.plugins.add('converse-rosterview', {
         });
         _converse.api.promises.add(['rosterViewInitialized']);
         _converse.api.promises.add(['rosterViewTrulyInitial']);
-        
+
 
         const STATUSES = {
             'dnd': __('This contact is busy'),
@@ -399,7 +399,7 @@ converse.plugins.add('converse-rosterview', {
                     if (chatbox) {
                         if (chatbox.get('hidden')) {
                             this.el.classList.remove('open');
-                        } else {                            
+                        } else {
                             this.el.classList.add('open');
                         }
                     }
@@ -462,17 +462,17 @@ converse.plugins.add('converse-rosterview', {
             },
 
             renderRosterItem (item) {
-                let status_icon = 'fa fa-times-circle';
+                let status_icon = '';
                 const show = item.presence.get('show') || 'offline';
-                if (show === 'online') {
-                    status_icon = 'fa fa-circle chat-status chat-status--online';
-                } else if (show === 'away') {
-                    status_icon = 'fa fa-circle chat-status chat-status--away';
-                } else if (show === 'xa') {
-                    status_icon = 'far fa-circle chat-status';
-                } else if (show === 'dnd') {
-                    status_icon = 'fa fa-minus-circle chat-status chat-status--busy';
-                }
+                // if (show === 'online') {
+                //     status_icon = 'fa fa-circle chat-status chat-status--online';
+                // } else if (show === 'away') {
+                //     status_icon = 'fa fa-circle chat-status chat-status--away';
+                // } else if (show === 'xa') {
+                //     status_icon = 'far fa-circle chat-status';
+                // } else if (show === 'dnd') {
+                //     status_icon = 'fa fa-minus-circle chat-status chat-status--busy';
+                // }
                 const display_name = item.getDisplayName();
                 this.el.innerHTML = tpl_roster_item(
                     _.extend(item.toJSON(), {
@@ -749,7 +749,7 @@ converse.plugins.add('converse-rosterview', {
                 }
             }
         });
-     
+
         _converse.RosterView = Backbone.OrderedListView.extend({
             tagName: 'div',
             id: 'converse-roster',
@@ -782,8 +782,8 @@ converse.plugins.add('converse-rosterview', {
                 // just this group's) have been fetched from browser
                 // storage or the XMPP server and once they've been
                 // assigned to their various groups.
-                _converse.on('rosterGroupsFetched', 
-               
+                _converse.on('rosterGroupsFetched',
+
                 this.sortAndPositionAllItems.bind(this));
 
                 _converse.on('rosterContactsFetched', () => {
@@ -1021,7 +1021,7 @@ converse.plugins.add('converse-rosterview', {
                 }
             })
         }
-        
+
         _converse.api.listen.on('rosterInitialized', initRoster);
         _converse.api.listen.on('rosterReadyAfterReconnection', initRoster);
     }

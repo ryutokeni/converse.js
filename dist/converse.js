@@ -82642,18 +82642,16 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       },
 
       renderRosterItem(item) {
-        let status_icon = 'fa fa-times-circle';
-        const show = item.presence.get('show') || 'offline';
-
-        if (show === 'online') {
-          status_icon = 'fa fa-circle chat-status chat-status--online';
-        } else if (show === 'away') {
-          status_icon = 'fa fa-circle chat-status chat-status--away';
-        } else if (show === 'xa') {
-          status_icon = 'far fa-circle chat-status';
-        } else if (show === 'dnd') {
-          status_icon = 'fa fa-minus-circle chat-status chat-status--busy';
-        }
+        let status_icon = '';
+        const show = item.presence.get('show') || 'offline'; // if (show === 'online') {
+        //     status_icon = 'fa fa-circle chat-status chat-status--online';
+        // } else if (show === 'away') {
+        //     status_icon = 'fa fa-circle chat-status chat-status--away';
+        // } else if (show === 'xa') {
+        //     status_icon = 'far fa-circle chat-status';
+        // } else if (show === 'dnd') {
+        //     status_icon = 'fa fa-minus-circle chat-status chat-status--busy';
+        // }
 
         const display_name = item.getDisplayName();
         this.el.innerHTML = templates_roster_item_html__WEBPACK_IMPORTED_MODULE_12___default()(_.extend(item.toJSON(), {
