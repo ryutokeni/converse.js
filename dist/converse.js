@@ -73626,24 +73626,24 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
               fullname = this.model.getDisplayName();
         let text;
 
-        if (_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_21__["default"].isVisible(this.el)) {
-          if (show === 'offline') {
-            text = __('%1$s has gone offline', fullname);
-          } else if (show === 'away') {
-            text = __('%1$s has gone away', fullname);
-          } else if (show === 'dnd') {
-            text = __('%1$s is busy', fullname);
-          } else if (show === 'online') {
-            text = __('%1$s is online', fullname);
-          }
-
-          if (text) {
-            this.content.insertAdjacentHTML('beforeend', templates_status_message_html__WEBPACK_IMPORTED_MODULE_17___default()({
-              'message': text,
-              'isodate': moment().format()
-            }));
-            this.scrollDown();
-          }
+        if (_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_21__["default"].isVisible(this.el)) {// if (show === 'offline') {
+          //     text = __('%1$s has gone offline', fullname);
+          // } else if (show === 'away') {
+          //     text = __('%1$s has gone away', fullname);
+          // } else if ((show === 'dnd')) {
+          //     text = __('%1$s is busy', fullname);
+          // } else if (show === 'online') {
+          //     text = __('%1$s is online', fullname);
+          // }
+          // if (text) {
+          //     this.content.insertAdjacentHTML(
+          //         'beforeend',
+          //         tpl_status_message({
+          //             'message': text,
+          //             'isodate': moment().format(),
+          //         }));
+          //     this.scrollDown();
+          // }
         }
       },
 

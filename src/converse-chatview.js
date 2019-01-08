@@ -1166,24 +1166,24 @@ converse.plugins.add('converse-chatview', {
 
                 let text;
                 if (u.isVisible(this.el)) {
-                    if (show === 'offline') {
-                        text = __('%1$s has gone offline', fullname);
-                    } else if (show === 'away') {
-                        text = __('%1$s has gone away', fullname);
-                    } else if ((show === 'dnd')) {
-                        text = __('%1$s is busy', fullname);
-                    } else if (show === 'online') {
-                        text = __('%1$s is online', fullname);
-                    }
-                    if (text) {
-                        this.content.insertAdjacentHTML(
-                            'beforeend',
-                            tpl_status_message({
-                                'message': text,
-                                'isodate': moment().format(),
-                            }));
-                        this.scrollDown();
-                    }
+                    // if (show === 'offline') {
+                    //     text = __('%1$s has gone offline', fullname);
+                    // } else if (show === 'away') {
+                    //     text = __('%1$s has gone away', fullname);
+                    // } else if ((show === 'dnd')) {
+                    //     text = __('%1$s is busy', fullname);
+                    // } else if (show === 'online') {
+                    //     text = __('%1$s is online', fullname);
+                    // }
+                    // if (text) {
+                    //     this.content.insertAdjacentHTML(
+                    //         'beforeend',
+                    //         tpl_status_message({
+                    //             'message': text,
+                    //             'isodate': moment().format(),
+                    //         }));
+                    //     this.scrollDown();
+                    // }
                 }
             },
 
