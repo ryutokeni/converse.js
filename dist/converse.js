@@ -77115,6 +77115,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         'click .send-button': 'onFormSubmitted',
         'click .show-room-details-modal': 'showRoomDetailsModal',
         'click .toggle-call': 'toggleCall',
+        'click .toggle-files': 'toggleFiles',
         'click .toggle-occupants': 'toggleOccupants',
         'click .toggle-smiley ul.emoji-picker li': 'insertEmoji',
         'click .toggle-smiley': 'toggleEmojiMenu',

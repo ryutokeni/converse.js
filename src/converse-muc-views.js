@@ -484,6 +484,7 @@ converse.plugins.add('converse-muc-views', {
                 'click .send-button': 'onFormSubmitted',
                 'click .show-room-details-modal': 'showRoomDetailsModal',
                 'click .toggle-call': 'toggleCall',
+                'click .toggle-files': 'toggleFiles',
                 'click .toggle-occupants': 'toggleOccupants',
                 'click .toggle-smiley ul.emoji-picker li': 'insertEmoji',
                 'click .toggle-smiley': 'toggleEmojiMenu',
