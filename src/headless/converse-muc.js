@@ -246,7 +246,6 @@ converse.plugins.add('converse-muc', {
             },
 
             getDisplayName () {
-              console.log(this);
                 return this.get('name') || this.get('jid');
             },
 
@@ -1157,7 +1156,6 @@ converse.plugins.add('converse-muc', {
             },
 
             getDisplayName () {
-                console.log(this);
                 return this.get('nick') || this.get('jid');
             },
 
@@ -1491,6 +1489,7 @@ converse.plugins.add('converse-muc', {
                  */
                 'open': async function (jids, attrs, participants) {
                     await _converse.api.waitUntil('chatBoxesFetched');
+                    console.log(jids);
                     if (_.isUndefined(jids)) {
                         const err_msg = 'rooms.open: You need to provide at least one JID';
                         _converse.log(err_msg, Strophe.LogLevel.ERROR);

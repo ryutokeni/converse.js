@@ -89829,7 +89829,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
       },
 
       getDisplayName() {
-        console.log(this);
         return this.get('name') || this.get('jid');
       },
 
@@ -90909,7 +90908,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
       },
 
       getDisplayName() {
-        console.log(this);
         return this.get('nick') || this.get('jid');
       },
 
@@ -91094,6 +91092,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           }
         }
 
+        console.log(groupchat);
+
         if (_.isString(groupchat)) {
           _converse.api.rooms.open(groupchat);
         } else if (_.isObject(groupchat)) {
@@ -91276,6 +91276,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
          */
         'open': async function open(jids, attrs, participants) {
           await _converse.api.waitUntil('chatBoxesFetched');
+          console.log(jids);
 
           if (_.isUndefined(jids)) {
             const err_msg = 'rooms.open: You need to provide at least one JID';
@@ -91283,12 +91284,11 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
             _converse.log(err_msg, Strophe.LogLevel.ERROR);
 
             throw new TypeError(err_msg);
-          } else if (_.isString(jids)) {
-            const newChatRoom = _converse.api.rooms.create(jids, attrs);
-
-            newChatRoom.trigger('show');
-            newChatRoom.save('participants', participants);
-            return newChatRoom;
+          } else if (_.isString(jids)) {// const newChatRoom = _converse.api.rooms.create(jids, attrs);
+            // newChatRoom.trigger('show');
+            // newChatRoom.save('participants', participants);
+            // console.log(newChatRoom);
+            // return newChatRoom;
           } else {
             return _.map(jids, jid => _converse.api.rooms.create(jid, attrs).trigger('show'));
           }
@@ -92170,6 +92170,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         let iq;
 
         try {
+          console.log(stanza);
           iq = await _converse.api.sendIQ(stanza);
         } catch (e) {
           _converse.log(e, Strophe.LogLevel.ERROR);
