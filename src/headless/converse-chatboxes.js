@@ -98,6 +98,7 @@ converse.plugins.add('converse-chatboxes', {
                         } else {
                             jid = this.get('from');
                         }
+                        jid = jid.replace(`${chatbox.get('jid')}/`, ''); // remove conference's jid
                         vcard = _converse.vcards.findWhere({'jid': jid}) || _converse.vcards.create({'jid': jid});
                     }
                     return vcard;
@@ -121,7 +122,7 @@ converse.plugins.add('converse-chatboxes', {
 
             getDisplayName () {
                 if (this.get('type') === 'groupchat') {
-                    return this.get('nick');
+                    return this.vcard.get('fullname') || this.get('nick');
                 } else {
                     return this.vcard.get('fullname') || 'Loading...';
                 }

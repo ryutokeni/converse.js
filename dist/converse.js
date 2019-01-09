@@ -83027,7 +83027,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       render() {
         this.el.innerHTML = templates_roster_html__WEBPACK_IMPORTED_MODULE_10___default()({
           'allow_contact_requests': _converse.allow_contact_requests,
-          'heading_contacts': __('Contacts'),
+          'heading_contacts': __('Address Book'),
           'title_add_contact': __('Add a contact'),
           'title_sync_contacts': __('Re-sync your contacts')
         });
@@ -84828,6 +84828,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
               jid = this.get('from');
             }
 
+            jid = jid.replace(`${chatbox.get('jid')}/`, ''); // remove conference's jid
+
             vcard = _converse.vcards.findWhere({
               'jid': jid
             }) || _converse.vcards.create({
@@ -84860,7 +84862,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
 
       getDisplayName() {
         if (this.get('type') === 'groupchat') {
-          return this.get('nick');
+          return this.vcard.get('fullname') || this.get('nick');
         } else {
           return this.vcard.get('fullname') || 'Loading...';
         }
@@ -89837,6 +89839,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
       },
 
       getDisplayName() {
+        console.log(this);
         return this.get('name') || this.get('jid');
       },
 
@@ -90916,6 +90919,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
       },
 
       getDisplayName() {
+        console.log(this);
         return this.get('nick') || this.get('jid');
       },
 

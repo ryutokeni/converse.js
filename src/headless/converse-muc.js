@@ -246,6 +246,7 @@ converse.plugins.add('converse-muc', {
             },
 
             getDisplayName () {
+              console.log(this);
                 return this.get('name') || this.get('jid');
             },
 
@@ -1156,6 +1157,7 @@ converse.plugins.add('converse-muc', {
             },
 
             getDisplayName () {
+                console.log(this);
                 return this.get('nick') || this.get('jid');
             },
 
