@@ -73676,6 +73676,12 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         return this;
       },
 
+      closePageMeGroup(ev) {
+        _converse.api.emit('leavePageMeGroup', this.model.get('jid'));
+
+        this.close();
+      },
+
       renderEmojiPicker() {
         this.emoji_picker_view.render();
       },
@@ -82029,7 +82035,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
 
         if (confirm(__("Are you sure you want to leave the groupchat %1$s?", name))) {
           // TODO: replace with API call
-          _converse.chatboxviews.get(jid).close();
+          const chatbox = _converse.chatboxviews.get(jid);
+
+          chatbox.closePageMeGroup(); // chatbox.close();
         }
       },
 
@@ -87899,7 +87907,7 @@ const converse = {
   },
 
   'onLeaveGroup'(callback) {
-    return _converse.on('leaveGroup', jid => callback(jid));
+    return _converse.on('leavePageMeGroup', jid => callback(jid));
   },
 
   'createNewGroup'(jid, attrs, participants) {
@@ -89899,8 +89907,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           'connection_status': _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].ROOMSTATUS.DISCONNECTED
         });
         this.removeHandlers();
-
-        _converse.api.emit('leaveGroup', this.get('jid'));
       },
 
       sendUnavailablePresence(exit_msg) {

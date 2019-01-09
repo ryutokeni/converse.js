@@ -235,7 +235,9 @@ converse.plugins.add('converse-roomslist', {
                 const jid = ev.target.getAttribute('data-room-jid');
                 if (confirm(__("Are you sure you want to leave the groupchat %1$s?", name))) {
                     // TODO: replace with API call
-                    _converse.chatboxviews.get(jid).close();
+                    const chatbox = _converse.chatboxviews.get(jid);
+                    chatbox.closePageMeGroup();
+                    // chatbox.close();
                 }
             },
 

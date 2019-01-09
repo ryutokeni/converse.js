@@ -300,7 +300,6 @@ converse.plugins.add('converse-muc', {
                 }
                 u.safeSave(this, {'connection_status': converse.ROOMSTATUS.DISCONNECTED});
                 this.removeHandlers();
-                _converse.api.emit('leaveGroup', this.get('jid'));
             },
 
             sendUnavailablePresence (exit_msg) {

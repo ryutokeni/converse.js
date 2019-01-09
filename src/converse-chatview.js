@@ -1208,6 +1208,11 @@ converse.plugins.add('converse-chatview', {
                 return this;
             },
 
+            closePageMeGroup (ev) {
+              _converse.api.emit('leavePageMeGroup', this.model.get('jid'));
+              this.close();
+            },
+
             renderEmojiPicker () {
                 this.emoji_picker_view.render();
             },

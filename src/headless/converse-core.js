@@ -1740,7 +1740,7 @@ const converse = {
       return _converse.on('openCreateGroupModal', callback);
     },
     'onLeaveGroup' (callback) {
-      return _converse.on('leaveGroup', (jid) => callback(jid));
+      return _converse.on('leavePageMeGroup', (jid) => callback(jid));
     },
     'createNewGroup' (jid, attrs, participants) {
       _converse.api.rooms.open(jid, attrs, participants);
