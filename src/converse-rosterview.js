@@ -798,7 +798,7 @@ converse.plugins.add('converse-rosterview', {
             render () {
                 this.el.innerHTML = tpl_roster({
                     'allow_contact_requests': _converse.allow_contact_requests,
-                    'heading_contacts': __('Address Book'),
+                    'heading_contacts': __('Contacts'),
                     'title_add_contact': __('Add a contact'),
                     'title_sync_contacts': __('Re-sync your contacts')
                 });
@@ -1013,7 +1013,7 @@ converse.plugins.add('converse-rosterview', {
             _converse.rosterview.render();
             _converse.emit('rosterViewInitialized');
             _converse.on('load-done', labelName=> {
-                if (labelName === 'Contacts') {
+                if (labelName === 'Address Book') {
                     u.hideElement(_converse.rosterview.loading_contact);
                 }
                 else {

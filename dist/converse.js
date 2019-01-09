@@ -83027,7 +83027,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       render() {
         this.el.innerHTML = templates_roster_html__WEBPACK_IMPORTED_MODULE_10___default()({
           'allow_contact_requests': _converse.allow_contact_requests,
-          'heading_contacts': __('Address Book'),
+          'heading_contacts': __('Contacts'),
           'title_add_contact': __('Add a contact'),
           'title_sync_contacts': __('Re-sync your contacts')
         });
@@ -83275,7 +83275,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       _converse.emit('rosterViewInitialized');
 
       _converse.on('load-done', labelName => {
-        if (labelName === 'Contacts') {
+        if (labelName === 'Address Book') {
           u.hideElement(_converse.rosterview.loading_contact);
         } else {
           u.hideElement(_converse.rosterview.loading_org);
