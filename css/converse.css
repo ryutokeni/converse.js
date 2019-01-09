@@ -11223,6 +11223,8 @@ body.reset {
   #conversejs #converse-roster span.pending-contact-name {
     line-height: var(--line-height);
     width: 100%; }
+  #conversejs #converse-roster .roster-group-contacts {
+    margin-top: 10px; }
 
 #conversejs .list-container {
   text-align: left;
