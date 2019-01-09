@@ -78964,22 +78964,12 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
 
       if (sender === '' || message.querySelectorAll('delay').length > 0) {
         return false;
-      }
+      } // const room = _converse.chatboxes.get(room_jid);
+      // const body = message.querySelector('body');
+      // if (_.isNull(body)) {
+      //     return false;
+      // }
 
-      const room = _converse.chatboxes.get(room_jid);
-
-      const body = message.querySelector('body');
-
-      if (_.isNull(body)) {
-        return false;
-      }
-
-      const mentioned = new RegExp(`\\b${room.get('nick')}\\b`).test(body.textContent);
-      notify_all = notify_all === true || _.isArray(notify_all) && _.includes(notify_all, room_jid);
-
-      if (sender === room.get('nick') || !notify_all && !mentioned) {
-        return false;
-      }
 
       return true;
     };
@@ -79005,7 +78995,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       if (!_.isNull(forwarded)) {
         return false;
       } else if (message.getAttribute('type') === 'groupchat') {
-        return _converse.shouldNotifyOfGroupMessage(message);
+        return !_converse.isOnlyChatStateNotification(message) && _converse.isMessageToHiddenChat(message) && _converse.shouldNotifyOfGroupMessage(message);
       } else if (u.isHeadlineMessage(_converse, message)) {
         // We want to show notifications for headline messages.
         return _converse.isMessageToHiddenChat(message);
