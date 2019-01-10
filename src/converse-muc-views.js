@@ -25,6 +25,7 @@ import tpl_chatroom_sidebar from "templates/chatroom_sidebar.html";
 import tpl_info from "templates/info.html";
 import tpl_list_chatrooms_modal from "templates/list_chatrooms_modal.html";
 import tpl_occupant from "templates/occupant.html";
+import tpl_pageme_group_member from "templates/pageme_group_member.html";
 import tpl_room_description from "templates/room_description.html";
 import tpl_room_item from "templates/room_item.html";
 import tpl_room_panel from "templates/room_panel.html";
@@ -620,7 +621,9 @@ converse.plugins.add('converse-muc-views', {
                 /* Create the ChatRoomOccupantsView Backbone.NativeView
                  */
                 this.model.occupants.chatroomview = this;
-                this.occupantsview = new _converse.ChatRoomOccupantsView({'model': this.model.occupants});
+                this.model.pagemeGroupMembers.chatroomview = this;
+
+                this.occupantsview = new _converse.PagemeGroupMembersView({'model': this.model.pagemeGroupMembers});
                 return this;
             },
 
@@ -2009,6 +2012,58 @@ converse.plugins.add('converse-muc-views', {
                 el.addEventListener('awesomplete-selectcomplete',
                     this.promptForInvite.bind(this));
             }
+        });
+
+        _converse.PagemeGroupMemberView = Backbone.VDOMView.extend({
+            tagName: 'li',
+            initialize () {
+              console.log(this.model.toJSON());
+                this.model.on('change', this.render, this);
+            },
+
+            toHTML () {
+                return tpl_pageme_group_member(
+                    _.extend(
+                        { '_': _ }, this.model.toJSON()
+                    )
+                );
+            },
+
+            destroy () {
+                this.el.parentElement.removeChild(this.el);
+            }
+        });
+
+        _converse.PagemeGroupMembersView = Backbone.OrderedListView.extend({
+            tagName: 'div',
+            className: 'occupants col-md-3 col-4',
+            listItems: 'model',
+            listSelector: '.occupant-list',
+
+            ItemView: _converse.PagemeGroupMemberView,
+
+            initialize () {
+                Backbone.OrderedListView.prototype.initialize.apply(this, arguments);
+                console.log(arguments);
+                this.chatroomview = this.model.chatroomview;
+                this.render();
+            },
+
+            render () {
+                this.el.innerHTML = tpl_chatroom_sidebar(
+                    _.extend(this.chatroomview.model.toJSON(), {
+                        'allow_muc_invitations': _converse.allow_muc_invitations,
+                        'label_occupants': __('Member list')
+                    })
+                );
+                return this;
+            },
+
+            setOccupantsHeight () {
+                const el = this.el.querySelector('.chatroom-features');
+                this.el.querySelector('.occupant-list').style.cssText =
+                    `height: calc(100% - ${el.offsetHeight}px - 5em);`;
+            },
         });
 
 

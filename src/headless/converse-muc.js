@@ -171,13 +171,26 @@ converse.plugins.add('converse-muc', {
             initialize() {
                 this.constructor.__super__.initialize.apply(this, arguments);
                 this.on('change:connection_status', this.onConnectionStatusChanged, this);
-
+                this.on('change:users', this.updateGroupMembers, this);
                 this.occupants = new _converse.ChatRoomOccupants();
                 this.occupants.browserStorage = new Backbone.BrowserStorage.session(
                     b64_sha1(`converse.occupants-${_converse.bare_jid}${this.get('jid')}`)
                 );
                 this.occupants.chatroom  = this;
+
+                this.pagemeGroupMembers = new _converse.PagemeGroupMembers();
+                this.pagemeGroupMembers.browserStorage = new Backbone.BrowserStorage.session(
+                    b64_sha1(`converse.pageme-group-members-${_converse.bare_jid}${this.get('jid')}`)
+                );
+                this.pagemeGroupMembers.chatroom  = this;
+                this.updateGroupMembers();
                 this.registerHandlers();
+            },
+
+            updateGroupMembers() {
+                const users = this.get('users');
+                users.forEach(user => this.pagemeGroupMembers.create(user));
+                console.log(users);
             },
 
             async onConnectionStatusChanged () {
@@ -289,6 +302,8 @@ converse.plugins.add('converse-muc', {
                  */
                 this.occupants.browserStorage._clear();
                 this.occupants.reset();
+                this.pagemeGroupMembers.browserStorage._clear();
+                this.pagemeGroupMembers.reset();
                 if (_converse.disco_entities) {
                     const disco_entity = _converse.disco_entities.get(this.get('jid'));
                     if (disco_entity) {
@@ -1237,6 +1252,34 @@ converse.plugins.add('converse-muc', {
                  * but should have at least one or the other.
                  */
                 const jid = Strophe.getBareJidFromJid(data.jid);
+                if (jid !== null) {
+                    return this.where({'jid': jid}).pop();
+                } else {
+                    return this.where({'nick': data.nick}).pop();
+                }
+            }
+        });
+
+        _converse.PagemeGroupMember = Backbone.Model.extend({
+
+            defaults: {
+                'show': 'offline'
+            },
+
+            initialize (attributes) {
+              console.log(attributes);
+                this.set(_.extend({
+                    'id': _converse.connection.getUniqueId(),
+                }, attributes));
+            }
+        });
+
+        _converse.PagemeGroupMembers = Backbone.Collection.extend({
+            model: _converse.PagemeGroupMember,
+
+
+            findGroupMember (data) {
+                const jid = `${data.jid}${_converse.user_settings.domain}`;
                 if (jid !== null) {
                     return this.where({'jid': jid}).pop();
                 } else {

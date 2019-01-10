@@ -76614,23 +76614,26 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var templates_list_chatrooms_modal_html__WEBPACK_IMPORTED_MODULE_19___default = /*#__PURE__*/__webpack_require__.n(templates_list_chatrooms_modal_html__WEBPACK_IMPORTED_MODULE_19__);
 /* harmony import */ var templates_occupant_html__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! templates/occupant.html */ "./src/templates/occupant.html");
 /* harmony import */ var templates_occupant_html__WEBPACK_IMPORTED_MODULE_20___default = /*#__PURE__*/__webpack_require__.n(templates_occupant_html__WEBPACK_IMPORTED_MODULE_20__);
-/* harmony import */ var templates_room_description_html__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! templates/room_description.html */ "./src/templates/room_description.html");
-/* harmony import */ var templates_room_description_html__WEBPACK_IMPORTED_MODULE_21___default = /*#__PURE__*/__webpack_require__.n(templates_room_description_html__WEBPACK_IMPORTED_MODULE_21__);
-/* harmony import */ var templates_room_item_html__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! templates/room_item.html */ "./src/templates/room_item.html");
-/* harmony import */ var templates_room_item_html__WEBPACK_IMPORTED_MODULE_22___default = /*#__PURE__*/__webpack_require__.n(templates_room_item_html__WEBPACK_IMPORTED_MODULE_22__);
-/* harmony import */ var templates_room_panel_html__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! templates/room_panel.html */ "./src/templates/room_panel.html");
-/* harmony import */ var templates_room_panel_html__WEBPACK_IMPORTED_MODULE_23___default = /*#__PURE__*/__webpack_require__.n(templates_room_panel_html__WEBPACK_IMPORTED_MODULE_23__);
-/* harmony import */ var templates_rooms_results_html__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! templates/rooms_results.html */ "./src/templates/rooms_results.html");
-/* harmony import */ var templates_rooms_results_html__WEBPACK_IMPORTED_MODULE_24___default = /*#__PURE__*/__webpack_require__.n(templates_rooms_results_html__WEBPACK_IMPORTED_MODULE_24__);
-/* harmony import */ var templates_spinner_html__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! templates/spinner.html */ "./src/templates/spinner.html");
-/* harmony import */ var templates_spinner_html__WEBPACK_IMPORTED_MODULE_25___default = /*#__PURE__*/__webpack_require__.n(templates_spinner_html__WEBPACK_IMPORTED_MODULE_25__);
-/* harmony import */ var xss__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! xss */ "./node_modules/xss/dist/xss.js");
-/* harmony import */ var xss__WEBPACK_IMPORTED_MODULE_26___default = /*#__PURE__*/__webpack_require__.n(xss__WEBPACK_IMPORTED_MODULE_26__);
+/* harmony import */ var templates_pageme_group_member_html__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! templates/pageme_group_member.html */ "./src/templates/pageme_group_member.html");
+/* harmony import */ var templates_pageme_group_member_html__WEBPACK_IMPORTED_MODULE_21___default = /*#__PURE__*/__webpack_require__.n(templates_pageme_group_member_html__WEBPACK_IMPORTED_MODULE_21__);
+/* harmony import */ var templates_room_description_html__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! templates/room_description.html */ "./src/templates/room_description.html");
+/* harmony import */ var templates_room_description_html__WEBPACK_IMPORTED_MODULE_22___default = /*#__PURE__*/__webpack_require__.n(templates_room_description_html__WEBPACK_IMPORTED_MODULE_22__);
+/* harmony import */ var templates_room_item_html__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! templates/room_item.html */ "./src/templates/room_item.html");
+/* harmony import */ var templates_room_item_html__WEBPACK_IMPORTED_MODULE_23___default = /*#__PURE__*/__webpack_require__.n(templates_room_item_html__WEBPACK_IMPORTED_MODULE_23__);
+/* harmony import */ var templates_room_panel_html__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! templates/room_panel.html */ "./src/templates/room_panel.html");
+/* harmony import */ var templates_room_panel_html__WEBPACK_IMPORTED_MODULE_24___default = /*#__PURE__*/__webpack_require__.n(templates_room_panel_html__WEBPACK_IMPORTED_MODULE_24__);
+/* harmony import */ var templates_rooms_results_html__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! templates/rooms_results.html */ "./src/templates/rooms_results.html");
+/* harmony import */ var templates_rooms_results_html__WEBPACK_IMPORTED_MODULE_25___default = /*#__PURE__*/__webpack_require__.n(templates_rooms_results_html__WEBPACK_IMPORTED_MODULE_25__);
+/* harmony import */ var templates_spinner_html__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! templates/spinner.html */ "./src/templates/spinner.html");
+/* harmony import */ var templates_spinner_html__WEBPACK_IMPORTED_MODULE_26___default = /*#__PURE__*/__webpack_require__.n(templates_spinner_html__WEBPACK_IMPORTED_MODULE_26__);
+/* harmony import */ var xss__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! xss */ "./node_modules/xss/dist/xss.js");
+/* harmony import */ var xss__WEBPACK_IMPORTED_MODULE_27___default = /*#__PURE__*/__webpack_require__.n(xss__WEBPACK_IMPORTED_MODULE_27__);
 // Converse.js
 // http://conversejs.org
 //
 // Copyright (c) 2013-2018, the Converse.js developers
 // Licensed under the Mozilla Public License (MPLv2)
+
 
 
 
@@ -76845,7 +76848,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       // All MUC features found here: http://xmpp.org/registrar/disco-features.html
       el.querySelector('span.spinner').remove();
       el.querySelector('a.room-info').classList.add('selected');
-      el.insertAdjacentHTML('beforeEnd', templates_room_description_html__WEBPACK_IMPORTED_MODULE_21___default()({
+      el.insertAdjacentHTML('beforeEnd', templates_room_description_html__WEBPACK_IMPORTED_MODULE_22___default()({
         'jid': stanza.getAttribute('from'),
         'desc': _.get(_.head(sizzle('field[var="muc#roominfo_description"] value', stanza)), 'textContent'),
         'occ': _.get(_.head(sizzle('field[var="muc#roominfo_occupants"] value', stanza)), 'textContent'),
@@ -76887,7 +76890,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         u.slideIn(div_el).then(u.removeElement);
         parent_el.querySelector('a.room-info').classList.remove('selected');
       } else {
-        parent_el.insertAdjacentHTML('beforeend', templates_spinner_html__WEBPACK_IMPORTED_MODULE_25___default()());
+        parent_el.insertAdjacentHTML('beforeend', templates_spinner_html__WEBPACK_IMPORTED_MODULE_26___default()());
 
         _converse.api.disco.info(ev.target.getAttribute('data-room-jid'), null).then(stanza => insertRoomInfo(parent_el, stanza)).catch(_.partial(_converse.log, _, Strophe.LogLevel.ERROR));
       }
@@ -76949,7 +76952,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       roomStanzaItemToHTMLElement(groupchat) {
         const name = Strophe.unescapeNode(groupchat.getAttribute('name') || groupchat.getAttribute('jid'));
         const div = document.createElement('div');
-        div.innerHTML = templates_room_item_html__WEBPACK_IMPORTED_MODULE_22___default()({
+        div.innerHTML = templates_room_item_html__WEBPACK_IMPORTED_MODULE_23___default()({
           'name': Strophe.xmlunescape(name),
           'jid': groupchat.getAttribute('jid'),
           'open_title': __('Click to open this groupchat'),
@@ -76964,7 +76967,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
 
       informNoRoomsFound() {
         const chatrooms_el = this.el.querySelector('.available-chatrooms');
-        chatrooms_el.innerHTML = templates_rooms_results_html__WEBPACK_IMPORTED_MODULE_24___default()({
+        chatrooms_el.innerHTML = templates_rooms_results_html__WEBPACK_IMPORTED_MODULE_25___default()({
           'feedback_text': __('No groupchats found')
         });
         const input_el = this.el.querySelector('input[name="server"]');
@@ -76982,7 +76985,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         if (this.rooms.length) {
           // For translators: %1$s is a variable and will be
           // replaced with the XMPP server name
-          available_chatrooms.innerHTML = templates_rooms_results_html__WEBPACK_IMPORTED_MODULE_24___default()({
+          available_chatrooms.innerHTML = templates_rooms_results_html__WEBPACK_IMPORTED_MODULE_25___default()({
             'feedback_text': __('Groupchats found:')
           });
           const fragment = document.createDocumentFragment();
@@ -77092,7 +77095,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         return templates_chatroom_details_modal_html__WEBPACK_IMPORTED_MODULE_9___default()(_.extend(this.model.toJSON(), {
           '_': _,
           '__': __,
-          'topic': u.addHyperlinks(xss__WEBPACK_IMPORTED_MODULE_26___default.a.filterXSS(_.get(this.model.get('subject'), 'text'), {
+          'topic': u.addHyperlinks(xss__WEBPACK_IMPORTED_MODULE_27___default.a.filterXSS(_.get(this.model.get('subject'), 'text'), {
             'whiteList': {}
           })),
           'display_name': __('Groupchat info for %1$s', this.model.getDisplayName()),
@@ -77272,8 +77275,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         /* Create the ChatRoomOccupantsView Backbone.NativeView
          */
         this.model.occupants.chatroomview = this;
-        this.occupantsview = new _converse.ChatRoomOccupantsView({
-          'model': this.model.occupants
+        this.model.pagemeGroupMembers.chatroomview = this;
+        this.occupantsview = new _converse.PagemeGroupMembersView({
+          'model': this.model.pagemeGroupMembers
         });
         return this;
       },
@@ -77336,7 +77340,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
           'info_close': __('Close and leave this groupchat'),
           'info_configure': __('Configure this groupchat'),
           'info_details': __('Show more details about this groupchat'),
-          'description': u.addHyperlinks(xss__WEBPACK_IMPORTED_MODULE_26___default.a.filterXSS(_.get(this.model.get('subject'), 'text'), {
+          'description': u.addHyperlinks(xss__WEBPACK_IMPORTED_MODULE_27___default.a.filterXSS(_.get(this.model.get('subject'), 'text'), {
             'whiteList': {}
           }))
         }));
@@ -77883,7 +77887,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
           nick_el.classList.remove('error');
         }
 
-        this.el.querySelector('.chatroom-form-container').outerHTML = templates_spinner_html__WEBPACK_IMPORTED_MODULE_25___default()();
+        this.el.querySelector('.chatroom-form-container').outerHTML = templates_spinner_html__WEBPACK_IMPORTED_MODULE_26___default()();
         this.join(nick);
       },
 
@@ -78442,7 +78446,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         u.removeElement(this.el.querySelector('.spinner'));
         const container_el = this.el.querySelector('.chatroom-body');
         const children = Array.prototype.slice.call(container_el.children, 0);
-        container_el.insertAdjacentHTML('afterbegin', templates_spinner_html__WEBPACK_IMPORTED_MODULE_25___default()());
+        container_el.insertAdjacentHTML('afterbegin', templates_spinner_html__WEBPACK_IMPORTED_MODULE_26___default()());
 
         _.each(children, u.hideElement);
       },
@@ -78508,7 +78512,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       },
 
       render() {
-        this.el.innerHTML = templates_room_panel_html__WEBPACK_IMPORTED_MODULE_23___default()({
+        this.el.innerHTML = templates_room_panel_html__WEBPACK_IMPORTED_MODULE_24___default()({
           'heading_chatrooms': __('Groupchats'),
           'title_new_room': __('Add a new groupchat'),
           'title_list_rooms': __('Query for groupchats')
@@ -78748,6 +78752,53 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
           'list': list
         });
         el.addEventListener('awesomplete-selectcomplete', this.promptForInvite.bind(this));
+      }
+
+    });
+    _converse.PagemeGroupMemberView = Backbone.VDOMView.extend({
+      tagName: 'li',
+
+      initialize() {
+        console.log(this.model.toJSON());
+        this.model.on('change', this.render, this);
+      },
+
+      toHTML() {
+        return templates_pageme_group_member_html__WEBPACK_IMPORTED_MODULE_21___default()(_.extend({
+          '_': _
+        }, this.model.toJSON()));
+      },
+
+      destroy() {
+        this.el.parentElement.removeChild(this.el);
+      }
+
+    });
+    _converse.PagemeGroupMembersView = Backbone.OrderedListView.extend({
+      tagName: 'div',
+      className: 'occupants col-md-3 col-4',
+      listItems: 'model',
+      listSelector: '.occupant-list',
+      ItemView: _converse.PagemeGroupMemberView,
+
+      initialize() {
+        Backbone.OrderedListView.prototype.initialize.apply(this, arguments);
+        console.log(arguments);
+        this.chatroomview = this.model.chatroomview;
+        this.render();
+      },
+
+      render() {
+        this.el.innerHTML = templates_chatroom_sidebar_html__WEBPACK_IMPORTED_MODULE_17___default()(_.extend(this.chatroomview.model.toJSON(), {
+          'allow_muc_invitations': _converse.allow_muc_invitations,
+          'label_occupants': __('Member list')
+        }));
+        return this;
+      },
+
+      setOccupantsHeight() {
+        const el = this.el.querySelector('.chatroom-features');
+        this.el.querySelector('.occupant-list').style.cssText = `height: calc(100% - ${el.offsetHeight}px - 5em);`;
       }
 
     });
@@ -87859,13 +87910,15 @@ const converse = {
   },
 
   'updateGroups'(groups) {
-    groups.forEach(group => {
-      _converse.api.rooms.open(group.jid, {
+    groups.forEach(async group => {
+      const chatbox = await _converse.api.rooms.open(group.jid, {
         subject: {
           text: group.groupName
         },
         nick: group.nick
       });
+      chatbox.save('users', group.users);
+      console.log(chatbox);
     });
   },
 
@@ -89748,10 +89801,21 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         this.constructor.__super__.initialize.apply(this, arguments);
 
         this.on('change:connection_status', this.onConnectionStatusChanged, this);
+        this.on('change:users', this.updateGroupMembers, this);
         this.occupants = new _converse.ChatRoomOccupants();
         this.occupants.browserStorage = new Backbone.BrowserStorage.session(b64_sha1(`converse.occupants-${_converse.bare_jid}${this.get('jid')}`));
         this.occupants.chatroom = this;
+        this.pagemeGroupMembers = new _converse.PagemeGroupMembers();
+        this.pagemeGroupMembers.browserStorage = new Backbone.BrowserStorage.session(b64_sha1(`converse.pageme-group-members-${_converse.bare_jid}${this.get('jid')}`));
+        this.pagemeGroupMembers.chatroom = this;
+        this.updateGroupMembers();
         this.registerHandlers();
+      },
+
+      updateGroupMembers() {
+        const users = this.get('users');
+        users.forEach(user => this.pagemeGroupMembers.create(user));
+        console.log(users);
       },
 
       async onConnectionStatusChanged() {
@@ -89879,6 +89943,10 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         this.occupants.browserStorage._clear();
 
         this.occupants.reset();
+
+        this.pagemeGroupMembers.browserStorage._clear();
+
+        this.pagemeGroupMembers.reset();
 
         if (_converse.disco_entities) {
           const disco_entity = _converse.disco_entities.get(this.get('jid'));
@@ -91001,6 +91069,37 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
          * but should have at least one or the other.
          */
         const jid = Strophe.getBareJidFromJid(data.jid);
+
+        if (jid !== null) {
+          return this.where({
+            'jid': jid
+          }).pop();
+        } else {
+          return this.where({
+            'nick': data.nick
+          }).pop();
+        }
+      }
+
+    });
+    _converse.PagemeGroupMember = Backbone.Model.extend({
+      defaults: {
+        'show': 'offline'
+      },
+
+      initialize(attributes) {
+        console.log(attributes);
+        this.set(_.extend({
+          'id': _converse.connection.getUniqueId()
+        }, attributes));
+      }
+
+    });
+    _converse.PagemeGroupMembers = Backbone.Collection.extend({
+      model: _converse.PagemeGroupMember,
+
+      findGroupMember(data) {
+        const jid = `${data.jid}${_converse.user_settings.domain}`;
 
         if (jid !== null) {
           return this.where({
@@ -92210,7 +92309,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           const items = sizzle(`item`, query);
           currentItems = _.cloneDeep(items);
           rawItems = _.cloneDeep(items);
-          this.compareContacts(importedContacts, 'Contacts');
+          this.compareContacts(importedContacts, 'Address Book');
           this.compareContacts(organizationContacts, 'Organization');
           this.data.save('version', query.getAttribute('ver'));
 
@@ -92237,8 +92336,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           let matched = this.isExistedInImportedContacts(item, contacts);
 
           if (matched) {
-            if (group === 'Contacts' && this.isExistedInImportedContacts(item, organizationContacts) || group === 'Organization' && this.isExistedInImportedContacts(item, importedContacts)) {
-              this.updateContact(item, ['Contacts', 'Organization']);
+            if (group === 'Address Book' && this.isExistedInImportedContacts(item, organizationContacts) || group === 'Organization' && this.isExistedInImportedContacts(item, importedContacts)) {
+              this.updateContact(item, ['Address Book', 'Organization']);
             } else {
               this.updateContact(item, [group]);
             }
@@ -118601,6 +118700,28 @@ __e(o.label_visitor) +
 '</span>\n                ';
  } ;
 __p += '\n            </span>\n        </div>\n    </div>\n</li>\n';
+return __p
+};
+
+/***/ }),
+
+/***/ "./src/templates/pageme_group_member.html":
+/*!************************************************!*\
+  !*** ./src/templates/pageme_group_member.html ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./node_modules/lodash/escape.js")};
+module.exports = function(o) {
+var __t, __p = '', __e = _.escape;
+__p += '<!-- src/templates/pageme_group_member.html -->\n<li class="occupant" id="' +
+__e( o.id ) +
+'">\n    <div class="row no-gutters">\n        <div class="col occupant-nick-badge">\n            <span class="badge badge-primary">' +
+__e(o.title) +
+'</span>\n            <span class="occupant-nick">' +
+__e(o.fullName || o.nick) +
+'</span>\n        </div>\n    </div>\n</li>\n';
 return __p
 };
 

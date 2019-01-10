@@ -1719,8 +1719,10 @@ const converse = {
       });
     },
     'updateGroups' (groups) {
-      groups.forEach((group) => {
-        _converse.api.rooms.open(group.jid, {subject: {text: group.groupName}, nick: group.nick});
+      groups.forEach(async (group) => {
+        const chatbox = await _converse.api.rooms.open(group.jid, {subject: {text: group.groupName}, nick: group.nick});
+        chatbox.save('users', group.users);
+        console.log(chatbox);
       })
     },
     'onLogOut' (callback) {

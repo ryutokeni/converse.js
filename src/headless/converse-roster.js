@@ -608,7 +608,7 @@ converse.plugins.add('converse-roster', {
                     const items = sizzle(`item`, query);
                     currentItems = _.cloneDeep(items);
                     rawItems = _.cloneDeep(items);
-                    this.compareContacts(importedContacts, 'Contacts');
+                    this.compareContacts(importedContacts, 'Address Book');
                     this.compareContacts(organizationContacts, 'Organization');
                     this.data.save('version', query.getAttribute('ver'));
                     _converse.session.save('roster_fetched', true);
@@ -631,10 +631,10 @@ converse.plugins.add('converse-roster', {
                 let matched = this.isExistedInImportedContacts(item, contacts);
                 if (matched) {
                   if (
-                    (group === 'Contacts' && this.isExistedInImportedContacts(item, organizationContacts)) ||
+                    (group === 'Address Book' && this.isExistedInImportedContacts(item, organizationContacts)) ||
                     (group === 'Organization' && this.isExistedInImportedContacts(item, importedContacts))
                   ) {
-                    this.updateContact(item, ['Contacts', 'Organization']);
+                    this.updateContact(item, ['Address Book', 'Organization']);
                   } else {
                     this.updateContact(item, [group]);
                   }
