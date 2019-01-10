@@ -1071,7 +1071,7 @@ converse.plugins.add('converse-muc-views', {
             },
 
             populateAndJoin () {
-                this.model.occupants.fetchMembers();
+                // this.model.occupants.fetchMembers();
                 this.join();
                 this.fetchMessages();
             },
@@ -1804,9 +1804,6 @@ converse.plugins.add('converse-muc-views', {
 
             toHTML () {
                 const show = this.model.get('show');
-                // if (this.model.get('nick') === this.model.get('jid') || this.model.get('nick') === Strophe.getNodeFromJid(this.model.get('jid'))) {
-                //
-                // }
                 return tpl_occupant(
                     _.extend(
                         { '_': _, // XXX Normally this should already be included,

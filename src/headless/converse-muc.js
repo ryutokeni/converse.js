@@ -1138,6 +1138,20 @@ converse.plugins.add('converse-muc', {
                 }, attributes));
 
                 this.on('change:image_hash', this.onAvatarChanged, this);
+                this.setVCard();
+                if (this.vcard) {
+                  this.set('nick', this.getDisplayName());
+                }
+            },
+
+            setVCard() {
+                const chatbox = this.collection.chatroom,
+                      nick = Strophe.getResourceFromJid(this.get('from'));
+                if (chatbox.get('nick') === nick) {
+                    return _converse.xmppstatus.vcard;
+                } else {
+                    this.vcard = _converse.vcards.findWhere({'jid': nick}) || _converse.vcards.create({'jid': nick});
+                }
             },
 
             onAvatarChanged () {
@@ -1156,6 +1170,9 @@ converse.plugins.add('converse-muc', {
             },
 
             getDisplayName () {
+                if (this.vcard) {
+                  return this.vcard.get('fullname');
+                }
                 return this.get('nick') || this.get('jid');
             },
 
@@ -1489,7 +1506,6 @@ converse.plugins.add('converse-muc', {
                  */
                 'open': async function (jids, attrs, participants) {
                     await _converse.api.waitUntil('chatBoxesFetched');
-                    console.log(jids);
                     if (_.isUndefined(jids)) {
                         const err_msg = 'rooms.open: You need to provide at least one JID';
                         _converse.log(err_msg, Strophe.LogLevel.ERROR);

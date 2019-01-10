@@ -77767,7 +77767,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       },
 
       populateAndJoin() {
-        this.model.occupants.fetchMembers();
+        // this.model.occupants.fetchMembers();
         this.join();
         this.fetchMessages();
       },
@@ -78543,10 +78543,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       },
 
       toHTML() {
-        const show = this.model.get('show'); // if (this.model.get('nick') === this.model.get('jid') || this.model.get('nick') === Strophe.getNodeFromJid(this.model.get('jid'))) {
-        //
-        // }
-
+        const show = this.model.get('show');
         return templates_occupant_html__WEBPACK_IMPORTED_MODULE_20___default()(_.extend({
           '_': _,
           // XXX Normally this should already be included,
@@ -90884,6 +90881,26 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           'id': _converse.connection.getUniqueId()
         }, attributes));
         this.on('change:image_hash', this.onAvatarChanged, this);
+        this.setVCard();
+
+        if (this.vcard) {
+          this.set('nick', this.getDisplayName());
+        }
+      },
+
+      setVCard() {
+        const chatbox = this.collection.chatroom,
+              nick = Strophe.getResourceFromJid(this.get('from'));
+
+        if (chatbox.get('nick') === nick) {
+          return _converse.xmppstatus.vcard;
+        } else {
+          this.vcard = _converse.vcards.findWhere({
+            'jid': nick
+          }) || _converse.vcards.create({
+            'jid': nick
+          });
+        }
       },
 
       onAvatarChanged() {
@@ -90908,6 +90925,10 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
       },
 
       getDisplayName() {
+        if (this.vcard) {
+          return this.vcard.get('fullname');
+        }
+
         return this.get('nick') || this.get('jid');
       },
 
@@ -91092,8 +91113,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           }
         }
 
-        console.log(groupchat);
-
         if (_.isString(groupchat)) {
           _converse.api.rooms.open(groupchat);
         } else if (_.isObject(groupchat)) {
@@ -91276,7 +91295,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
          */
         'open': async function open(jids, attrs, participants) {
           await _converse.api.waitUntil('chatBoxesFetched');
-          console.log(jids);
 
           if (_.isUndefined(jids)) {
             const err_msg = 'rooms.open: You need to provide at least one JID';
@@ -91284,11 +91302,12 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
             _converse.log(err_msg, Strophe.LogLevel.ERROR);
 
             throw new TypeError(err_msg);
-          } else if (_.isString(jids)) {// const newChatRoom = _converse.api.rooms.create(jids, attrs);
-            // newChatRoom.trigger('show');
-            // newChatRoom.save('participants', participants);
-            // console.log(newChatRoom);
-            // return newChatRoom;
+          } else if (_.isString(jids)) {
+            const newChatRoom = _converse.api.rooms.create(jids, attrs);
+
+            newChatRoom.trigger('show');
+            newChatRoom.save('participants', participants);
+            return newChatRoom;
           } else {
             return _.map(jids, jid => _converse.api.rooms.create(jid, attrs).trigger('show'));
           }
