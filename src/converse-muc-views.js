@@ -476,7 +476,8 @@ converse.plugins.add('converse-muc-views', {
                 'change input.fileupload': 'onFileSelection',
                 'click .chat-msg__action-edit': 'onMessageEditButtonClicked',
                 'click .chatbox-navback': 'showControlBox',
-                'click .close-chatbox-button': 'close',
+                'click .close-chatbox-button': 'closeRoom',
+                'click .add-group-member': 'showInviteMemberModal',
                 'click .configure-chatroom-button': 'getAndRenderConfigurationForm',
                 'click .hide-occupants': 'hideOccupants',
                 'click .new-msgs-indicator': 'viewUnreadMessages',
@@ -595,6 +596,22 @@ converse.plugins.add('converse-muc-views', {
                     return;
                 }
                 return _converse.ChatBoxView.prototype.keyPressed.apply(this, arguments);
+            },
+
+            closeRoom (ev) {
+                ev.preventDefault();
+                // const jid = ev.target.getAttribute('data-room-jid');
+                if (confirm(__("Are you sure you want to leave the groupchat %1$s?", name))) {
+                    // TODO: replace with API call
+                    // const chatbox = _converse.chatboxviews.get(jid);
+                    this.closePageMeGroup();
+                    // chatbox.close();
+                }
+            },
+
+            showInviteMemberModal (ev) {
+                ev.preventDefault();
+                _converse.emit('openInviteMemberModal', this.model.get('jid'));
             },
 
             keyUp (ev) {
@@ -1781,6 +1798,7 @@ converse.plugins.add('converse-muc-views', {
             },
 
             showAddRoomModal (ev) {
+                ev.preventDefault();
                 // if (_.isUndefined(this.add_room_modal)) {
                 //     this.add_room_modal = new _converse.AddChatRoomModal({'model': this.model});
                 // }

@@ -11476,6 +11476,9 @@ body.reset {
         #conversejs.converse-embedded .chatroom .box-flyout .chatroom-body .occupants .occupants-heading,
         #conversejs .chatroom .box-flyout .chatroom-body .occupants .occupants-heading {
           font-family: var(--heading-font); }
+          #conversejs.converse-embedded .chatroom .box-flyout .chatroom-body .occupants .occupants-heading i,
+          #conversejs .chatroom .box-flyout .chatroom-body .occupants .occupants-heading i {
+            float: right; }
         #conversejs.converse-embedded .chatroom .box-flyout .chatroom-body .occupants .chatroom-features,
         #conversejs .chatroom .box-flyout .chatroom-body .occupants .chatroom-features {
           display: var(--occupants-features-display); }
@@ -15990,8 +15993,8 @@ readers do not read off random characters that represent icons */
   width: auto; }
 
 #conversejs {
-  --subdued-color: #f1f8ff;
-  --subdued-color-lighten-25-percent: #e6e7e4;
+  --subdued-color: #bfbfbf;
+  --subdued-color-lighten-25-percent: #bfbfbf;
   --chat-status-online: #3AA569;
   --chat-status-busy: #ff0606;
   --chat-status-away: #9c9c9c;

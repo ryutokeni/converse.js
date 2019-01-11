@@ -77115,7 +77115,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         'change input.fileupload': 'onFileSelection',
         'click .chat-msg__action-edit': 'onMessageEditButtonClicked',
         'click .chatbox-navback': 'showControlBox',
-        'click .close-chatbox-button': 'close',
+        'click .close-chatbox-button': 'closeRoom',
+        'click .add-group-member': 'showInviteMemberModal',
         'click .configure-chatroom-button': 'getAndRenderConfigurationForm',
         'click .hide-occupants': 'hideOccupants',
         'click .new-msgs-indicator': 'viewUnreadMessages',
@@ -77244,6 +77245,22 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         }
 
         return _converse.ChatBoxView.prototype.keyPressed.apply(this, arguments);
+      },
+
+      closeRoom(ev) {
+        ev.preventDefault(); // const jid = ev.target.getAttribute('data-room-jid');
+
+        if (confirm(__("Are you sure you want to leave the groupchat %1$s?", name))) {
+          // TODO: replace with API call
+          // const chatbox = _converse.chatboxviews.get(jid);
+          this.closePageMeGroup(); // chatbox.close();
+        }
+      },
+
+      showInviteMemberModal(ev) {
+        ev.preventDefault();
+
+        _converse.emit('openInviteMemberModal', this.model.get('jid'));
       },
 
       keyUp(ev) {
@@ -78520,10 +78537,11 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       },
 
       showAddRoomModal(ev) {
-        // if (_.isUndefined(this.add_room_modal)) {
+        ev.preventDefault(); // if (_.isUndefined(this.add_room_modal)) {
         //     this.add_room_modal = new _converse.AddChatRoomModal({'model': this.model});
         // }
         // this.add_room_modal.show(ev);
+
         _converse.emit('openCreateGroupModal');
       },
 
@@ -83550,6 +83568,7 @@ const initialize = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20_
       onLogOut = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLogOut,
       onLoadMessages = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLoadMessages,
       onOpenCreateGroupModal = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenCreateGroupModal,
+      onOpenInviteMemberModal = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenInviteMemberModal,
       createNewGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].createNewGroup,
       onLeaveGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLeaveGroup,
       onShowPageMeMediaViewer = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onShowPageMeMediaViewer,
@@ -83590,6 +83609,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLoad
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenCreateGroupModal = function (callback) {
   return onOpenCreateGroupModal(callback);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onOpenInviteMemberModal = function (callback) {
+  return onOpenInviteMemberModal(callback);
 };
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onShowPageMeMediaViewer = function (callback) {
@@ -87942,6 +87965,10 @@ const converse = {
 
   'onOpenCreateGroupModal'(callback) {
     return _converse.on('openCreateGroupModal', callback);
+  },
+
+  'onOpenInviteMemberModal'(callback) {
+    return _converse.on('openInviteMemberModal', callback);
   },
 
   'onLeaveGroup'(callback) {
@@ -117591,9 +117618,9 @@ __p += '\n            Loading...\n        ';
  } ;
 __p += '\n    </div>\n    <!-- Sanitized in converse-muc-views. We want to render links. -->\n    <!-- <p class="chatroom-description">' +
 ((__t = (o.description)) == null ? '' : __t) +
-'</p> -->\n</div>\n<!-- <div class="chatbox-buttons row no-gutters">\n    <a class="chatbox-btn close-chatbox-button fa fa-sign-out-alt" title="' +
+'</p> -->\n</div>\n<div class="chatbox-buttons row no-gutters">\n    <a class="chatbox-btn close-chatbox-button fa fa-sign-out-alt" title="' +
 __e(o.info_close) +
-'"></a>\n    ';
+'"></a>\n    <!-- ';
  if (o.affiliation == 'owner') { ;
 __p += '\n    <a class="chatbox-btn configure-chatroom-button fa fa-wrench" title="' +
 __e(o.info_configure) +
@@ -117601,7 +117628,7 @@ __e(o.info_configure) +
  } ;
 __p += '\n    <a class="chatbox-btn show-room-details-modal fa fa-info-circle" title="' +
 __e(o.info_details) +
-'"></a>\n</div> -->\n';
+'"></a> -->\n</div>\n';
 return __p
 };
 
@@ -117688,9 +117715,9 @@ return __p
 var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./node_modules/lodash/escape.js")};
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape;
-__p += '<!-- src/templates/chatroom_sidebar.html -->\n<!-- <div class="occupants"> -->\n<div class="occupants-header">\n    <i class="hide-occupants fa fa-times"></i>\n    <p class="occupants-heading">' +
+__p += '<!-- src/templates/chatroom_sidebar.html -->\n<!-- <div class="occupants"> -->\n<div class="occupants-header">\n    <i class="hide-occupants fa fa-times"></i>\n    <p class="occupants-heading">\n      ' +
 __e(o.label_occupants) +
-'</p>\n</div>\n<ul class="occupant-list"></ul>\n<div class="chatroom-features"></div>\n<!-- </div> -->\n';
+'\n      <!-- <i class="fa fa-sign-out-alt close-chatbox-button"></i> -->\n      <i class="fa fa-user-plus add-group-member"></i>\n    </p>\n</div>\n<ul class="occupant-list"></ul>\n<div class="chatroom-features"></div>\n<!-- </div> -->\n';
 return __p
 };
 
@@ -119434,7 +119461,7 @@ __p += '\n        <a class="controlbox-heading__btn add-contact fa fa-user-plus"
 __e(o.title_add_contact) +
 '"\n           data-toggle="modal"\n           data-target="#add-contact-modal"></a>\n    ';
  } ;
-__p += '\n</div>\n\n<form class="roster-filter-form"></form>\n<div style="text-align : left; font-size: 15px; padding-top: 20px; color: #18ABFB" class="hidden roster-loading-Contacts">\n  Loading Contacts...\n</div>\n<div style="text-align : left; font-size: 15px; padding-top: 20px; color: #FDAD45" class="hidden roster-loading-Organization">\n  Loading Organization...\n</div>\n\n<div class="roster-contacts">\n   \n</div>\n\n\n\n\n\n\n';
+__p += '\n</div>\n\n<form class="roster-filter-form"></form>\n<div style="text-align : left; font-size: 15px; padding-top: 20px; color: #18ABFB" class="hidden roster-loading-Contacts">\n  Loading Address Book...\n</div>\n<div style="text-align : left; font-size: 15px; padding-top: 20px; color: #FDAD45" class="hidden roster-loading-Organization">\n  Loading Organization...\n</div>\n\n<div class="roster-contacts">\n\n</div>\n';
 return __p
 };
 

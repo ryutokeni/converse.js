@@ -169,6 +169,9 @@
                     }
                     .occupants-heading {
                         font-family: var(--heading-font);
+                        i {
+                          float: right;
+                        }
                     }
                     .chatroom-features {
                         display: var(--occupants-features-display);

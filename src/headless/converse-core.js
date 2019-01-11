@@ -1740,12 +1740,18 @@ const converse = {
     'onOpenCreateGroupModal' (callback) {
       return _converse.on('openCreateGroupModal', callback);
     },
+    'onOpenInviteMemberModal' (callback) {
+      return _converse.on('openInviteMemberModal', callback);
+    },
     'onLeaveGroup' (callback) {
       return _converse.on('leavePageMeGroup', (jid) => callback(jid));
     },
     'createNewGroup' (jid, attrs, participants) {
       _converse.api.rooms.open(jid, attrs, participants);
       // const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
+    },
+    'inviteToGroup' (jid, participants) {
+      
     },
     'onShowPageMeMediaViewer' (callback) {
       _converse.on('showPageMeMediaViewer', callback);

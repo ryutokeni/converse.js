@@ -60,13 +60,15 @@ const {
   onLogOut,
   onLoadMessages,
   onOpenCreateGroupModal,
+  onOpenInviteMemberModal,
   createNewGroup,
   onLeaveGroup,
   onShowPageMeMediaViewer,
   onShowPageMeMedicalRequest,
   onUploadFiles,
   onMedicalReqButtonClicked,
-  sendFileXMPP
+  sendFileXMPP,
+  inviteToGroup
 } = converse;
 
 converse.initialize = function (settings, callback) {
@@ -100,6 +102,10 @@ converse.onOpenCreateGroupModal = function (callback) {
   return onOpenCreateGroupModal(callback);
 }
 
+converse.onOpenInviteMemberModal = function (callback) {
+  return onOpenInviteMemberModal(callback);
+}
+
 converse.onShowPageMeMediaViewer = function (callback) {
   return onShowPageMeMediaViewer(callback);
 }
@@ -110,6 +116,10 @@ converse.onShowPageMeMedicalRequest = function (callback) {
 
 converse.createNewGroup = function (jid, attrs, participants) {
   return createNewGroup(jid, attrs, participants);
+}
+
+converse.inviteToGroup = function (jid, participants) {
+  return inviteToGroup(jid, participants);
 }
 
 converse.onLeaveGroup = function (callback) {
