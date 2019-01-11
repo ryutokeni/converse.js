@@ -300,7 +300,6 @@ converse.plugins.add('converse-muc-views', {
                 const jid = ev.target.getAttribute('data-room-jid');
                 const name = ev.target.getAttribute('data-room-name');
                 this.modal.hide();
-                console.log(jid);
                 _converse.api.rooms.open(jid, {'name': name});
             },
 
@@ -622,7 +621,6 @@ converse.plugins.add('converse-muc-views', {
                  */
                 this.model.occupants.chatroomview = this;
                 this.model.pagemeGroupMembers.chatroomview = this;
-
                 this.occupantsview = new _converse.PagemeGroupMembersView({'model': this.model.pagemeGroupMembers});
                 return this;
             },
@@ -2017,16 +2015,16 @@ converse.plugins.add('converse-muc-views', {
         _converse.PagemeGroupMemberView = Backbone.VDOMView.extend({
             tagName: 'li',
             initialize () {
-              console.log(this.model.toJSON());
                 this.model.on('change', this.render, this);
             },
 
             toHTML () {
-                return tpl_pageme_group_member(
-                    _.extend(
-                        { '_': _ }, this.model.toJSON()
-                    )
-                );
+              return tpl_pageme_group_member(
+                  _.extend(
+                      { '_': _,
+                      }, this.model.toJSON()
+                  )
+              );
             },
 
             destroy () {
@@ -2036,7 +2034,7 @@ converse.plugins.add('converse-muc-views', {
 
         _converse.PagemeGroupMembersView = Backbone.OrderedListView.extend({
             tagName: 'div',
-            className: 'occupants col-md-3 col-4',
+            className: 'occupants col-md-3 col-4 test',
             listItems: 'model',
             listSelector: '.occupant-list',
 
@@ -2044,7 +2042,6 @@ converse.plugins.add('converse-muc-views', {
 
             initialize () {
                 Backbone.OrderedListView.prototype.initialize.apply(this, arguments);
-                console.log(arguments);
                 this.chatroomview = this.model.chatroomview;
                 this.render();
             },

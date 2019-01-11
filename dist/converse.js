@@ -76931,7 +76931,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         const jid = ev.target.getAttribute('data-room-jid');
         const name = ev.target.getAttribute('data-room-name');
         this.modal.hide();
-        console.log(jid);
 
         _converse.api.rooms.open(jid, {
           'name': name
@@ -78759,7 +78758,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       tagName: 'li',
 
       initialize() {
-        console.log(this.model.toJSON());
         this.model.on('change', this.render, this);
       },
 
@@ -78776,14 +78774,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
     });
     _converse.PagemeGroupMembersView = Backbone.OrderedListView.extend({
       tagName: 'div',
-      className: 'occupants col-md-3 col-4',
+      className: 'occupants col-md-3 col-4 test',
       listItems: 'model',
       listSelector: '.occupant-list',
       ItemView: _converse.PagemeGroupMemberView,
 
       initialize() {
         Backbone.OrderedListView.prototype.initialize.apply(this, arguments);
-        console.log(arguments);
         this.chatroomview = this.model.chatroomview;
         this.render();
       },
@@ -87918,7 +87915,6 @@ const converse = {
         nick: group.nick
       });
       chatbox.save('users', group.users);
-      console.log(chatbox);
     });
   },
 
@@ -89808,14 +89804,21 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         this.pagemeGroupMembers = new _converse.PagemeGroupMembers();
         this.pagemeGroupMembers.browserStorage = new Backbone.BrowserStorage.session(b64_sha1(`converse.pageme-group-members-${_converse.bare_jid}${this.get('jid')}`));
         this.pagemeGroupMembers.chatroom = this;
-        this.updateGroupMembers();
         this.registerHandlers();
       },
 
       updateGroupMembers() {
-        const users = this.get('users');
-        users.forEach(user => this.pagemeGroupMembers.create(user));
-        console.log(users);
+        (this.get('users') || []).forEach(user => {
+          const pagemeGroupMember = this.pagemeGroupMembers.findGroupMember(user);
+
+          if (pagemeGroupMember) {
+            console.log(1, user);
+            pagemeGroupMember.save(user);
+          } else {
+            console.log(2, user);
+            this.pagemeGroupMembers.create(user);
+          }
+        });
       },
 
       async onConnectionStatusChanged() {
@@ -90497,7 +90500,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
          *  updated or once it's been established there's no need
          *  to update the list.
          */
-        this.getJidsWithAffiliations(affiliations).then(old_members => this.setAffiliations(deltaFunc(members, old_members))).then(() => this.occupants.fetchMembers()).catch(_.partial(_converse.log, _, Strophe.LogLevel.ERROR));
+        this.getJidsWithAffiliations(affiliations).then(old_members => this.setAffiliations(deltaFunc(members, old_members))).then(() => {// this.occupants.fetchMembers()
+        }).catch(_.partial(_converse.log, _, Strophe.LogLevel.ERROR));
       },
 
       getDefaultNick() {
@@ -90612,6 +90616,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
          * Parameters:
          *  (XMLElement) pres: The presence stanza
          */
+        this.updateGroupMembers();
         const data = this.parsePresence(pres);
 
         if (data.type === 'error' || !data.jid && !data.nick) {
@@ -90948,8 +90953,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         this.set(_.extend({
           'id': _converse.connection.getUniqueId()
         }, attributes));
-        this.on('change:image_hash', this.onAvatarChanged, this);
-        this.setVCard();
+        this.on('change:image_hash', this.onAvatarChanged, this); // this.setVCard();
 
         if (this.vcard) {
           this.set('nick', this.getDisplayName());
@@ -91088,7 +91092,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
       },
 
       initialize(attributes) {
-        console.log(attributes);
         this.set(_.extend({
           'id': _converse.connection.getUniqueId()
         }, attributes));
@@ -91098,17 +91101,26 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
     _converse.PagemeGroupMembers = Backbone.Collection.extend({
       model: _converse.PagemeGroupMember,
 
+      comparator(occupant1, occupant2) {
+        const nick1 = occupant1.get('fullName');
+        const nick2 = occupant2.get('fullName');
+        return nick1 < nick2 ? -1 : nick1 > nick2 ? 1 : 0;
+      },
+
       findGroupMember(data) {
         const jid = `${data.jid}${_converse.user_settings.domain}`;
+        console.log(jid);
 
-        if (jid !== null) {
+        if (data.jid) {
           return this.where({
             'jid': jid
           }).pop();
         } else {
-          return this.where({
-            'nick': data.nick
-          }).pop();
+          console.log(data.userName);
+          const test = this.where({
+            'userName': data.userName
+          });
+          return test.pop();
         }
       }
 
@@ -92288,7 +92300,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         let iq;
 
         try {
-          console.log(stanza);
           iq = await _converse.api.sendIQ(stanza);
         } catch (e) {
           _converse.log(e, Strophe.LogLevel.ERROR);
@@ -118717,10 +118728,10 @@ module.exports = function(o) {
 var __t, __p = '', __e = _.escape;
 __p += '<!-- src/templates/pageme_group_member.html -->\n<li class="occupant" id="' +
 __e( o.id ) +
-'">\n    <div class="row no-gutters">\n        <div class="col occupant-nick-badge">\n            <span class="badge badge-primary">' +
-__e(o.title) +
-'</span>\n            <span class="occupant-nick">' +
+'">\n    <div class="row no-gutters">\n        <div class="col occupant-nick-badge">\n            <span class="occupant-nick">' +
 __e(o.fullName || o.nick) +
+'</span>\n            <span class="badge badge-primary">' +
+__e(o.title) +
 '</span>\n        </div>\n    </div>\n</li>\n';
 return __p
 };

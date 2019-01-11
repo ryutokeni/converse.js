@@ -587,7 +587,6 @@ converse.plugins.add('converse-roster', {
                 }
                 let iq;
                 try {
-                  console.log(stanza);
                     iq = await _converse.api.sendIQ(stanza);
                 } catch (e) {
                     _converse.log(e, Strophe.LogLevel.ERROR);

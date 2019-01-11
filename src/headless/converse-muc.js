@@ -183,14 +183,18 @@ converse.plugins.add('converse-muc', {
                     b64_sha1(`converse.pageme-group-members-${_converse.bare_jid}${this.get('jid')}`)
                 );
                 this.pagemeGroupMembers.chatroom  = this;
-                this.updateGroupMembers();
                 this.registerHandlers();
             },
 
             updateGroupMembers() {
-                const users = this.get('users');
-                users.forEach(user => this.pagemeGroupMembers.create(user));
-                console.log(users);
+              (this.get('users') || []).forEach(user => {
+                const pagemeGroupMember = this.pagemeGroupMembers.findGroupMember(user);
+                if (pagemeGroupMember) {
+                  pagemeGroupMember.save(user);
+                } else {
+                  this.pagemeGroupMembers.create(user)
+                }
+              });
             },
 
             async onConnectionStatusChanged () {
@@ -771,7 +775,9 @@ converse.plugins.add('converse-muc', {
                  */
                 this.getJidsWithAffiliations(affiliations)
                     .then(old_members => this.setAffiliations(deltaFunc(members, old_members)))
-                    .then(() => this.occupants.fetchMembers())
+                    .then(() => {
+                      // this.occupants.fetchMembers()
+                    })
                     .catch(_.partial(_converse.log, _, Strophe.LogLevel.ERROR));
             },
 
@@ -872,6 +878,7 @@ converse.plugins.add('converse-muc', {
                  * Parameters:
                  *  (XMLElement) pres: The presence stanza
                  */
+                this.updateGroupMembers();
                 const data = this.parsePresence(pres);
                 if (data.type === 'error' || (!data.jid && !data.nick)) {
                     return true;
@@ -1153,7 +1160,7 @@ converse.plugins.add('converse-muc', {
                 }, attributes));
 
                 this.on('change:image_hash', this.onAvatarChanged, this);
-                this.setVCard();
+                // this.setVCard();
                 if (this.vcard) {
                   this.set('nick', this.getDisplayName());
                 }
@@ -1267,7 +1274,6 @@ converse.plugins.add('converse-muc', {
             },
 
             initialize (attributes) {
-              console.log(attributes);
                 this.set(_.extend({
                     'id': _converse.connection.getUniqueId(),
                 }, attributes));
@@ -1277,13 +1283,21 @@ converse.plugins.add('converse-muc', {
         _converse.PagemeGroupMembers = Backbone.Collection.extend({
             model: _converse.PagemeGroupMember,
 
+            comparator (occupant1, occupant2) {
+              const nick1 = occupant1.get('fullName');
+              const nick2 = occupant2.get('fullName');
+              return nick1 < nick2 ? -1 : (nick1 > nick2 ? 1 : 0);
+            },
 
             findGroupMember (data) {
                 const jid = `${data.jid}${_converse.user_settings.domain}`;
-                if (jid !== null) {
+                console.log(jid);
+                if (data.jid) {
                     return this.where({'jid': jid}).pop();
                 } else {
-                    return this.where({'nick': data.nick}).pop();
+                    console.log(data.userName);
+                    const test = this.where({'userName': data.userName});
+                    return test.pop();
                 }
             }
         });
