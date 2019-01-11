@@ -89812,10 +89812,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           const pagemeGroupMember = this.pagemeGroupMembers.findGroupMember(user);
 
           if (pagemeGroupMember) {
-            console.log(1, user);
             pagemeGroupMember.save(user);
           } else {
-            console.log(2, user);
             this.pagemeGroupMembers.create(user);
           }
         });
@@ -91109,14 +91107,12 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
       findGroupMember(data) {
         const jid = `${data.jid}${_converse.user_settings.domain}`;
-        console.log(jid);
 
         if (data.jid) {
           return this.where({
             'jid': jid
           }).pop();
         } else {
-          console.log(data.userName);
           const test = this.where({
             'userName': data.userName
           });

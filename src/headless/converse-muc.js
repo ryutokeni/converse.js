@@ -1291,11 +1291,9 @@ converse.plugins.add('converse-muc', {
 
             findGroupMember (data) {
                 const jid = `${data.jid}${_converse.user_settings.domain}`;
-                console.log(jid);
                 if (data.jid) {
                     return this.where({'jid': jid}).pop();
                 } else {
-                    console.log(data.userName);
                     const test = this.where({'userName': data.userName});
                     return test.pop();
                 }
