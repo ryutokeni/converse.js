@@ -215,7 +215,7 @@ converse.plugins.add('converse-profile', {
             tagName: "div",
             events: {
                 "click a.show-profile": "showProfileModal",
-                "click a.change-status": "showStatusChangeModal",
+                // "click a.change-status": "showStatusChangeModal",
                 "click .show-client-info": "showClientInfoModal",
                 "click .logout": "logOut"
             },
