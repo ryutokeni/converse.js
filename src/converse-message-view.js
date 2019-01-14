@@ -15,7 +15,7 @@ import tpl_message_versions_modal from "templates/message_versions_modal.html";
 import u from "@converse/headless/utils/emoji";
 import xss from "xss";
 
-const { Backbone, _, moment } = converse.env;
+const { Backbone, Strophe, _, moment } = converse.env;
 const medReqLabel = {
   wait4Appro: 'Waiting for Approval',
   wait4UrAppro: 'Waiting for Your Approval',
@@ -274,6 +274,9 @@ converse.plugins.add('converse-message-view', {
 
                 const promise = u.renderImageURLs(_converse, msg_content);
                 if (this.model.get('type') !== 'headline') {
+                    const jid = Strophe.getNodeFromJid(this.model.vcard.get('jid'));
+                    this.image = `${_converse.user_settings.avatarUrl}${jid}`;
+                    this.width = this.height = 60;
                     this.renderAvatar(msg);
                 }
                 await promise;

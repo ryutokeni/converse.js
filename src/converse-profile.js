@@ -220,7 +220,7 @@ converse.plugins.add('converse-profile', {
                 "click .logout": "logOut"
             },
 
-            initialize () {                
+            initialize () {
                 this.model.on("change", this.render, this);
                 this.model.vcard.on("change", this.render, this);
             },
@@ -245,6 +245,8 @@ converse.plugins.add('converse-profile', {
             },
 
             afterRender () {
+                const jid = Strophe.getNodeFromJid(_converse.bare_jid);
+                this.image = `${_converse.user_settings.avatarUrl}${jid}`;
                 this.renderAvatar(null, true, _converse.user_settings.userProfile.avatarUrl);
             },
 

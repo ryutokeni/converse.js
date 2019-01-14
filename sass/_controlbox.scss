@@ -185,11 +185,18 @@
         .controlbox-pane {
             .userinfo {
                 padding-bottom: 1em;
-
+                color: var(--controlbox-heading-color);
                 .username {
                     margin-left: 0.5em;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                    color: white;
+                    font-size: 15px;
+                    font-weight: 700;
+                }
+                .connection-status {
+                    margin-left: 0.5em;
+                    overflow: hidden;
                 }
                 .profile {
                     margin-bottom: 0.75em;
@@ -228,7 +235,8 @@
                 align-self: flex-start;
                 font-size: 1em;
                 padding: 0;
-                margin: 0.75em 0 0.75em 0.75em;
+                margin-left: 0.75em;
+                color: white;
                 &.fa-vcard {
                     margin-top: 1em;
                 }
@@ -395,7 +403,7 @@
             justify-content: space-between;
 
             .brand-heading {
-                color: var(--text-color);
+                color: var(--controlbox-heading-color);
                 font-size: 2em;
             }
             .chatbox-btn {

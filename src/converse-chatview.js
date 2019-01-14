@@ -175,6 +175,9 @@ converse.plugins.add('converse-chatview', {
                         }
                     )
                 );
+                const jid = Strophe.getNodeFromJid(this.model.vcard.get('jid'));
+                this.image = `${_converse.user_settings.avatarUrl}${jid}`;
+                this.width = this.height = 60;
                 this.renderAvatar();
                 return this;
             },

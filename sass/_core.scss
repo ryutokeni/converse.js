@@ -352,11 +352,11 @@ body.reset {
     @-webkit-keyframes fadeOut {
 		 0% { opacity: 1; visibility: visible; }
 		 100% { opacity: 0; visibility: hidden;  }
-	} 
+	}
     @keyframes fadeOut {
 		 0% { opacity: 1; visibility: visible; }
 		 100% { opacity: 0; visibility: hidden;  }
-	} 
+	}
 
     .fade-in {
         @include fade-in;
@@ -377,7 +377,7 @@ body.reset {
 
     .fade-out {
 		animation-duration: 1s;
-		animation-fill-mode: forwards;  
+		animation-fill-mode: forwards;
 		animation-name: fadeOut;
 		animation-timing-function: ease-in-out;
     }
@@ -450,6 +450,12 @@ body.reset {
         border-radius: var(--avatar-border-radius);
         border: var(--avatar-border);
         background-color: var(--avatar-background-color);
+        overflow: hidden;
+        img {
+          max-width: 100%;
+          max-height: 100%;
+          border-radius: inherit;
+        }
     }
 
     .activated {

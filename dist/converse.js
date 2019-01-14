@@ -72186,8 +72186,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var backbone_overview__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! backbone.overview */ "./node_modules/backbone.overview/backbone.overview.js");
 /* harmony import */ var backbone_overview__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(backbone_overview__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @converse/headless/converse-core */ "./src/headless/converse-core.js");
-/* harmony import */ var templates_avatar_svg__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! templates/avatar.svg */ "./src/templates/avatar.svg");
-/* harmony import */ var templates_avatar_svg__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(templates_avatar_svg__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var templates_avatar_html__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! templates/avatar.html */ "./src/templates/avatar.html");
+/* harmony import */ var templates_avatar_html__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(templates_avatar_html__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var templates_chatboxes_html__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! templates/chatboxes.html */ "./src/templates/chatboxes.html");
 /* harmony import */ var templates_chatboxes_html__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(templates_chatboxes_html__WEBPACK_IMPORTED_MODULE_5__);
 // Converse.js
@@ -72217,11 +72217,11 @@ const AvatarMixin = {
 
     const image_type = this.model.vcard.get('image_type'),
           image = this.model.vcard.get('image');
-    canvas_el.outerHTML = templates_avatar_svg__WEBPACK_IMPORTED_MODULE_4___default()({
+    canvas_el.outerHTML = templates_avatar_html__WEBPACK_IMPORTED_MODULE_4___default()({
       'classes': canvas_el.getAttribute('class'),
-      'width': canvas_el.width,
-      'height': canvas_el.height,
-      'image': me ? Url : "data:" + image_type + ";base64," + image
+      'width': this.width || canvas_el.width,
+      'height': this.height || canvas_el.height,
+      'image': this.image
     });
   }
 
@@ -72594,6 +72594,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           '_converse': _converse,
           'info_close': __('Close this chat box')
         }));
+        const jid = Strophe.getNodeFromJid(this.model.vcard.get('jid'));
+        this.image = `${_converse.user_settings.avatarUrl}${jid}`;
+        this.width = this.height = 60;
         this.renderAvatar();
         return this;
       },
@@ -75377,6 +75380,7 @@ __webpack_require__.r(__webpack_exports__);
 
 const _converse$env = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].env,
       Backbone = _converse$env.Backbone,
+      Strophe = _converse$env.Strophe,
       _ = _converse$env._,
       moment = _converse$env.moment;
 const medReqLabel = {
@@ -75649,6 +75653,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         const promise = _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderImageURLs(_converse, msg_content);
 
         if (this.model.get('type') !== 'headline') {
+          const jid = Strophe.getNodeFromJid(this.model.vcard.get('jid'));
+          this.image = `${_converse.user_settings.avatarUrl}${jid}`;
+          this.width = this.height = 60;
           this.renderAvatar(msg);
         }
 
@@ -80807,6 +80814,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
       },
 
       afterRender() {
+        const jid = Strophe.getNodeFromJid(_converse.bare_jid);
+        this.image = `${_converse.user_settings.avatarUrl}${jid}`;
         this.renderAvatar(null, true, _converse.user_settings.userProfile.avatarUrl);
       },
 
@@ -83575,7 +83584,8 @@ const initialize = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20_
       onShowPageMeMedicalRequest = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onShowPageMeMedicalRequest,
       onUploadFiles = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onUploadFiles,
       onMedicalReqButtonClicked = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onMedicalReqButtonClicked,
-      sendFileXMPP = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].sendFileXMPP;
+      sendFileXMPP = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].sendFileXMPP,
+      inviteToGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].inviteToGroup;
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].initialize = function (settings, callback) {
   if (_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].env._.isArray(settings.whitelisted_plugins)) {
@@ -83625,6 +83635,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onShow
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].createNewGroup = function (jid, attrs, participants) {
   return createNewGroup(jid, attrs, participants);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].inviteToGroup = function (jid, participants) {
+  return inviteToGroup(jid, participants);
 };
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_20__["default"].onLeaveGroup = function (callback) {
@@ -87979,6 +87993,8 @@ const converse = {
     _converse.api.rooms.open(jid, attrs, participants); // const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
 
   },
+
+  'inviteToGroup'(jid, participants) {},
 
   'onShowPageMeMediaViewer'(callback) {
     _converse.on('showPageMeMediaViewer', callback);
@@ -116851,17 +116867,17 @@ return __p
 
 /***/ }),
 
-/***/ "./src/templates/avatar.svg":
-/*!**********************************!*\
-  !*** ./src/templates/avatar.svg ***!
-  \**********************************/
+/***/ "./src/templates/avatar.html":
+/*!***********************************!*\
+  !*** ./src/templates/avatar.html ***!
+  \***********************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./node_modules/lodash/escape.js")};
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape;
-__p += '<!-- src/templates/avatar.svg -->\n<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="' +
+__p += '<!-- src/templates/avatar.html -->\n<!-- <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="' +
 __e(o.classes) +
 '" width="' +
 __e(o.width) +
@@ -116873,7 +116889,15 @@ __e(o.width) +
 __e(o.height) +
 '" preserveAspectRatio="xMidYMid meet" xlink:href="' +
 __e(o.image) +
-'"/>\n</svg>\n';
+'"/>\n</svg> -->\n<div class="' +
+__e(o.classes) +
+'" style="width: ' +
+__e(o.width) +
+'px; height: ' +
+__e(o.height) +
+'px">\n  <img src="' +
+__e(o.image) +
+'" alt="">\n</div>\n';
 return __p
 };
 
@@ -118964,45 +118988,45 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/profile_view.html -->\n<div class="userinfo controlbox-padded">\n<div class="controlbox-section profile d-flex">\n    <a class="show-profile" href="#">\n        <canvas class="avatar align-self-center" height="40" width="40"></canvas>\n    </a>\n    <span class="username w-100 align-self-center">' +
+__p += '<!-- src/templates/profile_view.html -->\n<div class="userinfo controlbox-padded">\n<div class="controlbox-section profile d-flex">\n    <a class="show-profile" href="#">\n        <canvas class="avatar align-self-center" height="40" width="40"></canvas>\n    </a>\n    <div class="d-flex flex-column w-100">\n      <div class="d-flex">\n        <span class="username w-100 align-self-start">' +
 __e(o.fullname) +
-'</span>\n    <!-- <a class="controlbox-heading__btn show-client-info fa fa-info-circle align-self-center" title="' +
+'</span>\n        <!-- <a class="controlbox-heading__btn show-client-info fa fa-info-circle align-self-center" title="' +
 __e(o.info_details) +
-'"></a> -->\n    ';
+'"></a> -->\n        ';
  if (o._converse.allow_logout) { ;
-__p += '\n        <a class="controlbox-heading__btn logout fa fa-sign-out-alt align-self-center" title="' +
+__p += '\n            <a class="controlbox-heading__btn logout fa fa-sign-out-alt align-self-start" title="' +
 __e(o.title_log_out) +
-'"></a>\n    ';
+'"></a>\n        ';
  } ;
-__p += '\n</div>\n<div class="d-flex xmpp-status">\n    <span class="' +
+__p += '\n      </div>\n      <div class="d-flex xmpp-status">\n        <span class="' +
 __e(o.chat_status) +
-' w-100 align-self-center" data-value="' +
+' connection-status w-100 align-self-center" data-value="' +
 __e(o.chat_status) +
-'">\n        <span class="\n            ';
+'">\n          <span class="\n          ';
  if (o.chat_status === 'online') { ;
 __p += ' fa fa-circle chat-status chat-status--online';
  } ;
-__p += '\n            ';
+__p += '\n          ';
  if (o.chat_status === 'dnd') { ;
 __p += ' fa fa-minus-circle chat-status chat-status--busy ';
  } ;
-__p += '\n            ';
+__p += '\n          ';
  if (o.chat_status === 'away') { ;
 __p += ' fa fa-circle chat-status chat-status--away';
  } ;
-__p += '\n            ';
+__p += '\n          ';
  if (o.chat_status === 'xa') { ;
 __p += ' far fa-circle chat-status chat-status--xa ';
  } ;
-__p += '\n            ';
+__p += '\n          ';
  if (o.chat_status === 'offline') { ;
 __p += ' fa fa-circle chat-status chat-status--offline';
  } ;
 __p += '"></span> ' +
 __e(o.status_message) +
-'</span>\n    <a class="controlbox-heading__btn change-status fa fa-pencil-alt" title="' +
+'</span>\n          <a class="controlbox-heading__btn change-status fa fa-pencil-alt" title="' +
 __e(o.title_change_status) +
-'" data-toggle="modal" data-target="#changeStatusModal"></a>\n</div>\n</div>\n';
+'" data-toggle="modal" data-target="#changeStatusModal"></a>\n        </div>\n    </div>\n</div>\n\n</div>\n';
 return __p
 };
 

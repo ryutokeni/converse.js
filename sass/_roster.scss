@@ -54,7 +54,7 @@
 
         .roster-group {
             border: none;
-            color: var(--text-color);
+            color: var(--controlbox-heading-color);
             font-weight: normal;
             text-shadow: 0 1px 0 var(--text-shadow-color);
             margin: 0.75em 0 0.75em 0;
@@ -64,7 +64,7 @@
                     color: var(--roster-group-toggle-hover-color);
                 }
                 font-family: var(--heading-font);
-                color: var(--text-color);
+                color: var(--controlbox-heading-color);
                 display: block;
                 width: 100%;
                 padding-top: 0;
@@ -72,6 +72,7 @@
             }
 
             li {
+                color: var(--controlbox-heading-color);
                 &.requesting-xmpp-contact {
                     a {
                         line-height: var(--line-height);
@@ -151,8 +152,5 @@
             line-height: var(--line-height);
             width: 100%;
         }
-    }
-    .roster-group-contacts {
-      margin-top: 10px;
     }
 }

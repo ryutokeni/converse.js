@@ -8,7 +8,7 @@ import "@converse/headless/converse-chatboxes";
 import "backbone.nativeview";
 import "backbone.overview";
 import converse from "@converse/headless/converse-core";
-import tpl_avatar from "templates/avatar.svg";
+import tpl_avatar from "templates/avatar.html";
 import tpl_chatboxes from "templates/chatboxes.html";
 
 const { Backbone, _, utils } = converse.env;
@@ -24,12 +24,11 @@ const AvatarMixin = {
         }
         const image_type = this.model.vcard.get('image_type'),
                 image = this.model.vcard.get('image');
-
         canvas_el.outerHTML = tpl_avatar({
             'classes': canvas_el.getAttribute('class'),
-            'width': canvas_el.width,
-            'height': canvas_el.height,
-            'image': me ?  Url : "data:" + image_type + ";base64," + image,
+            'width': this.width || canvas_el.width,
+            'height': this.height || canvas_el.height,
+            'image': this.image,
         });
     },
 };
