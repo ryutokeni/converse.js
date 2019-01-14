@@ -294,7 +294,7 @@ converse.plugins.add('converse-chatview', {
                 'click .close-chatbox-button': 'close',
                 'click .new-msgs-indicator': 'viewUnreadMessages',
                 'click .send-button': 'onFormSubmitted',
-                'click .show-user-details-modal': 'showUserDetailsModal',
+                // 'click .show-user-details-modal': 'showUserDetailsModal',
                 'click .spoiler-toggle': 'toggleSpoilerMessage',
                 'click .toggle-call': 'toggleCall',
                 'click .toggle-files': 'toggleFiles',

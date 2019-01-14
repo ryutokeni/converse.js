@@ -72714,7 +72714,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         'click .close-chatbox-button': 'close',
         'click .new-msgs-indicator': 'viewUnreadMessages',
         'click .send-button': 'onFormSubmitted',
-        'click .show-user-details-modal': 'showUserDetailsModal',
+        // 'click .show-user-details-modal': 'showUserDetailsModal',
         'click .spoiler-toggle': 'toggleSpoilerMessage',
         'click .toggle-call': 'toggleCall',
         'click .toggle-files': 'toggleFiles',
@@ -117097,9 +117097,9 @@ __p += '\n                    </a>\n                ';
  } ;
 __p += '\n                <p class="user-custom-message">' +
 __e( o.status ) +
-'</p>\n            </div>\n        </div>\n    </div>\n    <div class="chatbox-buttons row no-gutters">\n        <a class="chatbox-btn close-chatbox-button fa fa-times" title="' +
+'</p>\n            </div>\n        </div>\n    </div>\n    <div class="chatbox-buttons row no-gutters">\n        <!-- <a class="chatbox-btn close-chatbox-button fa fa-times" title="' +
 __e(o.info_close) +
-'"></a>\n        <a class="chatbox-btn show-user-details-modal fa fa-id-card" title="' +
+'"></a> -->\n        <a class="chatbox-btn show-user-details-modal fa fa-info-circle" title="' +
 __e(o.info_details) +
 '"></a>\n    </div>\n</div>\n';
 return __p
