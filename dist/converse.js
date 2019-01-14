@@ -116897,7 +116897,7 @@ __e(o.width) +
 __e(o.height) +
 'px">\n  <img src="' +
 __e(o.image) +
-'" alt="">\n</div>\n';
+'" onerror="this.src=\'./assets/appIcon.png\'" alt="">\n</div>\n';
 return __p
 };
 
@@ -117120,7 +117120,7 @@ var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 __p += '<!-- src/templates/chatbox_message_form.html -->\n<div class="message-form-container">\n<div class="new-msgs-indicator hidden">▼ ' +
 __e( o.unread_msgs ) +
-' ▼</div>\n<form class="sendXMPPMessage">\n    <input type="text" placeholder="' +
+' ▼</div>\n<form class="sendXMPPMessage d-flex flex-row">\n    <input type="text" placeholder="' +
 ((__t = (o.label_spoiler_hint)) == null ? '' : __t) +
 '" value="' +
 ((__t = ( o.hint_value )) == null ? '' : __t) +

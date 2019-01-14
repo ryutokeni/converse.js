@@ -33,7 +33,6 @@
 
 
     .chat-head-chatroom {
-        background-color: var(--chatroom-head-color);
         border-bottom: var(--chatroom-head-border-bottom);
 
         .chatroom-description {
@@ -293,7 +292,6 @@
 
         .sendXMPPMessage {
             .chat-toolbar {
-                background-color: white;
                 border-top: var(--message-input-border-top);
                 color: var(--message-input-color);
                 .fas, .fas:hover,
@@ -426,9 +424,7 @@
 
     .chatroom {
         .box-flyout {
-            background-color: var(--chatroom-head-color);
-            border: var(--flyout-padding) solid var(--chatroom-head-color);
-            border-top: 0.8em solid var(--chatroom-head-color);
+            background-color: var(--chatbox-background-color);
             width: 100%;
 
             .chatbox-title {
@@ -438,6 +434,7 @@
             }
 
             .chatroom-body {
+                background-color: var(--chatbox-background-color);
                 border-top-radius: var(--chatbox-border-radius);
                 .chatroom-form-container {
                     border-radius: var(--chatbox-border-radius);

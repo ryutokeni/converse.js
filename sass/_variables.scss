@@ -71,7 +71,8 @@ $font-path: "webfonts/icomoon/fonts/" !default;
     --info-color: #1E9652; // $dark-green
 
     --button-border-radius: 5px;
-    --chatbox-border-radius: 4px;
+    --chatbox-border-radius: 10px;
+    --chatbox-border-width: 3px;
 
     --controlbox-width: 250px;
     --controlbox-head-color: #4075b2; // $light-blue
@@ -111,6 +112,8 @@ $font-path: "webfonts/icomoon/fonts/" !default;
     --headline-head-color: #E7A151; // $orange
     --headline-message-color: #D2842B; // $dark-orange
 
+    --chatbox-background-color: #f0eff5;
+    --chatbox-title-background-color: #e9e9e9;
     --chatbox-button-size: 14px;
     --fullpage-chatbox-button-size: 16px;
 
@@ -122,8 +125,8 @@ $font-path: "webfonts/icomoon/fonts/" !default;
 
     --message-font-size: var(--font-size);
     --separator-text-color: var(--message-text-color);
-    --chat-separator-border-bottom: 2px solid var(--chat-head-color);
-    --chatroom-separator-border-bottom: 2px solid var(--chatroom-head-color);
+    --chat-separator-border-bottom: 2px solid #3e3e3e;
+    --chatroom-separator-border-bottom: 2px solid #3e3e3e;
 
     --message-input-border-top: 4px solid var(--chatroom-head-color);
     --message-input-color: var(--chatroom-head-color);

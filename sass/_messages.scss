@@ -23,12 +23,13 @@
             }
 
             .separator-text {
-                background: white;
+                background: var(--chatbox-background-color);
                 bottom: 1px; // Offset needed due to .separator border size
                 color: var(--separator-text-color);
                 display: inline-block;
                 line-height: 2em;
                 padding: 0 1em;
+                font-weight: 700;
                 position: relative;
                 z-index: 5;
             }
@@ -199,10 +200,10 @@
             .chat-msg__avatar {
                 margin-top: 0.5em;
                 vertical-align: middle;
-                height: 36px;
-                width: 36px;
-                min-height: 36px;
-                min-width: 36px;
+                height: 3.75rem;
+                width: 3.75rem;
+                min-height: 3.75rem;
+                min-width: 3.75rem;
             }
 
             .chat-msg__heading {
@@ -256,14 +257,14 @@
                     display: none;
                 }
                 .chat-msg__content {
-                    margin-left: 2.75rem;
+                    margin-left: 4.25rem;
                 }
             }
 
             .chat-msg__receipt {
                 margin-right: 0.5em;
                 color: var(--message-receipt-color);
-            }            
+            }
         }
     }
 
