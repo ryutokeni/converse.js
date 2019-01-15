@@ -10787,18 +10787,22 @@ body.reset {
   #conversejs #controlbox .controlbox-pane .userinfo {
     padding-bottom: 1em;
     color: var(--controlbox-heading-color); }
-    #conversejs #controlbox .controlbox-pane .userinfo .username {
+    #conversejs #controlbox .controlbox-pane .userinfo .infos {
       margin-left: 0.5em;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      color: white;
-      max-width: 210px;
-      font-size: 15px;
-      font-weight: 700;
-      white-space: nowrap; }
-    #conversejs #controlbox .controlbox-pane .userinfo .connection-status {
-      margin-left: 0.5em;
-      overflow: hidden; }
+      flex: auto;
+      max-width: 170px;
+      justify-content: center; }
+      #conversejs #controlbox .controlbox-pane .userinfo .infos span {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        vertical-align: middle; }
+      #conversejs #controlbox .controlbox-pane .userinfo .infos .username {
+        font-size: 15px;
+        font-weight: 700;
+        color: white; }
+    #conversejs #controlbox .controlbox-pane .userinfo .control-buttons {
+      flex: 0; }
     #conversejs #controlbox .controlbox-pane .userinfo .profile {
       margin-bottom: 0.75em; }
   #conversejs #controlbox #chatrooms {

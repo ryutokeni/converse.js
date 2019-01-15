@@ -186,19 +186,25 @@
             .userinfo {
                 padding-bottom: 1em;
                 color: var(--controlbox-heading-color);
-                .username {
+                .infos {
                     margin-left: 0.5em;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    color: white;
-                    max-width: 210px;
-                    font-size: 15px;
-                    font-weight: 700;
-                    white-space: nowrap;
+                    flex: auto;
+                    max-width: 170px;
+                    justify-content: center;
+                    span {
+                      text-overflow: ellipsis;
+                      white-space: nowrap;
+                      overflow: hidden;
+                      vertical-align: middle;
+                    }
+                    .username {
+                      font-size: 15px;
+                      font-weight: 700;
+                      color: white;
+                    }
                 }
-                .connection-status {
-                    margin-left: 0.5em;
-                    overflow: hidden;
+                .control-buttons {
+                    flex: 0
                 }
                 .profile {
                     margin-bottom: 0.75em;

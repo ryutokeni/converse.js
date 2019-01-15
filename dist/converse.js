@@ -118989,47 +118989,51 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/profile_view.html -->\n<div class="userinfo controlbox-padded">\n<div class="controlbox-section profile d-flex">\n    <a class="show-profile" href="#">\n        <canvas class="avatar align-self-center" height="40" width="40"></canvas>\n    </a>\n    <div class="d-flex flex-column w-100">\n      <div class="d-flex">\n        <span class="username w-100 align-self-start">' +
+__p += '<!-- src/templates/profile_view.html -->\n<div class="userinfo controlbox-padded">\n<div class="controlbox-section profile d-flex">\n    <a class="show-profile" href="#">\n        <canvas class="avatar align-self-center" height="40" width="40"></canvas>\n    </a>\n    <div class="d-flex flex-row w-100">\n      <div class="d-flex flex-column infos">\n        ';
+ if (o.organizations && o.organizations.length) { ;
+__p += '\n          <span class="username">' +
 __e(o.organizations) +
-'</span>\n        <!-- <a class="controlbox-heading__btn show-client-info fa fa-info-circle align-self-center" title="' +
-__e(o.info_details) +
-'"></a> -->\n        ';
- if (o._converse.allow_logout) { ;
-__p += '\n            <a class="controlbox-heading__btn logout fa fa-sign-out-alt align-self-start" title="' +
-__e(o.title_log_out) +
-'"></a>\n        ';
+'</span>\n        ';
  } ;
-__p += '\n      </div>\n      <div class="d-flex xmpp-status">\n        <span class="' +
+__p += '\n        <!-- <a class="controlbox-heading__btn show-client-info fa fa-info-circle align-self-center" title="' +
+__e(o.info_details) +
+'"></a> -->\n        <span class="' +
 __e(o.chat_status) +
-' connection-status w-100 align-self-center" data-value="' +
+'" data-value="' +
 __e(o.chat_status) +
-'">\n          <!-- <span class="\n          ';
+'">\n        <!-- <span class="\n        ';
  if (o.chat_status === 'online') { ;
 __p += ' fa fa-circle chat-status chat-status--online';
  } ;
-__p += '\n          ';
+__p += '\n        ';
  if (o.chat_status === 'dnd') { ;
 __p += ' fa fa-minus-circle chat-status chat-status--busy ';
  } ;
-__p += '\n          ';
+__p += '\n        ';
  if (o.chat_status === 'away') { ;
 __p += ' fa fa-circle chat-status chat-status--away';
  } ;
-__p += '\n          ';
+__p += '\n        ';
  if (o.chat_status === 'xa') { ;
 __p += ' far fa-circle chat-status chat-status--xa ';
  } ;
-__p += '\n          ';
+__p += '\n        ';
  if (o.chat_status === 'offline') { ;
 __p += ' fa fa-circle chat-status chat-status--offline';
  } ;
 __p += '"></span>' +
 __e(o.fullname) +
-'</span> -->\n          <span class="fa fa-circle chat-status chat-status--offline"></span> ' +
+'</span> -->\n        <span class="fa fa-circle chat-status chat-status--offline"></span> ' +
 __e(o.fullname) +
-'</span>\n          <a class="controlbox-heading__btn change-status fa fa-pencil-alt" title="' +
+'</span>\n      </div>\n      <div class="d-flex flex-column control-buttons">\n        ';
+ if (o._converse.allow_logout) { ;
+__p += '\n            <a class="controlbox-heading__btn logout fa fa-sign-out-alt align-self-start" title="' +
+__e(o.title_log_out) +
+'"></a>\n        ';
+ } ;
+__p += '\n\n        <a class="controlbox-heading__btn change-status fa fa-pencil-alt" title="' +
 __e(o.title_change_status) +
-'" data-toggle="modal" data-target="#changeStatusModal"></a>\n        </div>\n    </div>\n</div>\n\n</div>\n';
+'" data-toggle="modal" data-target="#changeStatusModal"></a>\n      </div>\n    </div>\n</div>\n\n</div>\n';
 return __p
 };
 
