@@ -184,8 +184,10 @@
 
         .controlbox-pane {
             .userinfo {
-                padding-bottom: 1em;
+                padding: 1.2rem;
+                padding-right: 1em;
                 color: var(--controlbox-heading-color);
+                background-color: var(--controlbox-heading-background-color);
                 .infos {
                     margin-left: 0.5em;
                     flex: auto;
@@ -207,7 +209,7 @@
                     flex: 0
                 }
                 .profile {
-                    margin-bottom: 0.75em;
+                    margin: 0 !important;
                 }
             }
         }
@@ -227,14 +229,16 @@
         }
 
         .controlbox-section {
-
+            display: inline-block;
+            width: 100%;
+            margin-top: 2.5rem !important;
             .controlbox-heading {
                 font-family: var(--heading-font);
                 color: var(--controlbox-heading-color);
                 font-weight: var(--controlbox-heading-font-weight);
                 padding: 0;
-                margin: 0.75em 0;
-                font-size: 1.4em;
+                margin: 0.75em 0 0.25em 0;
+                font-size: 1.2rem;
             }
 
             .controlbox-heading__btn {
@@ -315,11 +319,11 @@
             left: 0;
             text-align: left;
             overflow-x: hidden;
-            padding: 1em 0 1em 0;
+            padding: 0;
 
             .controlbox-padded {
-               padding-left: 1em;
-               padding-right: 1em;
+               padding-left: 1rem;
+               padding-right: 1rem;
             }
 
             .add-converse-contact {

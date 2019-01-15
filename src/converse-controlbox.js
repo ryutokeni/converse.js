@@ -245,8 +245,8 @@ converse.plugins.add('converse-controlbox', {
                 /* Place the rosterview inside the "Contacts" panel. */
                 _converse.api.waitUntil('rosterViewTrulyInitial')
                 .then( () => {
-                        const loading = this.el.querySelector('.loading-contact');
-                              u.hideElement(loading);
+                        // const loading = this.el.querySelector('.loading-contact');
+                        //       u.hideElement(loading);
                 })
                 _converse.api.waitUntil('rosterViewInitialized')
                     .then(() => {

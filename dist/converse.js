@@ -74180,9 +74180,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         /* Place the rosterview inside the "Contacts" panel. */
 
 
-        _converse.api.waitUntil('rosterViewTrulyInitial').then(() => {
-          const loading = this.el.querySelector('.loading-contact');
-          u.hideElement(loading);
+        _converse.api.waitUntil('rosterViewTrulyInitial').then(() => {// const loading = this.el.querySelector('.loading-contact');
+          //       u.hideElement(loading);
         });
 
         _converse.api.waitUntil('rosterViewInitialized').then(() => {
@@ -82827,7 +82826,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
     });
     _converse.RosterGroupView = Backbone.OrderedListView.extend({
       tagName: 'div',
-      className: 'roster-group hidden',
+      className: 'roster-group controlbox-section hidden',
       events: {
         "click a.group-toggle": "toggle"
       },
@@ -83034,7 +83033,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
     _converse.RosterView = Backbone.OrderedListView.extend({
       tagName: 'div',
       id: 'converse-roster',
-      className: 'controlbox-section',
+      className: '',
       ItemView: _converse.RosterGroupView,
       listItems: 'model',
       listSelector: '.roster-contacts',
@@ -117807,7 +117806,7 @@ __p += '<!-- src/templates/controlbox.html -->\n<div class="flyout box-flyout">\
  if (!o.sticky_controlbox) { ;
 __p += '\n            <a class="chatbox-btn close-chatbox-button fa fa-times"></a>\n        ';
  } ;
-__p += '\n    </div>\n    <div class="controlbox-panes">\n        <div style="text-align : center; font-size: 20px; padding-top: 20px;" class="loading-contact">\n            <h3>Loading...</h3>\n        </div>\n    </div>\n    \n</div> \n';
+__p += '\n    </div>\n    <div class="controlbox-panes">\n        <!-- <div style="text-align : center; font-size: 20px; padding-top: 20px;" class="loading-contact">\n            <h3>Loading...</h3>\n        </div> -->\n    </div>\n\n</div>\n';
 return __p
 };
 
@@ -118260,15 +118259,15 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/group_header.html -->\n<a href="#" class="group-toggle controlbox-padded" title="' +
+__p += '<!-- src/templates/group_header.html -->\n<a href="#" class="group-toggle controlbox-heading controlbox-padded" title="' +
 __e(o.desc_group_toggle) +
-'">\n    <span class="fa ';
+'">\n    <!-- <span class="fa ';
  if (o.toggle_state === o._converse.OPENED) { ;
 __p += ' fa-caret-down ';
  } else { ;
 __p += ' fa-caret-right ';
  } ;
-__p += '">\n    </span> ' +
+__p += '"> -->\n    </span> ' +
 __e(o.label_group) +
 '</a>\n\n<ul class="items-list roster-group-contacts ';
  if (o.toggle_state === o._converse.CLOSED) { ;
@@ -119484,9 +119483,9 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/roster.html -->\n<div class="d-flex controlbox-padded">\n    <span class="w-100 controlbox-heading">' +
+__p += '<!-- src/templates/roster.html -->\n<div class="d-flex controlbox-padded">\n    <!-- <span class="w-100 controlbox-heading">' +
 __e(o.heading_contacts) +
-'</span>\n    <!-- <a class="controlbox-heading__btn sync-contacts fa fa-sync" title="' +
+'</span> -->\n    <!-- <a class="controlbox-heading__btn sync-contacts fa fa-sync" title="' +
 __e(o.title_sync_contacts) +
 '"></a> -->\n    <!-- ';
  if (o.allow_contact_requests) { ;
@@ -119494,7 +119493,7 @@ __p += '\n        <a class="controlbox-heading__btn add-contact align-self-cente
 __e(o.title_add_contact) +
 '"\n           data-toggle="modal"\n           data-target="#add-contact-modal"></a>\n    ';
  } ;
-__p += ' -->\n</div>\n\n<form class="roster-filter-form"></form>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #18ABFB" class="hidden roster-loading-Contacts">\n  Loading Address Book...\n</div>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #FDAD45" class="hidden roster-loading-Organization">\n  Loading My Organization...\n</div>\n\n<div class="roster-contacts">\n\n</div>\n';
+__p += ' -->\n</div>\n\n<form class="roster-filter-form"></form>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #fff" class="hidden roster-loading-Contacts">\n  Loading Address Book...\n</div>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #fff" class="hidden roster-loading-Organization">\n  Loading My Organization...\n</div>\n\n<div class="roster-contacts">\n\n</div>\n';
 return __p
 };
 

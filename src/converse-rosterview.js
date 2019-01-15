@@ -561,7 +561,7 @@ converse.plugins.add('converse-rosterview', {
 
         _converse.RosterGroupView = Backbone.OrderedListView.extend({
             tagName: 'div',
-            className: 'roster-group hidden',
+            className: 'roster-group controlbox-section hidden',
             events: {
                 "click a.group-toggle": "toggle"
             },
@@ -750,7 +750,7 @@ converse.plugins.add('converse-rosterview', {
         _converse.RosterView = Backbone.OrderedListView.extend({
             tagName: 'div',
             id: 'converse-roster',
-            className: 'controlbox-section',
+            className: '',
 
             ItemView: _converse.RosterGroupView,
             listItems: 'model',

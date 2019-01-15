@@ -9339,6 +9339,7 @@ readers do not read off random characters that represent icons */
   --controlbox-head-color-lighten-45-percent: #eff4f7;
   --controlbox-pane-background-color: #4b92d4;
   --controlbox-heading-color: #b5d2ed;
+  --controlbox-heading-background-color: #4075b2;
   --controlbox-heading-font-weight: bold;
   --chat-gutter: 0.5em;
   --minimized-chats-width: 130px;
@@ -10785,8 +10786,10 @@ body.reset {
   #conversejs #controlbox .toggle-register-login {
     font-weight: bold; }
   #conversejs #controlbox .controlbox-pane .userinfo {
-    padding-bottom: 1em;
-    color: var(--controlbox-heading-color); }
+    padding: 1.2rem;
+    padding-right: 1em;
+    color: var(--controlbox-heading-color);
+    background-color: var(--controlbox-heading-background-color); }
     #conversejs #controlbox .controlbox-pane .userinfo .infos {
       margin-left: 0.5em;
       flex: auto;
@@ -10804,7 +10807,7 @@ body.reset {
     #conversejs #controlbox .controlbox-pane .userinfo .control-buttons {
       flex: 0; }
     #conversejs #controlbox .controlbox-pane .userinfo .profile {
-      margin-bottom: 0.75em; }
+      margin: 0 !important; }
   #conversejs #controlbox #chatrooms {
     padding: 0; }
     #conversejs #controlbox #chatrooms .add-chatroom {
@@ -10814,22 +10817,26 @@ body.reset {
       #conversejs #controlbox #chatrooms .add-chatroom input[type=submit],
       #conversejs #controlbox #chatrooms .add-chatroom input[type=text] {
         width: 100%; }
-  #conversejs #controlbox .controlbox-section .controlbox-heading {
-    font-family: var(--heading-font);
-    color: var(--controlbox-heading-color);
-    font-weight: var(--controlbox-heading-font-weight);
-    padding: 0;
-    margin: 0.75em 0;
-    font-size: 1.4em; }
-  #conversejs #controlbox .controlbox-section .controlbox-heading__btn {
-    cursor: pointer;
-    align-self: flex-start;
-    font-size: 1em;
-    padding: 0;
-    margin-left: 0.75em;
-    color: white; }
-    #conversejs #controlbox .controlbox-section .controlbox-heading__btn.fa-vcard {
-      margin-top: 1em; }
+  #conversejs #controlbox .controlbox-section {
+    display: inline-block;
+    width: 100%;
+    margin-top: 2.5rem !important; }
+    #conversejs #controlbox .controlbox-section .controlbox-heading {
+      font-family: var(--heading-font);
+      color: var(--controlbox-heading-color);
+      font-weight: var(--controlbox-heading-font-weight);
+      padding: 0;
+      margin: 0.75em 0 0.25em 0;
+      font-size: 1.2rem; }
+    #conversejs #controlbox .controlbox-section .controlbox-heading__btn {
+      cursor: pointer;
+      align-self: flex-start;
+      font-size: 1em;
+      padding: 0;
+      margin-left: 0.75em;
+      color: white; }
+      #conversejs #controlbox .controlbox-section .controlbox-heading__btn.fa-vcard {
+        margin-top: 1em; }
   #conversejs #controlbox .dropdown a {
     width: 143px;
     display: inline-block; }
@@ -10876,10 +10883,10 @@ body.reset {
     left: 0;
     text-align: left;
     overflow-x: hidden;
-    padding: 1em 0 1em 0; }
+    padding: 0; }
     #conversejs #controlbox .controlbox-pane .controlbox-padded {
-      padding-left: 1em;
-      padding-right: 1em; }
+      padding-left: 1rem;
+      padding-right: 1rem; }
     #conversejs #controlbox .controlbox-pane .add-converse-contact {
       margin: 0 0 0.75em 0; }
     #conversejs #controlbox .controlbox-pane .chatbox-btn {
