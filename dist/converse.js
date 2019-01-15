@@ -119003,7 +119003,7 @@ __p += '\n      </div>\n      <div class="d-flex xmpp-status">\n        <span cl
 __e(o.chat_status) +
 ' connection-status w-100 align-self-center" data-value="' +
 __e(o.chat_status) +
-'">\n          <span class="\n          ';
+'">\n          <!-- <span class="\n          ';
  if (o.chat_status === 'online') { ;
 __p += ' fa fa-circle chat-status chat-status--online';
  } ;
@@ -119024,6 +119024,8 @@ __p += '\n          ';
 __p += ' fa fa-circle chat-status chat-status--offline';
  } ;
 __p += '"></span>' +
+__e(o.fullname) +
+'</span> -->\n          <span class="fa fa-circle chat-status chat-status--offline"></span> ' +
 __e(o.fullname) +
 '</span>\n          <a class="controlbox-heading__btn change-status fa fa-pencil-alt" title="' +
 __e(o.title_change_status) +
