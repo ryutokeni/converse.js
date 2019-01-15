@@ -800,7 +800,7 @@ converse.plugins.add('converse-rosterview', {
                     'title_sync_contacts': __('Re-sync your contacts')
                 });
                 const form = this.el.querySelector('.roster-filter-form');
-                this.el.replaceChild(this.filter_view.render().el, form);
+                // this.el.replaceChild(this.filter_view.render().el, form);
                 this.roster_el = this.el.querySelector('.roster-contacts');
                 //this.loading_el = this.el.querySelector('.roster-loading');
                 this.loading_contact = this.el.querySelector('.roster-loading-Contacts');

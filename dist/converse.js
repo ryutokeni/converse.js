@@ -82852,7 +82852,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       },
 
       render() {
-        console.log('model roster group view:', this.model.get('name'));
         this.el.setAttribute('data-group', this.model.get('name'));
         this.el.innerHTML = templates_group_header_html__WEBPACK_IMPORTED_MODULE_7___default()({
           'label_group': this.model.get('name'),
@@ -83090,8 +83089,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           'title_add_contact': __('Add a contact'),
           'title_sync_contacts': __('Re-sync your contacts')
         });
-        const form = this.el.querySelector('.roster-filter-form');
-        this.el.replaceChild(this.filter_view.render().el, form);
+        const form = this.el.querySelector('.roster-filter-form'); // this.el.replaceChild(this.filter_view.render().el, form);
+
         this.roster_el = this.el.querySelector('.roster-contacts'); //this.loading_el = this.el.querySelector('.roster-loading');
 
         this.loading_contact = this.el.querySelector('.roster-loading-Contacts');
@@ -83333,8 +83332,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       _converse.emit('rosterViewInitialized');
 
       _converse.on('load-done', labelName => {
-        console.log('listen', labelName);
-
         if (labelName === 'Address Book') {
           u.hideElement(_converse.rosterview.loading_contact);
         } else {
