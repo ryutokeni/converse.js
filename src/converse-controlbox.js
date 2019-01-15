@@ -252,9 +252,6 @@ converse.plugins.add('converse-controlbox', {
                     .then(() => {
                         const userinfo_el = this.el.querySelector('.userinfo');
                         // this.controlbox_pane.el.insertAdjacentElement('beforeEnd', _converse.rosterview.el);
-                        console.log(userinfo_el);
-                        console.log(this.controlbox_pane.el);
-                        console.log(_converse.rosterview.el);
                         userinfo_el.insertAdjacentElement('afterend', _converse.rosterview.el);
                     })
                     .catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
