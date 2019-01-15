@@ -74186,7 +74186,12 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         });
 
         _converse.api.waitUntil('rosterViewInitialized').then(() => {
-          this.controlbox_pane.el.insertAdjacentElement('beforeEnd', _converse.rosterview.el); // console.log(u.isVisible(this.el.querySelector('#converse-roster')));
+          const userinfo_el = this.el.querySelector('.userinfo'); // this.controlbox_pane.el.insertAdjacentElement('beforeEnd', _converse.rosterview.el);
+
+          console.log(userinfo_el);
+          console.log(this.controlbox_pane.el);
+          console.log(_converse.rosterview.el);
+          userinfo_el.insertAdjacentElement('afterend', _converse.rosterview.el);
         }).catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
       },
 
@@ -119027,7 +119032,7 @@ __e(o.fullname) +
 __e(o.fullname) +
 '</span>\n      </div>\n      <div class="d-flex flex-column control-buttons">\n        ';
  if (o._converse.allow_logout) { ;
-__p += '\n            <a class="controlbox-heading__btn logout fa fa-sign-out-alt align-self-start" title="' +
+__p += '\n            <a class="controlbox-heading__btn logout fa fa-sign-out-alt" title="' +
 __e(o.title_log_out) +
 '"></a>\n        ';
  } ;
