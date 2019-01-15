@@ -10996,7 +10996,14 @@ body.reset {
     border-radius: 0; }
     #conversejs.converse-fullscreen #controlbox #converse-login-panel .converse-form,
     #conversejs.converse-mobile #controlbox #converse-login-panel .converse-form {
-      padding: 3em 2em 3em; }
+      padding: 0;
+      margin: 0;
+      max-width: 100%;
+      position: absolute;
+      display: block;
+      width: 100%;
+      height: 100%;
+      background-color: white; }
   #conversejs.converse-fullscreen #controlbox .toggle-register-login,
   #conversejs.converse-mobile #controlbox .toggle-register-login {
     line-height: var(--line-height-huge); }
