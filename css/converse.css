@@ -9345,7 +9345,7 @@ readers do not read off random characters that represent icons */
   --mobile-chat-width: 100%;
   --mobile-chat-height: 400px;
   --normal-font: "Helvetica", "Arial", sans-serif;
-  --heading-font: futura, 'Century Gothic', 'URW Gothic L', Verdana, sans-serif;
+  --heading-font: "Helvetica", "Arial", sans-serif;
   --heading-display: block;
   --heading-color: white;
   --chatroom-head-color: #E77051;
@@ -10790,7 +10790,7 @@ body.reset {
     #conversejs #controlbox .controlbox-pane .userinfo .infos {
       margin-left: 0.5em;
       flex: auto;
-      max-width: 170px;
+      max-width: 190px;
       justify-content: center; }
       #conversejs #controlbox .controlbox-pane .userinfo .infos span {
         text-overflow: ellipsis;

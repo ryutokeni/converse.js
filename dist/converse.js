@@ -119486,13 +119486,13 @@ __p += '<!-- src/templates/roster.html -->\n<div class="d-flex controlbox-padded
 __e(o.heading_contacts) +
 '</span>\n    <!-- <a class="controlbox-heading__btn sync-contacts fa fa-sync" title="' +
 __e(o.title_sync_contacts) +
-'"></a> -->\n    ';
+'"></a> -->\n    <!-- ';
  if (o.allow_contact_requests) { ;
-__p += '\n        <a class="controlbox-heading__btn add-contact fa fa-user-plus"\n           title="' +
+__p += '\n        <a class="controlbox-heading__btn add-contact align-self-center fa fa-user-plus"\n           title="' +
 __e(o.title_add_contact) +
 '"\n           data-toggle="modal"\n           data-target="#add-contact-modal"></a>\n    ';
  } ;
-__p += '\n</div>\n\n<form class="roster-filter-form"></form>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #18ABFB" class="hidden roster-loading-Contacts">\n  Loading Address Book...\n</div>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #FDAD45" class="hidden roster-loading-Organization">\n  Loading My Organization...\n</div>\n\n<div class="roster-contacts">\n\n</div>\n';
+__p += ' -->\n</div>\n\n<form class="roster-filter-form"></form>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #18ABFB" class="hidden roster-loading-Contacts">\n  Loading Address Book...\n</div>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #FDAD45" class="hidden roster-loading-Organization">\n  Loading My Organization...\n</div>\n\n<div class="roster-contacts">\n\n</div>\n';
 return __p
 };
 
