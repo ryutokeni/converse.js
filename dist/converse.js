@@ -82852,7 +82852,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       },
 
       render() {
-        //  console.log('model roster group view:', this.model);
+        console.log('model roster group view:', this.model.get('name'));
         this.el.setAttribute('data-group', this.model.get('name'));
         this.el.innerHTML = templates_group_header_html__WEBPACK_IMPORTED_MODULE_7___default()({
           'label_group': this.model.get('name'),
@@ -82861,10 +82861,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           '_converse': _converse
         });
         this.contacts_el = this.el.querySelector('.roster-group-contacts');
-
-        _converse.emit('load-done', this.model.get('name'));
-
-        console.log('hide Loading emit');
         return this;
       },
 
@@ -83100,7 +83096,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
         this.loading_contact = this.el.querySelector('.roster-loading-Contacts');
         this.loading_org = this.el.querySelector('.roster-loading-Organization');
-        console.log('show loading');
         u.showElement(this.loading_contact);
         u.showElement(this.loading_org);
         return this;
@@ -83338,6 +83333,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       _converse.emit('rosterViewInitialized');
 
       _converse.on('load-done', labelName => {
+        console.log('listen', labelName);
+
         if (labelName === 'Address Book') {
           u.hideElement(_converse.rosterview.loading_contact);
         } else {
@@ -92361,7 +92358,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           currentItems = _.cloneDeep(items);
           rawItems = _.cloneDeep(items);
           this.compareContacts(importedContacts, 'Address Book');
-          this.compareContacts(organizationContacts, 'Organization');
+          this.compareContacts(organizationContacts, 'My Organization');
           this.data.save('version', query.getAttribute('ver'));
 
           _converse.session.save('roster_fetched', true);
@@ -92375,8 +92372,14 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           currentItems = _.cloneDeep(rawItems);
         }
 
+        if (!contacts) {
+          contacts = [];
+        } else {
+          _converse.emit('load-done', group);
+        }
+
         if (sync) {
-          if (group === 'Organization') {
+          if (group === 'My Organization') {
             organizationContacts = contacts;
           } else {
             importedContacts = contacts;
@@ -92387,8 +92390,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           let matched = this.isExistedInImportedContacts(item, contacts);
 
           if (matched) {
-            if (group === 'Address Book' && this.isExistedInImportedContacts(item, organizationContacts) || group === 'Organization' && this.isExistedInImportedContacts(item, importedContacts)) {
-              this.updateContact(item, ['Address Book', 'Organization']);
+            if (group === 'Address Book' && this.isExistedInImportedContacts(item, organizationContacts) || group === 'My Organization' && this.isExistedInImportedContacts(item, importedContacts)) {
+              this.updateContact(item, ['Address Book', 'My Organization']);
             } else {
               this.updateContact(item, [group]);
             }
@@ -119492,7 +119495,7 @@ __p += '\n        <a class="controlbox-heading__btn add-contact fa fa-user-plus"
 __e(o.title_add_contact) +
 '"\n           data-toggle="modal"\n           data-target="#add-contact-modal"></a>\n    ';
  } ;
-__p += '\n</div>\n\n<form class="roster-filter-form"></form>\n<div style="text-align : left; font-size: 15px; padding-top: 20px; color: #18ABFB" class="hidden roster-loading-Contacts">\n  Loading Address Book...\n</div>\n<div style="text-align : left; font-size: 15px; padding-top: 20px; color: #FDAD45" class="hidden roster-loading-Organization">\n  Loading Organization...\n</div>\n\n<div class="roster-contacts">\n\n</div>\n';
+__p += '\n</div>\n\n<form class="roster-filter-form"></form>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #18ABFB" class="hidden roster-loading-Contacts">\n  Loading Address Book...\n</div>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #FDAD45" class="hidden roster-loading-Organization">\n  Loading My Organization...\n</div>\n\n<div class="roster-contacts">\n\n</div>\n';
 return __p
 };
 

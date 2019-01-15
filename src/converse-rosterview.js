@@ -591,7 +591,6 @@ converse.plugins.add('converse-rosterview', {
             },
 
             render () {
-              //  console.log('model roster group view:', this.model);
                 this.el.setAttribute('data-group', this.model.get('name'));
                 this.el.innerHTML = tpl_group_header({
                     'label_group': this.model.get('name'),
@@ -600,8 +599,6 @@ converse.plugins.add('converse-rosterview', {
                     '_converse': _converse
                 });
                 this.contacts_el = this.el.querySelector('.roster-group-contacts');
-                _converse.emit('load-done', this.model.get('name'));
-                console.log('hide Loading emit');
                 return this;
             },
 
@@ -808,7 +805,6 @@ converse.plugins.add('converse-rosterview', {
                 //this.loading_el = this.el.querySelector('.roster-loading');
                 this.loading_contact = this.el.querySelector('.roster-loading-Contacts');
                 this.loading_org = this.el.querySelector('.roster-loading-Organization');
-                console.log('show loading');
                 u.showElement(this.loading_contact);
                 u.showElement(this.loading_org);
                 return this;
@@ -1012,7 +1008,7 @@ converse.plugins.add('converse-rosterview', {
             // })
             _converse.rosterview.render();
             _converse.emit('rosterViewInitialized');
-            _converse.on('load-done', labelName=> {
+            _converse.on('load-done', (labelName) => {
                 if (labelName === 'Address Book') {
                     u.hideElement(_converse.rosterview.loading_contact);
                 }

@@ -608,7 +608,7 @@ converse.plugins.add('converse-roster', {
                     currentItems = _.cloneDeep(items);
                     rawItems = _.cloneDeep(items);
                     this.compareContacts(importedContacts, 'Address Book');
-                    this.compareContacts(organizationContacts, 'Organization');
+                    this.compareContacts(organizationContacts, 'My Organization');
                     this.data.save('version', query.getAttribute('ver'));
                     _converse.session.save('roster_fetched', true);
                 }
@@ -619,8 +619,13 @@ converse.plugins.add('converse-roster', {
               if (!currentItems || !currentItems.length) {
                 currentItems = _.cloneDeep(rawItems);
               }
+              if (!contacts) {
+                contacts = [];
+              } else {
+                _converse.emit('load-done', group);
+              }
               if (sync) {
-                if (group === 'Organization') {
+                if (group === 'My Organization') {
                   organizationContacts = contacts;
                 } else {
                   importedContacts = contacts;
@@ -631,9 +636,9 @@ converse.plugins.add('converse-roster', {
                 if (matched) {
                   if (
                     (group === 'Address Book' && this.isExistedInImportedContacts(item, organizationContacts)) ||
-                    (group === 'Organization' && this.isExistedInImportedContacts(item, importedContacts))
+                    (group === 'My Organization' && this.isExistedInImportedContacts(item, importedContacts))
                   ) {
-                    this.updateContact(item, ['Address Book', 'Organization']);
+                    this.updateContact(item, ['Address Book', 'My Organization']);
                   } else {
                     this.updateContact(item, [group]);
                   }
