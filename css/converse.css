@@ -9339,7 +9339,7 @@ readers do not read off random characters that represent icons */
   --controlbox-head-color-lighten-45-percent: #eff4f7;
   --controlbox-pane-background-color: #4b92d4;
   --controlbox-heading-color: #b5d2ed;
-  --controlbox-heading-font-weight: normal;
+  --controlbox-heading-font-weight: bold;
   --chat-gutter: 0.5em;
   --minimized-chats-width: 130px;
   --mobile-chat-width: 100%;
@@ -10820,8 +10820,7 @@ body.reset {
     font-weight: var(--controlbox-heading-font-weight);
     padding: 0;
     margin: 0.75em 0;
-    font-size: 1.1em;
-    text-transform: uppercase; }
+    font-size: 1.4em; }
   #conversejs #controlbox .controlbox-section .controlbox-heading__btn {
     cursor: pointer;
     align-self: flex-start;
