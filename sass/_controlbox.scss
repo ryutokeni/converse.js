@@ -191,8 +191,10 @@
                     overflow: hidden;
                     text-overflow: ellipsis;
                     color: white;
+                    max-width: 210px;
                     font-size: 15px;
                     font-weight: 700;
+                    white-space: nowrap;
                 }
                 .connection-status {
                     margin-left: 0.5em;

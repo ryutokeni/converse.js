@@ -232,6 +232,7 @@ converse.plugins.add('converse-profile', {
                     this.model.vcard.toJSON(), {
                     '__': __,
                     'fullname': this.model.vcard.get('fullname') || 'Loading...',
+                    'organizations': _converse.user_settings.organizations,
                     'status_message': this.model.get('status_message') ||
                                         __("I am %1$s", this.getPrettyStatus(chat_status)),
                     'chat_status': chat_status,

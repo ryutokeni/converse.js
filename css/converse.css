@@ -10792,8 +10792,10 @@ body.reset {
       overflow: hidden;
       text-overflow: ellipsis;
       color: white;
+      max-width: 210px;
       font-size: 15px;
-      font-weight: 700; }
+      font-weight: 700;
+      white-space: nowrap; }
     #conversejs #controlbox .controlbox-pane .userinfo .connection-status {
       margin-left: 0.5em;
       overflow: hidden; }

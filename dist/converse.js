@@ -80787,7 +80787,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
       tagName: "div",
       events: {
         "click a.show-profile": "showProfileModal",
-        "click a.change-status": "showStatusChangeModal",
+        // "click a.change-status": "showStatusChangeModal",
         "click .show-client-info": "showClientInfoModal",
         "click .logout": "logOut"
       },
@@ -80802,6 +80802,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
         return templates_profile_view_html__WEBPACK_IMPORTED_MODULE_8___default()(_.extend(this.model.toJSON(), this.model.vcard.toJSON(), {
           '__': __,
           'fullname': this.model.vcard.get('fullname') || 'Loading...',
+          'organizations': _converse.user_settings.organizations,
           'status_message': this.model.get('status_message') || __("I am %1$s", this.getPrettyStatus(chat_status)),
           'chat_status': chat_status,
           '_converse': _converse,
@@ -117039,7 +117040,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/chatarea.html -->\n<div class="chat-area col-md-9 col-8">\n    <div class="text-center">\n      <button class="load-more-messages">Load more...</button>\n    </div>\n    <div class="chat-content ';
+__p += '<!-- src/templates/chatarea.html -->\n<div class="chat-area col-md-9 col-8">\n    <div class="text-center">\n      <!-- <button class="load-more-messages">Load more...</button> -->\n    </div>\n    <div class="chat-content ';
  if (o.show_send_button) { ;
 __p += 'chat-content-sendbutton';
  } ;
@@ -117060,7 +117061,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/chatbox.html -->\n<div class="flyout box-flyout">\n    <div class="chat-body">\n      <div class="text-center">\n        <button class="load-more-messages">Load more...</button>\n      </div>\n        <div class="chat-content ';
+__p += '<!-- src/templates/chatbox.html -->\n<div class="flyout box-flyout">\n    <div class="chat-body">\n      <div class="text-center">\n        <!-- <button class="load-more-messages">Load more...</button> -->\n      </div>\n        <div class="chat-content ';
  if (o.show_send_button) { ;
 __p += 'chat-content-sendbutton';
  } ;
@@ -118989,7 +118990,7 @@ module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 __p += '<!-- src/templates/profile_view.html -->\n<div class="userinfo controlbox-padded">\n<div class="controlbox-section profile d-flex">\n    <a class="show-profile" href="#">\n        <canvas class="avatar align-self-center" height="40" width="40"></canvas>\n    </a>\n    <div class="d-flex flex-column w-100">\n      <div class="d-flex">\n        <span class="username w-100 align-self-start">' +
-__e(o.fullname) +
+__e(o.organizations) +
 '</span>\n        <!-- <a class="controlbox-heading__btn show-client-info fa fa-info-circle align-self-center" title="' +
 __e(o.info_details) +
 '"></a> -->\n        ';
@@ -119022,8 +119023,8 @@ __p += '\n          ';
  if (o.chat_status === 'offline') { ;
 __p += ' fa fa-circle chat-status chat-status--offline';
  } ;
-__p += '"></span> ' +
-__e(o.status_message) +
+__p += '"></span>' +
+__e(o.fullname) +
 '</span>\n          <a class="controlbox-heading__btn change-status fa fa-pencil-alt" title="' +
 __e(o.title_change_status) +
 '" data-toggle="modal" data-target="#changeStatusModal"></a>\n        </div>\n    </div>\n</div>\n\n</div>\n';
