@@ -80787,7 +80787,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
     _converse.XMPPStatusView = _converse.VDOMViewWithAvatar.extend({
       tagName: "div",
       events: {
-        "click a.show-profile": "showProfileModal",
+        // "click a.show-profile": "showProfileModal",
         // "click a.change-status": "showStatusChangeModal",
         "click .show-client-info": "showClientInfoModal",
         "click .logout": "logOut"
@@ -82621,6 +82621,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         this.model.on("remove", this.remove, this);
         this.model.presence.on("change:show", this.render, this);
         this.model.vcard.on('change:fullname', this.render, this);
+        this.on('changed:group', this.render, this);
       },
 
       render() {
@@ -82691,7 +82692,14 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           this.el.classList.add('current-xmpp-contact');
           this.el.classList.remove(_.without(['both', 'to'], subscription)[0]);
           this.el.classList.add(subscription);
-          this.renderRosterItem(this.model);
+          const parentElement = this.el.parentElement;
+          let group = '';
+
+          if (parentElement) {
+            group = parentElement.getAttribute('data-group');
+          }
+
+          this.renderRosterItem(this.model, group);
         }
 
         return this;
@@ -82713,18 +82721,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         }
       },
 
-      renderRosterItem(item) {
-        let status_icon = '';
-        const show = item.presence.get('show') || 'offline'; // if (show === 'online') {
-        //     status_icon = 'fa fa-circle chat-status chat-status--online';
-        // } else if (show === 'away') {
-        //     status_icon = 'fa fa-circle chat-status chat-status--away';
-        // } else if (show === 'xa') {
-        //     status_icon = 'far fa-circle chat-status';
-        // } else if (show === 'dnd') {
-        //     status_icon = 'fa fa-minus-circle chat-status chat-status--busy';
-        // }
-
+      renderRosterItem(item, group) {
+        let status_icon = `fa chat-status ${group === 'Address Book' ? 'open-single' : 'open-organization'}`;
+        const show = 'online';
         const display_name = item.getDisplayName();
         this.el.innerHTML = templates_roster_item_html__WEBPACK_IMPORTED_MODULE_12___default()(_.extend(item.toJSON(), {
           'display_name': display_name,
@@ -82861,6 +82860,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           '_converse': _converse
         });
         this.contacts_el = this.el.querySelector('.roster-group-contacts');
+        this.contacts_el.setAttribute('data-group', this.model.get('name'));
         return this;
       },
 
@@ -82892,6 +82892,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
         _.each(this.model.contacts.models, contact => {
           const contact_view = this.get(contact.get('id'));
+          contact_view.el.setAttribute('data-group', this.model.get('name'));
 
           if (_.includes(contacts, contact)) {
             u.hideElement(contact_view.el);

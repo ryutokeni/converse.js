@@ -23,6 +23,9 @@
     .set-xmpp-status,
     .xmpp-status,
     .roster-contacts {
+        .chat-status {
+          color: var(--text-color);
+        }
         .chat-status--online {
             color: var(--chat-status-online);
         }
@@ -191,12 +194,11 @@
                 .infos {
                     margin-left: 0.5em;
                     flex: auto;
-                    max-width: 190px;
                     justify-content: center;
                     span {
-                      text-overflow: ellipsis;
-                      white-space: nowrap;
-                      overflow: hidden;
+                      // text-overflow: ellipsis;
+                      // white-space: nowrap;
+                      // overflow: hidden;
                       vertical-align: middle;
                     }
                     .username {

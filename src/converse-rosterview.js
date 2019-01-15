@@ -365,6 +365,7 @@ converse.plugins.add('converse-rosterview', {
 
                 this.model.presence.on("change:show", this.render, this);
                 this.model.vcard.on('change:fullname', this.render, this);
+                this.on('changed:group', this.render, this);
             },
 
             render () {
@@ -441,7 +442,12 @@ converse.plugins.add('converse-rosterview', {
                     this.el.classList.add('current-xmpp-contact');
                     this.el.classList.remove(_.without(['both', 'to'], subscription)[0]);
                     this.el.classList.add(subscription);
-                    this.renderRosterItem(this.model);
+                    const parentElement = this.el.parentElement;
+                    let group = '';
+                    if (parentElement) {
+                      group = parentElement.getAttribute('data-group');
+                    }
+                    this.renderRosterItem(this.model, group);
                 }
                 return this;
             },
@@ -461,18 +467,9 @@ converse.plugins.add('converse-rosterview', {
                 }
             },
 
-            renderRosterItem (item) {
-                let status_icon = '';
-                const show = item.presence.get('show') || 'offline';
-                // if (show === 'online') {
-                //     status_icon = 'fa fa-circle chat-status chat-status--online';
-                // } else if (show === 'away') {
-                //     status_icon = 'fa fa-circle chat-status chat-status--away';
-                // } else if (show === 'xa') {
-                //     status_icon = 'far fa-circle chat-status';
-                // } else if (show === 'dnd') {
-                //     status_icon = 'fa fa-minus-circle chat-status chat-status--busy';
-                // }
+            renderRosterItem (item, group) {
+                let status_icon = `fa chat-status ${group === 'Address Book' ? 'open-single' : 'open-organization'}`;
+                const show = 'online';
                 const display_name = item.getDisplayName();
                 this.el.innerHTML = tpl_roster_item(
                     _.extend(item.toJSON(), {
@@ -599,6 +596,7 @@ converse.plugins.add('converse-rosterview', {
                     '_converse': _converse
                 });
                 this.contacts_el = this.el.querySelector('.roster-group-contacts');
+                this.contacts_el.setAttribute('data-group', this.model.get('name'));
                 return this;
             },
 
@@ -627,6 +625,7 @@ converse.plugins.add('converse-rosterview', {
                 const all_contact_views = this.getAll();
                 _.each(this.model.contacts.models, (contact) => {
                     const contact_view = this.get(contact.get('id'));
+                    contact_view.el.setAttribute('data-group', this.model.get('name'));
                     if (_.includes(contacts, contact)) {
                         u.hideElement(contact_view.el);
                     } else if (contact_view.mayBeShown()) {

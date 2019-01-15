@@ -10656,6 +10656,11 @@ body.reset {
         font-size: var(--font-size-huge);
         margin-right: 0.5em; }
 
+#conversejs .set-xmpp-status .chat-status,
+#conversejs .xmpp-status .chat-status,
+#conversejs .roster-contacts .chat-status {
+  color: var(--text-color); }
+
 #conversejs .set-xmpp-status .chat-status--online,
 #conversejs .xmpp-status .chat-status--online,
 #conversejs .roster-contacts .chat-status--online {
@@ -10793,12 +10798,8 @@ body.reset {
     #conversejs #controlbox .controlbox-pane .userinfo .infos {
       margin-left: 0.5em;
       flex: auto;
-      max-width: 190px;
       justify-content: center; }
       #conversejs #controlbox .controlbox-pane .userinfo .infos span {
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
         vertical-align: middle; }
       #conversejs #controlbox .controlbox-pane .userinfo .infos .username {
         font-size: 15px;
