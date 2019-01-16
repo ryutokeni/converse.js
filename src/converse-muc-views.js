@@ -507,7 +507,7 @@ converse.plugins.add('converse-muc-views', {
                 this.model.on('change:jid', this.renderHeading, this);
                 this.model.on('change:name', this.renderHeading, this);
                 this.model.on('change:subject', this.renderHeading, this);
-                this.model.on('change:subject', this.setChatRoomSubject, this);
+                // this.model.on('change:subject', this.setChatRoomSubject, this);
                 this.model.on('configurationNeeded', this.getAndRenderConfigurationForm, this);
                 this.model.on('destroy', this.hide, this);
                 this.model.on('show', this.show, this);

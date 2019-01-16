@@ -77151,8 +77151,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         this.model.on('change:connection_status', this.afterConnected, this);
         this.model.on('change:jid', this.renderHeading, this);
         this.model.on('change:name', this.renderHeading, this);
-        this.model.on('change:subject', this.renderHeading, this);
-        this.model.on('change:subject', this.setChatRoomSubject, this);
+        this.model.on('change:subject', this.renderHeading, this); // this.model.on('change:subject', this.setChatRoomSubject, this);
+
         this.model.on('configurationNeeded', this.getAndRenderConfigurationForm, this);
         this.model.on('destroy', this.hide, this);
         this.model.on('show', this.show, this); // this.model.occupants.on('add', this.onOccupantAdded, this);
@@ -119411,11 +119411,11 @@ __e(o.info_add_bookmark) +
  } ;
 __p += '"\n   href="#"></a>\n';
  } ;
-__p += '\n\n<a class="list-item-action room-info fa fa-info-circle" data-room-jid="' +
+__p += '\n\n<!-- <a class="list-item-action room-info fa fa-info-circle" data-room-jid="' +
 __e(o.jid) +
 '"\n   title="' +
 __e(o.info_title) +
-'" href="#"></a>\n\n<a class="list-item-action fa fa-times close-room"\n   data-room-jid="' +
+'" href="#"></a> -->\n\n<a class="list-item-action fa fa-times close-room"\n   data-room-jid="' +
 __e(o.jid) +
 '"\n   data-room-name="' +
 __e(o.name || o.jid) +
@@ -119608,13 +119608,13 @@ __p += ' unread-msgs ';
  } ;
 __p += '">' +
 __e(o.display_name) +
-'</span></a>\n';
+'</span></a>\n<!-- ';
  if (o.allow_contact_removal) { ;
 __p += '\n<a class="list-item-action remove-xmpp-contact far fa-trash-alt" title="' +
 __e(o.desc_remove) +
 '" href="#"></a>\n';
  } ;
-__p += '\n';
+__p += ' -->\n';
 return __p
 };
 

@@ -219,6 +219,10 @@
         #chatrooms {
             padding: 0;
 
+            .open-rooms-toggle {
+              color: var(--controlbox-heading-color);
+            }
+
             .rooms-list {
               .list-item {
                 color: var(--controlbox-heading-color);

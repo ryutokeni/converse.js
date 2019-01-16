@@ -43,7 +43,6 @@
             }
 
             .list-item-action {
-                opacity: 0;
                 font-size: var(--font-size-tiny);
                 padding: 0;
                 margin: 0 0 0 0.4em;
@@ -57,7 +56,7 @@
                         color: var(--list-item-link-hover-color);
                     }
                 }
-                color: var(--subdued-color);
+                color: var(--controlbox-heading-color);
                 &:hover {
                     color: var(--list-toggle-hover-color);
                     opacity: 1;

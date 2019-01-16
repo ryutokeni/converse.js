@@ -10811,6 +10811,8 @@ body.reset {
       margin: 0 !important; }
   #conversejs #controlbox #chatrooms {
     padding: 0; }
+    #conversejs #controlbox #chatrooms .open-rooms-toggle {
+      color: var(--controlbox-heading-color); }
     #conversejs #controlbox #chatrooms .rooms-list .list-item {
       color: var(--controlbox-heading-color); }
     #conversejs #controlbox #chatrooms .add-chatroom {
@@ -11225,8 +11227,6 @@ body.reset {
         width: 100%;
         padding-top: 0;
         padding-bottom: 0.3rem; }
-        #conversejs #converse-roster .roster-contacts .roster-group .group-toggle:hover {
-          color: var(--roster-group-toggle-hover-color); }
       #conversejs #converse-roster .roster-contacts .roster-group li {
         color: var(--controlbox-heading-color); }
         #conversejs #converse-roster .roster-contacts .roster-group li.requesting-xmpp-contact a {
@@ -11318,12 +11318,11 @@ body.reset {
       #conversejs .items-list .list-item .list-item-link:hover {
         color: var(--list-item-link-hover-color); }
     #conversejs .items-list .list-item .list-item-action {
-      opacity: 0;
       font-size: var(--font-size-tiny);
       padding: 0;
       margin: 0 0 0 0.4em;
       width: 1.6em;
-      color: var(--subdued-color); }
+      color: var(--controlbox-heading-color); }
       #conversejs .items-list .list-item .list-item-action:before {
         font-size: var(--font-size); }
       #conversejs .items-list .list-item .list-item-action.button-on {
