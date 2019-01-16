@@ -639,8 +639,10 @@ converse.plugins.add('converse-roster', {
                     (group === 'My Organization' && this.isExistedInImportedContacts(item, importedContacts))
                   ) {
                     this.updateContact(item, ['Address Book', 'My Organization']);
+                    this.updateContact(item, ['Address Book', 'My Organization']); // a glitch to force the view render to get correct group
                   } else {
                     this.updateContact(item, [group]);
+                    this.updateContact(item, [group]); // a glitch to force the view render to get correct group
                   }
 
                 } else {
