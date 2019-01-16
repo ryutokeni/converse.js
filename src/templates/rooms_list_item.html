@@ -5,10 +5,9 @@
 {[ if (o.num_unread) { ]}
     <span class="msgs-indicator badge badge-info">{{{ o.num_unread }}}</span>
 {[ } ]}
-<a class="list-item-link open-room available-room w-100"
+<a class="list-item-link chat-status open-room available-room w-100"
     data-room-jid="{{{o.jid}}}"
-    title="{{{o.open_title}}}" href="#">{{{o.name || o.jid}}}</a>
-
+    title="{{{o.open_title}}}" href="#"><span class="contact-name">{{{o.name || o.jid}}}</span></a>
 {[ if (o.allow_bookmarks) { ]}
 <a class="list-item-action fa {[ if (o.bookmarked) { ]} fa-bookmark remove-bookmark button-on {[ } else { ]} add-bookmark fa-bookmark-o {[ } ]}"
    data-room-jid="{{{o.jid}}}" data-bookmark-name="{{{o.name}}}"

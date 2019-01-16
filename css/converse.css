@@ -10811,6 +10811,8 @@ body.reset {
       margin: 0 !important; }
   #conversejs #controlbox #chatrooms {
     padding: 0; }
+    #conversejs #controlbox #chatrooms .rooms-list .list-item {
+      color: var(--controlbox-heading-color); }
     #conversejs #controlbox #chatrooms .add-chatroom {
       margin: 0;
       padding: 0; }

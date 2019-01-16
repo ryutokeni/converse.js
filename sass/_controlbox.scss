@@ -219,6 +219,12 @@
         #chatrooms {
             padding: 0;
 
+            .rooms-list {
+              .list-item {
+                color: var(--controlbox-heading-color);
+              }
+            }
+
             .add-chatroom {
                 input[type=button],
                 input[type=submit],

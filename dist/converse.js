@@ -82658,41 +82658,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
               this.el.classList.add('open');
             }
           }
-        } // if ((ask === 'subscribe') || (subscription === 'from')) {
-        //     /* ask === 'subscribe'
-        //      *      Means we have asked to subscribe to them.
-        //      *
-        //      * subscription === 'from'
-        //      *      They are subscribed to use, but not vice versa.
-        //      *      We assume that there is a pending subscription
-        //      *      from us to them (otherwise we're in a state not
-        //      *      supported by converse.js).
-        //      *
-        //      *  So in both cases the user is a "pending" contact.
-        //      */
-        //     const display_name = this.model.getDisplayName();
-        //     this.el.classList.add('pending-xmpp-contact');
-        //     this.el.innerHTML = tpl_pending_contact(
-        //         _.extend(this.model.toJSON(), {
-        //             'display_name': display_name,
-        //             'desc_remove': __('Click to remove %1$s as a contact', display_name),
-        //             'allow_chat_pending_contacts': _converse.allow_chat_pending_contacts
-        //         })
-        //     );
-        // } else if (requesting === true) {
-        //     const display_name = this.model.getDisplayName();
-        //     this.el.classList.add('requesting-xmpp-contact');
-        //     this.el.innerHTML = tpl_requesting_contact(
-        //         _.extend(this.model.toJSON(), {
-        //             'display_name': display_name,
-        //             'desc_accept': __("Click to accept the contact request from %1$s", display_name),
-        //             'desc_decline': __("Click to decline the contact request from %1$s", display_name),
-        //             'allow_chat_pending_contacts': _converse.allow_chat_pending_contacts
-        //         })
-        //     );
-        // } else if (subscription === 'both' || subscription === 'to') {
-        // }
-
+        }
 
         this.el.classList.add('current-xmpp-contact');
         this.el.classList.remove(_.without(['both', 'to'], subscription)[0]);
@@ -119415,13 +119381,13 @@ __p += '\n    <span class="msgs-indicator badge badge-info">' +
 __e( o.num_unread ) +
 '</span>\n';
  } ;
-__p += '\n<a class="list-item-link open-room available-room w-100"\n    data-room-jid="' +
+__p += '\n<a class="list-item-link chat-status open-room available-room w-100"\n    data-room-jid="' +
 __e(o.jid) +
 '"\n    title="' +
 __e(o.open_title) +
-'" href="#">' +
+'" href="#"><span class="contact-name">' +
 __e(o.name || o.jid) +
-'</a>\n\n';
+'</span></a>\n';
  if (o.allow_bookmarks) { ;
 __p += '\n<a class="list-item-action fa ';
  if (o.bookmarked) { ;
