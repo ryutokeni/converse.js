@@ -461,10 +461,10 @@
             @include make-col(4);
         }
         @include media-breakpoint-up(lg) {
-            @include make-col(3);
+            flex: 0 0 300px;
         }
         @include media-breakpoint-up(xl) {
-            @include make-col(2);
+            flex: 0 0 300px;
         }
 
         &.logged-out {

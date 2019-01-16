@@ -10548,12 +10548,12 @@ body.reset {
       max-width: 66.66667%; } }
   @media (min-width: 992px) {
     #conversejs.converse-fullscreen .chatbox {
-      flex: 0 0 75%;
-      max-width: 75%; } }
+      flex: 0 0 calc(100vw - 300px);
+      max-width: calc(100vw - 300px); } }
   @media (min-width: 1200px) {
     #conversejs.converse-fullscreen .chatbox {
-      flex: 0 0 83.33333%;
-      max-width: 83.33333%; } }
+      flex: 0 0 calc(100vw - 300px);
+      max-width: calc(100vw - 300px); } }
   #conversejs.converse-fullscreen .chatbox .box-flyout {
     box-shadow: none;
     height: var(--fullpage-chat-height);
@@ -10979,13 +10979,11 @@ body.reset {
   @media (min-width: 992px) {
     #conversejs.converse-fullscreen #controlbox,
     #conversejs.converse-mobile #controlbox {
-      flex: 0 0 25%;
-      max-width: 25%; } }
+      flex: 0 0 300px; } }
   @media (min-width: 1200px) {
     #conversejs.converse-fullscreen #controlbox,
     #conversejs.converse-mobile #controlbox {
-      flex: 0 0 16.66667%;
-      max-width: 16.66667%; } }
+      flex: 0 0 300px; } }
   #conversejs.converse-fullscreen #controlbox.logged-out,
   #conversejs.converse-mobile #controlbox.logged-out {
     flex: 0 0 100%;

@@ -613,10 +613,12 @@
             @include make-col(8);
         }
         @include media-breakpoint-up(lg) {
-            @include make-col(9);
+            flex: 0 0 calc(100vw - 300px);
+            max-width: calc(100vw - 300px);
         }
         @include media-breakpoint-up(xl) {
-            @include make-col(10);
+            flex: 0 0 calc(100vw - 300px);
+            max-width: calc(100vw - 300px);
         }
 
         .box-flyout {
