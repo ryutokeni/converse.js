@@ -92395,10 +92395,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           if (matched) {
             if (group === 'Address Book' && this.isExistedInImportedContacts(item, organizationContacts) || group === 'My Organization' && this.isExistedInImportedContacts(item, importedContacts)) {
               this.updateContact(item, ['Address Book', 'My Organization']);
-              this.updateContact(item, ['Address Book', 'My Organization']);
+              this.updateContact(item, ['Address Book', 'My Organization']); // a glitch to force the view render to get correct group
             } else {
               this.updateContact(item, [group]);
-              this.updateContact(item, [group]);
+              this.updateContact(item, [group]); // a glitch to force the view render to get correct group
             }
           } else {
             try {
@@ -118997,7 +118997,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/profile_view.html -->\n<div class="userinfo controlbox-padded">\n<div class="controlbox-section profile d-flex">\n    <a class="show-profile" href="#">\n        <canvas class="avatar align-self-center" height="40" width="40"></canvas>\n    </a>\n    <div class="d-flex flex-row w-100">\n      <div class="d-flex flex-column infos">\n        ';
+__p += '<!-- src/templates/profile_view.html -->\n<div class="userinfo controlbox-padded">\n<div class="controlbox-section profile d-flex">\n    <a class="show-profile">\n        <canvas class="avatar align-self-center" height="40" width="40"></canvas>\n    </a>\n    <div class="d-flex flex-row w-100">\n      <div class="d-flex flex-column infos">\n        ';
  if (o.organizations && o.organizations.length) { ;
 __p += '\n          <span class="username">' +
 __e(o.organizations) +
