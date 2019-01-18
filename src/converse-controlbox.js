@@ -9,6 +9,7 @@
 import "converse-chatview";
 import "converse-profile";
 import "converse-rosterview";
+import "pageme-recent-messages-view";
 import _FormData from "formdata-polyfill";
 import bootstrap from "bootstrap";
 import converse from "@converse/headless/converse-core";
@@ -71,7 +72,7 @@ converse.plugins.add('converse-controlbox', {
      *
      * NB: These plugins need to have already been loaded via require.js.
      */
-    dependencies: ["converse-modal", "converse-chatboxes", "converse-rosterview", "converse-chatview"],
+    dependencies: ["converse-modal", "converse-chatboxes", "converse-rosterview", "converse-chatview", "pageme-recent-messages-view"],
 
     overrides: {
         // Overrides mentioned here will be picked up by converse.js's
@@ -203,6 +204,7 @@ converse.plugins.add('converse-controlbox', {
                 this.render();
                 if (this.model.get('connected')) {
                     this.insertRoster();
+                    this.insertRecentMessages();
                 }
                 _converse.emit('controlboxInitialized', this);
             },
@@ -235,6 +237,7 @@ converse.plugins.add('converse-controlbox', {
                 if (this.model.get('connected')) {
                     this.render();
                     this.insertRoster();
+                    this.insertRecentMessages();
                 }
             },
 
@@ -253,6 +256,18 @@ converse.plugins.add('converse-controlbox', {
                         const userinfo_el = this.el.querySelector('.userinfo');
                         // this.controlbox_pane.el.insertAdjacentElement('beforeEnd', _converse.rosterview.el);
                         userinfo_el.insertAdjacentElement('afterend', _converse.rosterview.el);
+                    })
+                    .catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
+            },
+
+            insertRecentMessages () {
+                if (_converse.authentication === _converse.ANONYMOUS) {
+                    return;
+                }
+                _converse.api.waitUntil('chatBoxesInitialized')
+                    .then(() => {
+                        const userinfo_el = this.el.querySelector('.userinfo');
+                        userinfo_el.insertAdjacentElement('afterend', _converse.recentMessagesViews.el);
                     })
                     .catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
             },

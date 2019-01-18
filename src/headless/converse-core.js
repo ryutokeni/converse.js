@@ -1720,8 +1720,16 @@ const converse = {
     },
     'updateGroups' (groups) {
       groups.forEach(async (group) => {
-        const chatbox = await _converse.api.rooms.open(group.jid, {subject: {text: group.groupName}, nick: group.nick});
-        chatbox.save('users', group.users);
+        const chatbox = await _converse.api.rooms.open(group.jid, {
+          subject: {
+            text: group.groupName
+          },
+          nick: group.nick
+        });
+        chatbox.save({
+          users: group.users,
+          latestMessageTime: group.latestMessageTime
+        });
       })
     },
     'onLogOut' (callback) {
@@ -1751,7 +1759,7 @@ const converse = {
       // const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
     },
     'inviteToGroup' (jid, participants) {
-      
+
     },
     'onShowPageMeMediaViewer' (callback) {
       _converse.on('showPageMeMediaViewer', callback);
@@ -1779,10 +1787,11 @@ const converse = {
               medReqStt: msg.medReqStt,
               isMedReqSender: msg.isMedReqSender,
               senderSignedMedReq: msg.senderSignedMedReq,
-              rcvrSignedMedReq: msg.rcvrSignedMedReq
-            });
+              rcvrSignedMedReq: msg.rcvrSignedMedReq,
+              silent: true
+            },);
           } else {
-            _converse.chatboxes.onMessage(msg.stanza);
+            _converse.chatboxes.onMessage(msg.stanza, { silent: true });
           }
           return;
         }
@@ -1797,7 +1806,7 @@ const converse = {
             _converse.pagemeMessages[existed] = msg;
           }
         }
-        _converse.chatboxes.onMessage(msg.stanza);
+        _converse.chatboxes.onMessage(msg.stanza, { silent: true });
       });
       _converse.api.emit('rerenderMessage');
 

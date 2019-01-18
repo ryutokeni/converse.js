@@ -410,7 +410,6 @@ converse.plugins.add('converse-rosterview', {
                 this.el.classList.add(subscription);
                 const parentElement = this.el.parentElement;
                 let group = '';
-                console.log(_.cloneDeep(this.el), this.el);
                 if (parentElement) {
                   group = parentElement.getAttribute('data-group');
                 }
@@ -749,9 +748,9 @@ converse.plugins.add('converse-rosterview', {
                 this.sortAndPositionAllItems.bind(this));
 
                 _converse.on('rosterContactsFetched', () => {
-                    _converse.roster.each((contact) => this.addRosterContact(contact, {'silent': true}));
-                    this.update();
-                    this.updateFilter();
+                    // _converse.roster.each((contact) => this.addRosterContact(contact, {'silent': true}));
+                    // this.update();
+                    // this.updateFilter();
                     this.trigger('rosterContactsFetchedAndProcessed');
                 });
                 this.createRosterFilter();

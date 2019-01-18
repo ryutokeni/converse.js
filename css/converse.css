@@ -10684,6 +10684,9 @@ body.reset {
 #conversejs .roster-contacts .fa-times-circle {
   color: var(--subdued-color); }
 
+#conversejs #recent-messages .list-item {
+  color: var(--controlbox-heading-color); }
+
 #conversejs .room-info {
   font-size: var(--font-size-small);
   font-style: normal;

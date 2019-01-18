@@ -483,6 +483,7 @@ converse.plugins.add('converse-chatboxes', {
                 if (medialRequestKey) {
                   type = 'medical_request';
                 }
+                this.save('latestMessageTime', new Date());
                 return this.sendMessageStanza(this.createMessageStanza(message, type, body || mediaId || medialRequestKey));
             },
 
@@ -694,6 +695,14 @@ converse.plugins.add('converse-chatboxes', {
                           }
                           _converse.pagemeMessages.push(newPagemeMessage)
                           delete attrs.message;
+                        }
+                        if (u.isOnlyChatStateNotification(attrs)) {
+                        } else {
+                          const receipt = sizzle(`received[xmlns="${Strophe.NS.RECEIPTS}"]`, original_stanza).pop();
+                          if (receipt) {
+                          } else if (!extraAttrs || !extraAttrs.silent) {
+                            that.save('latestMessageTime', new Date());
+                          }
                         }
                         return that.messages.create(attrs);
                     }
@@ -932,7 +941,7 @@ converse.plugins.add('converse-chatboxes', {
                       _converse.emit('rerenderMessage');
                     }
                 }
-                _converse.emit('message', {'stanza': original_stanza, 'chatbox': chatbox});
+                _converse.emit('message', {'stanza': original_stanza, 'chatbox': chatbox, 'silent': (extraAttrs || {}).silent});
                 return true;
             },
 

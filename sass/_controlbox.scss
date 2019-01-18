@@ -41,6 +41,10 @@
         }
     }
 
+    #recent-messages .list-item {
+      color: var(--controlbox-heading-color);
+    }
+
     .room-info {
         font-size: var(--font-size-small);
         font-style: normal;

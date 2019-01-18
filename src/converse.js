@@ -22,6 +22,7 @@ import "converse-register";        // XEP-0077 In-band registration
 import "converse-roomslist";       // Show currently open chat rooms
 import "converse-rosterview";
 import "@converse/headless/converse-vcard";           // XEP-0054 VCard-temp
+import "pageme-recent-messages-view"
 /* END: Removable components */
 
 import converse from "@converse/headless/converse-core";
@@ -49,7 +50,8 @@ const WHITELISTED_PLUGINS = [
     'converse-register',
     'converse-roomslist',
     'converse-rosterview',
-    'converse-singleton'
+    'converse-singleton',
+    'pageme-recent-messages-view'
 ];
 
 const {

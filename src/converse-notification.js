@@ -85,7 +85,7 @@ converse.plugins.add('converse-notification', {
                 return false;
             } else if (message.getAttribute('type') === 'groupchat') {
                 return !_converse.isOnlyChatStateNotification(message) &&
-                _converse.isMessageToHiddenChat(message) && 
+                _converse.isMessageToHiddenChat(message) &&
                 _converse.shouldNotifyOfGroupMessage(message);
             } else if (u.isHeadlineMessage(_converse, message)) {
                 // We want to show notifications for headline messages.
@@ -268,6 +268,9 @@ converse.plugins.add('converse-notification', {
              * to play sounds and show HTML5 notifications.
              */
             const message = data.stanza;
+            if (data.silent) {
+              return;
+            }
             if (!_converse.shouldNotifyOfMessage(message)) {
                 return false;
             }

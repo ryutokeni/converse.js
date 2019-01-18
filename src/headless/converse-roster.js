@@ -622,6 +622,11 @@ converse.plugins.add('converse-roster', {
               if (!contacts) {
                 contacts = [];
               } else {
+                if (group === 'My Organization') {
+                  _converse.user_settings.my_organization = contacts;
+                } else {
+                  _converse.user_settings.imported_contacts = contacts;
+                }
                 _converse.emit('load-done', group);
               }
               if (sync) {
@@ -644,7 +649,6 @@ converse.plugins.add('converse-roster', {
                     this.updateContact(item, [group]);
                     this.updateContact(item, [group]); // a glitch to force the view render to get correct group
                   }
-
                 } else {
                   try {
                     item.destroy();
@@ -661,7 +665,8 @@ converse.plugins.add('converse-roster', {
                 }
                 return (jid === contact.userName +  domain);
               });
-              return foundContactIndex > -1;
+              const existed = foundContactIndex > -1;
+              return existed;
             },
 
             updateContact (item, groups) {
