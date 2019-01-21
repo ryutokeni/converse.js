@@ -297,7 +297,8 @@ converse.plugins.add('converse-chatview', {
                 // 'click .show-user-details-modal': 'showUserDetailsModal',
                 'click .spoiler-toggle': 'toggleSpoilerMessage',
                 'click .toggle-call': 'toggleCall',
-                'click .toggle-files': 'toggleFiles',
+                'click .toggle-photos': 'toggleFiles',
+                'click .toggle-videos': 'toggleFiles',
                 'click .toggle-medical-requests': 'toggleMedicalRequests',
                 'click .toggle-clear': 'clearMessages',
                 'click .toggle-compose-spoiler': 'toggleComposeSpoilerMessage',
@@ -309,6 +310,7 @@ converse.plugins.add('converse-chatview', {
                 'dragover .chat-textarea': 'onDragOver',
                 'drop .chat-textarea': 'onDrop',
                 'click .load-more-messages': 'loadMoreMessages',
+                'click .toogle-toolbox-wrapper': 'toggleToolboxMenu'
             },
 
             initialize () {
@@ -364,9 +366,11 @@ converse.plugins.add('converse-chatview', {
                     this.model.toJSON(),
                     this.getToolbarOptions(options || {})
                 );
-                this.el.querySelector('.chat-toolbar').innerHTML = toolbar(options);
-                this.addSpoilerButton(options);
-                this.addFileUploadButton();
+                console.log(options);
+                this.el.querySelector('.chat-toolbar.left-toolbar').innerHTML = toolbar(_.assign(options, { toolbar_side: 'left' }));
+                this.el.querySelector('.chat-toolbar.right-toolbar').innerHTML = toolbar(_.assign(options, { toolbar_side: 'right' }));
+                // this.addSpoilerButton(options);
+                // this.addFileUploadButton();
                 _converse.emit('renderToolbar', this);
                 return this;
             },
@@ -1112,6 +1116,13 @@ converse.plugins.add('converse-chatview', {
                     this.emoji_dropdown.el = dropdown_el;
                     this.emoji_dropdown.toggle();
                 }
+            },
+
+            toggleToolboxMenu (ev) {
+                const dropdown_el = this.el.querySelector('.toggle-toolbox.dropup');
+                const toolbox_dropdown = new bootstrap.Dropdown(dropdown_el, true);
+                console.log(toolbox_dropdown);
+                toolbox_dropdown.toggle();
             },
 
             toggleCall (ev) {

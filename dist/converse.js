@@ -72717,7 +72717,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         // 'click .show-user-details-modal': 'showUserDetailsModal',
         'click .spoiler-toggle': 'toggleSpoilerMessage',
         'click .toggle-call': 'toggleCall',
-        'click .toggle-files': 'toggleFiles',
+        'click .toggle-photos': 'toggleFiles',
+        'click .toggle-videos': 'toggleFiles',
         'click .toggle-medical-requests': 'toggleMedicalRequests',
         'click .toggle-clear': 'clearMessages',
         'click .toggle-compose-spoiler': 'toggleComposeSpoilerMessage',
@@ -72728,7 +72729,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         'keydown .chat-textarea': 'keyPressed',
         'dragover .chat-textarea': 'onDragOver',
         'drop .chat-textarea': 'onDrop',
-        'click .load-more-messages': 'loadMoreMessages'
+        'click .load-more-messages': 'loadMoreMessages',
+        'click .toogle-toolbox-wrapper': 'toggleToolboxMenu'
       },
 
       initialize() {
@@ -72779,9 +72781,14 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
         toolbar = toolbar || templates_toolbar_html__WEBPACK_IMPORTED_MODULE_18___default.a;
         options = _.assign(this.model.toJSON(), this.getToolbarOptions(options || {}));
-        this.el.querySelector('.chat-toolbar').innerHTML = toolbar(options);
-        this.addSpoilerButton(options);
-        this.addFileUploadButton();
+        console.log(options);
+        this.el.querySelector('.chat-toolbar.left-toolbar').innerHTML = toolbar(_.assign(options, {
+          toolbar_side: 'left'
+        }));
+        this.el.querySelector('.chat-toolbar.right-toolbar').innerHTML = toolbar(_.assign(options, {
+          toolbar_side: 'right'
+        })); // this.addSpoilerButton(options);
+        // this.addFileUploadButton();
 
         _converse.emit('renderToolbar', this);
 
@@ -73571,6 +73578,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           this.emoji_dropdown.el = dropdown_el;
           this.emoji_dropdown.toggle();
         }
+      },
+
+      toggleToolboxMenu(ev) {
+        const dropdown_el = this.el.querySelector('.toggle-toolbox.dropup');
+        const toolbox_dropdown = new bootstrap__WEBPACK_IMPORTED_MODULE_4___default.a.Dropdown(dropdown_el, true);
+        console.log(toolbox_dropdown);
+        toolbox_dropdown.toggle();
       },
 
       toggleCall(ev) {
@@ -117367,7 +117381,11 @@ __e( o.unread_msgs ) +
  if (!o.composing_spoiler) { ;
 __p += ' hidden ';
  } ;
-__p += ' spoiler-hint"/>\n\n    <div class="suggestion-box">\n        <ul class="suggestion-box__results suggestion-box__results--above" hidden=""></ul>\n        <textarea\n            type="text"\n            class="chat-textarea suggestion-box__input\n                ';
+__p += ' spoiler-hint"/>\n   ';
+ if (o.show_toolbar) { ;
+__p += '\n       <ul class="chat-toolbar left-toolbar no-text-select"></ul>\n   ';
+ } ;
+__p += '\n    <div class="suggestion-box">\n        <ul class="suggestion-box__results suggestion-box__results--above" hidden=""></ul>\n        <textarea\n            type="text"\n            class="chat-textarea suggestion-box__input\n                ';
  if (o.show_send_button) { ;
 __p += ' chat-textarea-send-button ';
  } ;
@@ -117387,7 +117405,7 @@ __e( o.label_send ) +
  } ;
 __p += '\n    </div>\n    ';
  if (o.show_toolbar) { ;
-__p += '\n        <ul class="chat-toolbar no-text-select"></ul>\n    ';
+__p += '\n        <ul class="chat-toolbar right-toolbar no-text-select"></ul>\n    ';
  } ;
 __p += '\n</form>\n</div>\n';
 return __p
@@ -120095,36 +120113,38 @@ module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 __p += '<!-- src/templates/toolbar.html -->\n';
- if (o.show_medical_request)  { ;
-__p += '\n  <li class="toggle-medical-requests fa fa-stethoscope" title="' +
+ if (o.toolbar_side === 'left')  { ;
+__p += '\n  <!-- <li class="toggle-medical-requests fa fa-stethoscope" title="' +
 __e(o.label_medical_requests) +
-'"></li>\n';
- } ;
-__p += '\n<li class="toggle-files fa fa-file-upload" title="' +
+'"></li>\n  <li class="toggle-files fa fa-file-upload" title="' +
 __e(o.label_file_upload) +
-'"></li>\n';
+'"></li> -->\n  <li class="toogle-toolbox-wrapper fa fa-plus dropup">\n    <button class="toggle-toolbox dropup hidden" id="toggleToolbox" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">+</button>\n    <div class="dropdown-menu toolbox-menu" aria-labelledby="toggleToolbox">\n      <div class="group-item">\n        <span class="toolbox-item toolbox-photo toggle-photos"></span>\n        <span class="toolbox-item toolbox-video toggle-videos"></span>\n      </div>\n      <div class="dropdown-divider"></div>\n      <span class="group-item-name"><b>Extensions:</b></span>\n      <div class="group-item">\n        <span class="toolbox-item toolbox-medical-request toggle-medical-requests"></span>\n      </div>\n\n    </div>\n  </li>\n';
+ } else { ;
+__p += '\n  ';
  if (o.use_emoji)  { ;
-__p += '\n<li class="toggle-toolbar-menu toggle-smiley dropup">\n    <a class="toggle-smiley far fa-smile" title="' +
+__p += '\n  <li class="toggle-toolbar-menu toggle-smiley dropup">\n      <a class="toggle-smiley far fa-smile" title="' +
 __e(o.tooltip_insert_smiley) +
-'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>\n    <div class="emoji-picker dropdown-menu toolbar-menu"></div>\n</li>\n';
+'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>\n      <div class="emoji-picker dropdown-menu toolbar-menu"></div>\n  </li>\n  ';
  } ;
-__p += '\n';
+__p += '\n  ';
  if (o.show_call_button)  { ;
-__p += '\n<li class="toggle-call fa fa-phone" title="' +
+__p += '\n  <li class="toggle-call fa fa-phone" title="' +
 __e(o.label_start_call) +
-'"></li>\n';
+'"></li>\n  ';
  } ;
-__p += '\n';
+__p += '\n  ';
  if (o.show_occupants_toggle)  { ;
-__p += '\n<li class="toggle-occupants fa ';
+__p += '\n  <li class="toggle-occupants fa ';
  if (o.hidden_occupants)  { ;
 __p += ' fa-angle-double-left ';
  } else { ;
 __p += ' fa-angle-double-right ';
  } ;
-__p += '"\n    title="' +
+__p += '"\n      title="' +
 __e(o.label_hide_occupants) +
-'"></li>\n';
+'"></li>\n  ';
+ } ;
+__p += '\n';
  } ;
 __p += '\n';
 return __p

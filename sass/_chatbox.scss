@@ -663,14 +663,38 @@
             ul {
                 width: 100%;
                 border: 0;
-                border-left: var(--chatbox-border-width) solid var(--subdued-color);
-                border-top-right-radius: var(--chatbox-border-radius);
-                border-bottom-right-radius: var(--chatbox-border-radius);
                 align-items: center;
                 * {
                   color: var(--subdued-color) !important;
                 }
             }
+            ul.right-toolbar {
+                border-left: var(--chatbox-border-width) solid var(--subdued-color);
+                border-top-right-radius: var(--chatbox-border-radius);
+                border-bottom-right-radius: var(--chatbox-border-radius);
+            }
+            ul.left-toolbar {
+                border-right: var(--chatbox-border-width) solid var(--subdued-color);
+                border-top-left-radius: var(--chatbox-border-radius);
+                border-bottom-left-radius: var(--chatbox-border-radius);
+                .toogle-toolbox-wrapper {
+                  position: relative;
+                  .toolbox-menu {
+                    bottom: 2rem;
+                    top: auto;
+                    z-index: 1000;
+                  }
+                  .group-item-name {
+                    margin: 0 20px;
+                  }
+                  .group-item {
+                    display: flex;
+                    margin: 20px 10px;
+                    align-items: flex-start;
+                  }
+                }
+            }
+
             .toggle-smiley {
                 font-size: 34px;
                 ul {

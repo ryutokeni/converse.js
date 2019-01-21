@@ -10588,12 +10588,29 @@ body.reset {
     #conversejs.converse-fullscreen .chatbox .sendXMPPMessage ul {
       width: 100%;
       border: 0;
-      border-left: var(--chatbox-border-width) solid var(--subdued-color);
-      border-top-right-radius: var(--chatbox-border-radius);
-      border-bottom-right-radius: var(--chatbox-border-radius);
       align-items: center; }
       #conversejs.converse-fullscreen .chatbox .sendXMPPMessage ul * {
         color: var(--subdued-color) !important; }
+    #conversejs.converse-fullscreen .chatbox .sendXMPPMessage ul.right-toolbar {
+      border-left: var(--chatbox-border-width) solid var(--subdued-color);
+      border-top-right-radius: var(--chatbox-border-radius);
+      border-bottom-right-radius: var(--chatbox-border-radius); }
+    #conversejs.converse-fullscreen .chatbox .sendXMPPMessage ul.left-toolbar {
+      border-right: var(--chatbox-border-width) solid var(--subdued-color);
+      border-top-left-radius: var(--chatbox-border-radius);
+      border-bottom-left-radius: var(--chatbox-border-radius); }
+      #conversejs.converse-fullscreen .chatbox .sendXMPPMessage ul.left-toolbar .toogle-toolbox-wrapper {
+        position: relative; }
+        #conversejs.converse-fullscreen .chatbox .sendXMPPMessage ul.left-toolbar .toogle-toolbox-wrapper .toolbox-menu {
+          bottom: 2rem;
+          top: auto;
+          z-index: 1000; }
+        #conversejs.converse-fullscreen .chatbox .sendXMPPMessage ul.left-toolbar .toogle-toolbox-wrapper .group-item-name {
+          margin: 0 20px; }
+        #conversejs.converse-fullscreen .chatbox .sendXMPPMessage ul.left-toolbar .toogle-toolbox-wrapper .group-item {
+          display: flex;
+          margin: 20px 10px;
+          align-items: flex-start; }
     #conversejs.converse-fullscreen .chatbox .sendXMPPMessage .toggle-smiley {
       font-size: 34px; }
       #conversejs.converse-fullscreen .chatbox .sendXMPPMessage .toggle-smiley ul.emoji-toolbar .emoji-category-picker {
