@@ -460,6 +460,8 @@ converse.plugins.add('converse-muc', {
                  *    (String) recipient - JID of the person being invited
                  *    (String) reason - Optional reason for the invitation
                  */
+                console.log(reason);
+                
                 if (this.get('membersonly')) {
                     // When inviting to a members-only groupchat, we first add
                     // the person to the member list by giving them an

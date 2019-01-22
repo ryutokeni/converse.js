@@ -1759,7 +1759,11 @@ const converse = {
       // const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
     },
     'inviteToGroup' (jid, participants) {
-
+        const chatbox = _converse.chatboxes.findWhere({'jid': jid});
+        if (!chatbox) {
+            return;
+        }
+        chatbox.directInvite(participants[0], 'pageme invite');
     },
     'onShowPageMeMediaViewer' (callback) {
       _converse.on('showPageMeMediaViewer', callback);
