@@ -435,8 +435,8 @@ function cleanup () {
     // This happens in tests. We therefore first clean up.
     Backbone.history.stop();
     _converse.chatboxviews.closeAllChatBoxes();
-    window.localStorage.clear();
-    window.sessionStorage.clear();
+    // window.localStorage.clear();
+    // window.sessionStorage.clear();
     if (_converse.bookmarks) {
         _converse.bookmarks.reset();
     }
