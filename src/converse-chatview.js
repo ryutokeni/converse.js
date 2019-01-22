@@ -168,8 +168,8 @@ converse.plugins.add('converse-chatview', {
             render () {
                 this.el.innerHTML = tpl_chatbox_head(
                     _.extend(
-                        this.model.vcard.toJSON(),
                         this.model.toJSON(),
+                        this.model.vcard.toJSON(),
                         { '_converse': _converse,
                           'info_close': __('Close this chat box')
                         }
@@ -366,7 +366,6 @@ converse.plugins.add('converse-chatview', {
                     this.model.toJSON(),
                     this.getToolbarOptions(options || {})
                 );
-                console.log(options);
                 this.el.querySelector('.chat-toolbar.left-toolbar').innerHTML = toolbar(_.assign(options, { toolbar_side: 'left' }));
                 this.el.querySelector('.chat-toolbar.right-toolbar').innerHTML = toolbar(_.assign(options, { toolbar_side: 'right' }));
                 // this.addSpoilerButton(options);

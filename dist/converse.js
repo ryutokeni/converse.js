@@ -72590,7 +72590,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       },
 
       render() {
-        this.el.innerHTML = templates_chatbox_head_html__WEBPACK_IMPORTED_MODULE_8___default()(_.extend(this.model.vcard.toJSON(), this.model.toJSON(), {
+        this.el.innerHTML = templates_chatbox_head_html__WEBPACK_IMPORTED_MODULE_8___default()(_.extend(this.model.toJSON(), this.model.vcard.toJSON(), {
           '_converse': _converse,
           'info_close': __('Close this chat box')
         }));
@@ -72781,7 +72781,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
         toolbar = toolbar || templates_toolbar_html__WEBPACK_IMPORTED_MODULE_18___default.a;
         options = _.assign(this.model.toJSON(), this.getToolbarOptions(options || {}));
-        console.log(options);
         this.el.querySelector('.chat-toolbar.left-toolbar').innerHTML = toolbar(_.assign(options, {
           toolbar_side: 'left'
         }));
