@@ -87995,12 +87995,56 @@ const converse = {
   },
 
   'onLeaveGroup'(callback) {
-    return _converse.on('leavePageMeGroup', jid => callback(jid));
+    return _converse.on('leavePageMeGroup', jid => {
+      jid = jid.toLowerCase();
+
+      const chatbox = _converse.chatboxes.getChatBox(jid, {
+        type: _converse.CHATROOMS_TYPE,
+        id: jid,
+        box_id: b64_sha1(jid)
+      }, true);
+
+      let arrayParticipants = chatbox.get('users');
+
+      let currentUser = _converse.user_settings.jid.split('@')[0];
+
+      let arrayUser = arrayParticipants.filter(e => e.userName !== currentUser);
+      console.log(chatbox); // chatbox.save({
+      //     users: arrayUser,
+      //     latestMessageTime: null
+      // })
+
+      return callback(jid);
+    });
   },
 
   'createNewGroup'(jid, attrs, participants) {
-    _converse.api.rooms.open(jid, attrs, participants); // const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
+    _converse.api.rooms.open(jid, attrs, participants);
 
+    jid = jid.toLowerCase();
+    attrs.type = _converse.CHATROOMS_TYPE;
+    attrs.id = jid;
+    attrs.box_id = b64_sha1(jid);
+
+    const chatbox = _converse.chatboxes.getChatBox(jid, attrs, true);
+
+    if (!chatbox) {
+      return;
+    }
+
+    let arrayParticipants = participants.map(e => e.split('@')[0]);
+
+    let arrayUser = _converse.user_settings.imported_contacts.filter(e => arrayParticipants.includes(e.userName));
+
+    arrayUser = arrayUser.map(e => {
+      e['joinedDate'] = moment__WEBPACK_IMPORTED_MODULE_7___default()(e['joinedDate'], 'YYYYMMDDHHmmssZ');
+      return e;
+    }); // console.log(chatbox);
+
+    chatbox.save({
+      users: arrayUser,
+      latestMessageTime: null
+    }); // const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
   },
 
   'inviteToGroup'(jid, participants) {
@@ -88012,7 +88056,19 @@ const converse = {
       return;
     }
 
-    chatbox.directInvite(participants[0], 'pageme invite');
+    participants.forEach(user => {
+      chatbox.directInvite(user, 'pageme invite');
+    });
+    let arrayParticipants = participants.map(e => e.split('@')[0]);
+    let arrayUser = (_converse.user_settings.imported_contacts || []).filter(e => arrayParticipants.includes(e.userName));
+    arrayUser = arrayUser.map(e => {
+      e['joinedDate'] = moment__WEBPACK_IMPORTED_MODULE_7___default()(e['joinedDate'], 'YYYYMMDDHHmmssZ');
+      return e;
+    });
+    chatbox.save({
+      users: arrayUser,
+      latestMessageTime: null
+    });
   },
 
   'onShowPageMeMediaViewer'(callback) {
@@ -89876,6 +89932,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
       updateGroupMembers() {
         (this.get('users') || []).forEach(user => {
+          console.log(user);
           const pagemeGroupMember = this.pagemeGroupMembers.findGroupMember(user);
 
           if (pagemeGroupMember) {
@@ -90203,24 +90260,21 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
          *    (String) recipient - JID of the person being invited
          *    (String) reason - Optional reason for the invitation
          */
-        console.log(reason);
+        // if (this.get('membersonly')) {
+        // When inviting to a members-only groupchat, we first add
+        // the person to the member list by giving them an
+        // affiliation of 'member' (if they're not affiliated
+        // already), otherwise they won't be able to join.
+        const map = {};
+        map[recipient] = 'member';
 
-        if (this.get('membersonly')) {
-          // When inviting to a members-only groupchat, we first add
-          // the person to the member list by giving them an
-          // affiliation of 'member' (if they're not affiliated
-          // already), otherwise they won't be able to join.
-          const map = {};
-          map[recipient] = 'member';
+        const deltaFunc = _.partial(_utils_form__WEBPACK_IMPORTED_MODULE_7__["default"].computeAffiliationsDelta, true, false);
 
-          const deltaFunc = _.partial(_utils_form__WEBPACK_IMPORTED_MODULE_7__["default"].computeAffiliationsDelta, true, false);
-
-          this.updateMemberLists([{
-            'jid': recipient,
-            'affiliation': 'member',
-            'reason': reason
-          }], ['member', 'owner', 'admin'], deltaFunc);
-        }
+        this.updateMemberLists([{
+          'jid': recipient,
+          'affiliation': 'member',
+          'reason': reason
+        }], ['member', 'owner', 'admin'], deltaFunc); // }
 
         const attrs = {
           'xmlns': 'jabber:x:conference',
@@ -90550,6 +90604,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
       },
 
       updateMemberLists(members, affiliations, deltaFunc) {
+        console.log('updated list member');
         /* Fetch the lists of users with the given affiliations.
          * Then compute the delta between those users and
          * the passed in members, and if it exists, send the delta
@@ -90567,6 +90622,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
          *  updated or once it's been established there's no need
          *  to update the list.
          */
+
         this.getJidsWithAffiliations(affiliations).then(old_members => this.setAffiliations(deltaFunc(members, old_members))).then(() => {// this.occupants.fetchMembers()
         }).catch(_.partial(_converse.log, _, Strophe.LogLevel.ERROR));
       },
