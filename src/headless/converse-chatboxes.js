@@ -87,19 +87,18 @@ converse.plugins.add('converse-chatboxes', {
                 } else {
                     let vcard;
                     if (this.get('vcard_jid')) {
-                        vcard = _converse.vcards.findWhere({'jid': this.get('vcard_jid')});
+                        vcard = _converse.vcards.findWhere({
+                          'jid': this.get('vcard_jid')
+                        });
                     }
                     if (!vcard) {
-                        let jid;
-                        const occupant = chatbox.occupants.findWhere({'nick': nick});
-                        if (occupant && occupant.get('jid')) {
-                            jid = occupant.get('jid');
-                            this.save({'vcard_jid': jid}, {'silent': true});
-                        } else {
-                            jid = this.get('from');
-                        }
+                        let jid = this.get('from');
                         jid = jid.replace(`${chatbox.get('jid')}/`, ''); // remove conference's jid
-                        vcard = _converse.vcards.findWhere({'jid': jid}) || _converse.vcards.create({'jid': jid});
+                        vcard = _converse.vcards.findWhere({
+                          'jid': jid
+                        }) || _converse.vcards.create({
+                          'jid': jid
+                        });
                     }
                     return vcard;
                 }

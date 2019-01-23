@@ -142,7 +142,7 @@ converse.plugins.add('pageme-recent-messages-view', {
             openChatbox (ev) {
                 ev.preventDefault();
                 const name = ev.target.textContent;
-                const jid = ev.target.getAttribute('data-jid');
+                const jid = ev.delegateTarget.dataset.jid;
                 const data = {
                     'name': name || Strophe.unescapeNode(Strophe.getNodeFromJid(jid)) || jid
                 }

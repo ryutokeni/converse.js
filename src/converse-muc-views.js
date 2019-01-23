@@ -476,6 +476,7 @@ converse.plugins.add('converse-muc-views', {
                 'change input.fileupload': 'onFileSelection',
                 'click .chat-msg__action-edit': 'onMessageEditButtonClicked',
                 'click .chatbox-navback': 'showControlBox',
+                'click .sign-out-button': 'leaveRoom',
                 'click .close-chatbox-button': 'closeRoom',
                 'click .add-group-member': 'showInviteMemberModal',
                 'click .configure-chatroom-button': 'getAndRenderConfigurationForm',
@@ -598,15 +599,21 @@ converse.plugins.add('converse-muc-views', {
                 return _converse.ChatBoxView.prototype.keyPressed.apply(this, arguments);
             },
 
-            closeRoom (ev) {
+            leaveRoom(ev) {
                 ev.preventDefault();
                 // const jid = ev.target.getAttribute('data-room-jid');
                 if (confirm(__("Are you sure you want to leave the groupchat %1$s?", name))) {
-                    // TODO: replace with API call
-                    // const chatbox = _converse.chatboxviews.get(jid);
-                    this.closePageMeGroup();
-                    // chatbox.close();
+                // TODO: replace with API call
+                // const chatbox = _converse.chatboxviews.get(jid);
+                this.closePageMeGroup();
+                // chatbox.close();
                 }
+            },
+
+            closeRoom (ev) {
+                ev.preventDefault();
+                this.hide();
+                return this;
             },
 
             showInviteMemberModal (ev) {
@@ -691,7 +698,8 @@ converse.plugins.add('converse-muc-views', {
                 return tpl_chatroom_head(
                     _.extend(this.model.toJSON(), {
                         'Strophe': Strophe,
-                        'info_close': __('Close and leave this groupchat'),
+                        'info_close': __('Close this groupchat'),
+                        'sign_out': __('Leave this groupchat'),
                         'info_configure': __('Configure this groupchat'),
                         'info_details': __('Show more details about this groupchat'),
                         'description': u.addHyperlinks(xss.filterXSS(_.get(this.model.get('subject'), 'text'), {'whiteList': {}})),

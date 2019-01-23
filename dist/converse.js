@@ -77151,6 +77151,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         'change input.fileupload': 'onFileSelection',
         'click .chat-msg__action-edit': 'onMessageEditButtonClicked',
         'click .chatbox-navback': 'showControlBox',
+        'click .sign-out-button': 'leaveRoom',
         'click .close-chatbox-button': 'closeRoom',
         'click .add-group-member': 'showInviteMemberModal',
         'click .configure-chatroom-button': 'getAndRenderConfigurationForm',
@@ -77283,7 +77284,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         return _converse.ChatBoxView.prototype.keyPressed.apply(this, arguments);
       },
 
-      closeRoom(ev) {
+      leaveRoom(ev) {
         ev.preventDefault(); // const jid = ev.target.getAttribute('data-room-jid');
 
         if (confirm(__("Are you sure you want to leave the groupchat %1$s?", name))) {
@@ -77291,6 +77292,12 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
           // const chatbox = _converse.chatboxviews.get(jid);
           this.closePageMeGroup(); // chatbox.close();
         }
+      },
+
+      closeRoom(ev) {
+        ev.preventDefault();
+        this.hide();
+        return this;
       },
 
       showInviteMemberModal(ev) {
@@ -77389,7 +77396,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
          */
         return templates_chatroom_head_html__WEBPACK_IMPORTED_MODULE_13___default()(_.extend(this.model.toJSON(), {
           'Strophe': Strophe,
-          'info_close': __('Close and leave this groupchat'),
+          'info_close': __('Close this groupchat'),
+          'sign_out': __('Leave this groupchat'),
           'info_configure': __('Configure this groupchat'),
           'info_details': __('Show more details about this groupchat'),
           'description': u.addHyperlinks(xss__WEBPACK_IMPORTED_MODULE_27___default.a.filterXSS(_.get(this.model.get('subject'), 'text'), {
@@ -82116,7 +82124,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       openRoom(ev) {
         ev.preventDefault();
         const name = ev.target.textContent;
-        const jid = ev.target.getAttribute('data-room-jid');
+        const jid = ev.delegateTarget.dataset.roomJid;
+        console.log(ev);
+        console.log(name, jid);
         const data = {
           'name': name || Strophe.unescapeNode(Strophe.getNodeFromJid(jid)) || jid
         };
@@ -84881,22 +84891,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           }
 
           if (!vcard) {
-            let jid;
-            const occupant = chatbox.occupants.findWhere({
-              'nick': nick
-            });
-
-            if (occupant && occupant.get('jid')) {
-              jid = occupant.get('jid');
-              this.save({
-                'vcard_jid': jid
-              }, {
-                'silent': true
-              });
-            } else {
-              jid = this.get('from');
-            }
-
+            let jid = this.get('from');
             jid = jid.replace(`${chatbox.get('jid')}/`, ''); // remove conference's jid
 
             vcard = _converse.vcards.findWhere({
@@ -88008,8 +88003,8 @@ const converse = {
 
       let currentUser = _converse.user_settings.jid.split('@')[0];
 
-      let arrayUser = arrayParticipants.filter(e => e.userName !== currentUser);
-      console.log(chatbox); // chatbox.save({
+      let arrayUser = arrayParticipants.filter(e => e.userName !== currentUser); // console.log(chatbox);
+      // chatbox.save({
       //     users: arrayUser,
       //     latestMessageTime: null
       // })
@@ -89932,7 +89927,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
       updateGroupMembers() {
         (this.get('users') || []).forEach(user => {
-          console.log(user);
           const pagemeGroupMember = this.pagemeGroupMembers.findGroupMember(user);
 
           if (pagemeGroupMember) {
@@ -90260,21 +90254,22 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
          *    (String) recipient - JID of the person being invited
          *    (String) reason - Optional reason for the invitation
          */
-        // if (this.get('membersonly')) {
-        // When inviting to a members-only groupchat, we first add
-        // the person to the member list by giving them an
-        // affiliation of 'member' (if they're not affiliated
-        // already), otherwise they won't be able to join.
-        const map = {};
-        map[recipient] = 'member';
+        if (this.get('membersonly')) {
+          // When inviting to a members-only groupchat, we first add
+          // the person to the member list by giving them an
+          // affiliation of 'member' (if they're not affiliated
+          // already), otherwise they won't be able to join.
+          const map = {};
+          map[recipient] = 'member';
 
-        const deltaFunc = _.partial(_utils_form__WEBPACK_IMPORTED_MODULE_7__["default"].computeAffiliationsDelta, true, false);
+          const deltaFunc = _.partial(_utils_form__WEBPACK_IMPORTED_MODULE_7__["default"].computeAffiliationsDelta, true, false);
 
-        this.updateMemberLists([{
-          'jid': recipient,
-          'affiliation': 'member',
-          'reason': reason
-        }], ['member', 'owner', 'admin'], deltaFunc); // }
+          this.updateMemberLists([{
+            'jid': recipient,
+            'affiliation': 'member',
+            'reason': reason
+          }], ['member', 'owner', 'admin'], deltaFunc);
+        }
 
         const attrs = {
           'xmlns': 'jabber:x:conference',
@@ -90604,7 +90599,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
       },
 
       updateMemberLists(members, affiliations, deltaFunc) {
-        console.log('updated list member');
         /* Fetch the lists of users with the given affiliations.
          * Then compute the delta between those users and
          * the passed in members, and if it exists, send the delta
@@ -90622,7 +90616,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
          *  updated or once it's been established there's no need
          *  to update the list.
          */
-
         this.getJidsWithAffiliations(affiliations).then(old_members => this.setAffiliations(deltaFunc(members, old_members))).then(() => {// this.occupants.fetchMembers()
         }).catch(_.partial(_converse.log, _, Strophe.LogLevel.ERROR));
       },
@@ -92905,6 +92898,9 @@ _converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins.add('converse-vca
      * loaded by converse.js's plugin machinery.
      */
     const _converse = this._converse;
+
+    _converse.api.promises.add(['vcardInitialized']);
+
     _converse.VCard = Backbone.Model.extend({
       defaults: {
         'image': _converse.DEFAULT_IMAGE,
@@ -93029,6 +93025,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins.add('converse-vca
       _converse.vcards.browserStorage = new Backbone.BrowserStorage[_converse.config.get('storage')](id);
 
       _converse.vcards.fetch();
+
+      _converse.emit('vcardInitialized');
     };
 
     _converse.api.listen.on('sessionInitialized', _converse.initVCardCollection);
@@ -116993,7 +116991,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       openChatbox(ev) {
         ev.preventDefault();
         const name = ev.target.textContent;
-        const jid = ev.target.getAttribute('data-jid');
+        const jid = ev.delegateTarget.dataset.jid;
         const data = {
           'name': name || Strophe.unescapeNode(Strophe.getNodeFromJid(jid)) || jid
         };
@@ -117416,9 +117414,9 @@ __p += '\n                    </a>\n                ';
  } ;
 __p += '\n                <p class="user-custom-message">' +
 __e( o.status ) +
-'</p>\n            </div>\n        </div>\n    </div>\n    <div class="chatbox-buttons row no-gutters">\n        <!-- <a class="chatbox-btn close-chatbox-button fa fa-times" title="' +
+'</p>\n            </div>\n        </div>\n    </div>\n    <div class="chatbox-buttons row no-gutters">\n        <a class="chatbox-btn close-chatbox-button fa fa-times" title="' +
 __e(o.info_close) +
-'"></a> -->\n        <a class="chatbox-btn show-user-details-modal fa fa-info-circle" title="' +
+'"></a>\n        <a class="chatbox-btn show-user-details-modal fa fa-info-circle" title="' +
 __e(o.info_details) +
 '"></a>\n    </div>\n</div>\n';
 return __p
@@ -117965,9 +117963,13 @@ __p += '\n            Loading...\n        ';
  } ;
 __p += '\n    </div>\n    <!-- Sanitized in converse-muc-views. We want to render links. -->\n    <!-- <p class="chatroom-description">' +
 ((__t = (o.description)) == null ? '' : __t) +
-'</p> -->\n</div>\n<div class="chatbox-buttons row no-gutters">\n    <a class="chatbox-btn close-chatbox-button fa fa-sign-out-alt" title="' +
+'</p> -->\n</div>\n<div class="chatbox-buttons row no-gutters">\n    <!-- <a class="chatbox-btn close-chatbox-button fa fa-sign-out-alt" title="' +
 __e(o.info_close) +
-'"></a>\n    <!-- ';
+'"></a> -->\n\n    <a class="chatbox-btn sign-out-button fa fa-sign-out-alt" title="' +
+__e(o.sign_out) +
+'"></a>\n    <a class="chatbox-btn close-chatbox-button fa fa-times" title="' +
+__e(o.info_close) +
+'"></a>\n\n    <!-- ';
  if (o.affiliation == 'owner') { ;
 __p += '\n    <a class="chatbox-btn configure-chatroom-button fa fa-wrench" title="' +
 __e(o.info_configure) +
@@ -119389,11 +119391,11 @@ module.exports = function(o) {
 var __t, __p = '', __e = _.escape;
 __p += '<!-- src/templates/recent_messages_item.html -->\n<a class="list-item-link cbox-list-item open-chat w-100" data-jid="' +
 __e(o.jid) +
-'" href="#"><span class="chat-status ' +
+'" href="#">\n  <span class="chat-status ' +
 __e(o.status_icon) +
-'"></span><span class="contact-name">' +
+'"></span>\n  <span class="contact-name">' +
 __e(o.name || 'Loading...') +
-'</span></a>\n';
+'</span>\n</a>\n';
 return __p
 };
 

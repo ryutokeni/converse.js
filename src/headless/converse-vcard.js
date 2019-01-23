@@ -20,6 +20,10 @@ converse.plugins.add('converse-vcard', {
          */
         const { _converse } = this;
 
+        _converse.api.promises.add([
+          'vcardInitialized',
+        ]);
+
         _converse.VCard = Backbone.Model.extend({
             defaults: {
                 'image': _converse.DEFAULT_IMAGE,
@@ -126,6 +130,7 @@ converse.plugins.add('converse-vcard', {
             const id = b64_sha1(`converse.vcards`);
             _converse.vcards.browserStorage = new Backbone.BrowserStorage[_converse.config.get('storage')](id);
             _converse.vcards.fetch();
+            _converse.emit('vcardInitialized');
         }
         _converse.api.listen.on('sessionInitialized', _converse.initVCardCollection);
 
