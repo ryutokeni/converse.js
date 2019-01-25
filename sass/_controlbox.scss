@@ -26,10 +26,14 @@
         .chat-status {
           color: var(--text-color);
         }
-        .chat-status--online {
+        .fa-circle::before {
+          border: 2px solid white !important;
+          border-radius: 50%;
+        }
+        .chat-status--online, .chat-status--ON_CALL {
             color: var(--chat-status-online);
         }
-        .chat-status--busy {
+        .chat-status--busy, .chat-status--BUSY {
             color: var(--chat-status-busy);
         }
         .chat-status--away {

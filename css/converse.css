@@ -10678,14 +10678,24 @@ body.reset {
 #conversejs .roster-contacts .chat-status {
   color: var(--text-color); }
 
-#conversejs .set-xmpp-status .chat-status--online,
+#conversejs .set-xmpp-status .chat-status::before,
+#conversejs .xmpp-status .chat-status::before,
+#conversejs .roster-contacts .chat-status::before {
+  border: 2px solid white !important;
+  border-radius: 50%; }
+
+#conversejs .set-xmpp-status .chat-status--online, #conversejs .set-xmpp-status .chat-status--ON_CALL,
 #conversejs .xmpp-status .chat-status--online,
-#conversejs .roster-contacts .chat-status--online {
+#conversejs .xmpp-status .chat-status--ON_CALL,
+#conversejs .roster-contacts .chat-status--online,
+#conversejs .roster-contacts .chat-status--ON_CALL {
   color: var(--chat-status-online); }
 
-#conversejs .set-xmpp-status .chat-status--busy,
+#conversejs .set-xmpp-status .chat-status--busy, #conversejs .set-xmpp-status .chat-status--BUSY,
 #conversejs .xmpp-status .chat-status--busy,
-#conversejs .roster-contacts .chat-status--busy {
+#conversejs .xmpp-status .chat-status--BUSY,
+#conversejs .roster-contacts .chat-status--busy,
+#conversejs .roster-contacts .chat-status--BUSY {
   color: var(--chat-status-busy); }
 
 #conversejs .set-xmpp-status .chat-status--away,
@@ -11162,41 +11172,36 @@ body.reset {
   #conversejs.converse-overlayed .converse-chatboxes .chatbox .box-flyout {
     margin-left: 30px; } }
 
-#conversejs #converse-modals .set-xmpp-status {
-  margin: 1em; }
-  #conversejs #converse-modals .set-xmpp-status .custom-control-label {
-    margin-top: 0.25em; }
-
-#conversejs #converse-modals #omemo-tabpanel {
-  margin-top: 1em; }
-
-#conversejs #converse-modals .btn {
-  font-weight: normal; }
-
-#conversejs #converse-modals #user-profile-modal .profile-form label {
-  font-weight: bold; }
-
-#conversejs #converse-modals #user-profile-modal .fingerprint-removal label {
-  display: flex;
-  padding: 0.75rem 1.25rem; }
-
-#conversejs #converse-modals #user-profile-modal .list-group-item {
-  display: flex;
-  justify-content: left;
-  font-size: 95%; }
-  #conversejs #converse-modals #user-profile-modal .list-group-item input[type="checkbox"] {
-    margin-right: 1em; }
-
-#conversejs #converse-modals .fingerprints {
-  width: 100%;
-  margin-bottom: 1em; }
-
-#conversejs #converse-modals .fingerprint-trust {
-  display: flex;
-  justify-content: space-between;
-  font-size: 95%; }
-  #conversejs #converse-modals .fingerprint-trust .fingerprint {
-    margin-left: 1em; }
+#conversejs #converse-modals {
+  z-index: 2000 !important; }
+  #conversejs #converse-modals .set-xmpp-status {
+    margin: 1em; }
+    #conversejs #converse-modals .set-xmpp-status .custom-control-label {
+      margin-top: 0.25em; }
+  #conversejs #converse-modals #omemo-tabpanel {
+    margin-top: 1em; }
+  #conversejs #converse-modals .btn {
+    font-weight: normal; }
+  #conversejs #converse-modals #user-profile-modal .profile-form label {
+    font-weight: bold; }
+  #conversejs #converse-modals #user-profile-modal .fingerprint-removal label {
+    display: flex;
+    padding: 0.75rem 1.25rem; }
+  #conversejs #converse-modals #user-profile-modal .list-group-item {
+    display: flex;
+    justify-content: left;
+    font-size: 95%; }
+    #conversejs #converse-modals #user-profile-modal .list-group-item input[type="checkbox"] {
+      margin-right: 1em; }
+  #conversejs #converse-modals .fingerprints {
+    width: 100%;
+    margin-bottom: 1em; }
+  #conversejs #converse-modals .fingerprint-trust {
+    display: flex;
+    justify-content: space-between;
+    font-size: 95%; }
+    #conversejs #converse-modals .fingerprint-trust .fingerprint {
+      margin-left: 1em; }
 
 #conversejs #converse-roster {
   text-align: left;

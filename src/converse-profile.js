@@ -144,20 +144,20 @@ converse.plugins.add('converse-profile', {
             toHTML () {
                 return tpl_chat_status_modal(
                     _.extend(
+                        {
+                          'pageMeStatus': _converse.user_settings.pageMeStatus,
+                          'statusMessage': _converse.user_settings.statusMessage
+                        },
                         this.model.toJSON(),
-                        this.model.vcard.toJSON(), {
-                        'label_away': __('Away'),
-                        'label_close': __('Close'),
-                        'label_busy': __('Busy'),
-                        'label_cancel': __('Cancel'),
-                        'label_custom_status': __('Custom status'),
-                        'label_offline': __('Offline'),
-                        'label_online': __('Online'),
-                        'label_save': __('Save'),
-                        'label_xa': __('Away for long'),
-                        'modal_title': __('Change chat status'),
-                        'placeholder_status_message': __('Personal status message')
-                    }));
+                        this.model.vcard.toJSON(),
+                        {
+                          'label_close': __('Close'),
+                          'label_cancel': __('Cancel'),
+                          'label_save': __('Save'),
+                          'modal_title': __('Change chat status'),
+                          'placeholder_status_message': __('Personal status message')
+                        }
+                    ));
             },
 
             afterRender () {
@@ -179,10 +179,14 @@ converse.plugins.add('converse-profile', {
                 ev.preventDefault();
                 const data = new FormData(ev.target);
                 this.model.save({
-                    'status_message': data.get('status_message'),
-                    'status': data.get('chat_status')
+                    'statusMessage': data.get('status_message'),
+                    'pageMeStatus': data.get('chat_status')
                 });
                 this.modal.hide();
+                _converse.emit('statusFormSubmitted', {
+                  status: data.get('chat_status'),
+                  statusMessage: data.get('status_message'),
+                });
             }
         });
 
@@ -215,7 +219,7 @@ converse.plugins.add('converse-profile', {
             tagName: "div",
             events: {
                 // "click a.show-profile": "showProfileModal",
-                // "click a.change-status": "showStatusChangeModal",
+                "click a.change-status": "showStatusChangeModal",
                 "click .show-client-info": "showClientInfoModal",
                 "click .logout": "logOut"
             },

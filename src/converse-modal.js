@@ -22,7 +22,7 @@ converse.plugins.add('converse-modal', {
             initialize () {
                 this.render().insertIntoDOM();
                 this.modal = new bootstrap.Modal(this.el, {
-                    backdrop: 'static',
+                    backdrop: false,
                     keyboard: true
                 });
                 this.el.addEventListener('hide.bs.modal', (event) => {
@@ -72,7 +72,7 @@ converse.plugins.add('converse-modal', {
 
         /************************ BEGIN API ************************/
         // We extend the default converse.js API to add methods specific to MUC chat rooms.
-        let alert 
+        let alert
 
         _.extend(_converse.api, {
             'alert': {
@@ -108,4 +108,3 @@ converse.plugins.add('converse-modal', {
         });
     }
 });
-

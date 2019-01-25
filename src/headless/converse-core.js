@@ -1850,6 +1850,11 @@ const converse = {
         ...medicalRequest
       });
     },
+    'onStatusFormSubmitted' (callback) {
+      _converse.on('statusFormSubmitted', (data) => {
+        callback(data);
+      })
+    },
     /**
      * Exposes methods for adding and removing plugins. You'll need to write a plugin
      * if you want to have access to the private API methods defined further down below.

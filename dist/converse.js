@@ -76502,7 +76502,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins
       initialize() {
         this.render().insertIntoDOM();
         this.modal = new bootstrap__WEBPACK_IMPORTED_MODULE_1___default.a.Modal(this.el, {
-          backdrop: 'static',
+          backdrop: false,
           keyboard: true
         });
         this.el.addEventListener('hide.bs.modal', event => {
@@ -80762,16 +80762,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
       },
 
       toHTML() {
-        return templates_chat_status_modal_html__WEBPACK_IMPORTED_MODULE_5___default()(_.extend(this.model.toJSON(), this.model.vcard.toJSON(), {
-          'label_away': __('Away'),
+        return templates_chat_status_modal_html__WEBPACK_IMPORTED_MODULE_5___default()(_.extend({
+          'pageMeStatus': _converse.user_settings.pageMeStatus,
+          'statusMessage': _converse.user_settings.statusMessage
+        }, this.model.toJSON(), this.model.vcard.toJSON(), {
           'label_close': __('Close'),
-          'label_busy': __('Busy'),
           'label_cancel': __('Cancel'),
-          'label_custom_status': __('Custom status'),
-          'label_offline': __('Offline'),
-          'label_online': __('Online'),
           'label_save': __('Save'),
-          'label_xa': __('Away for long'),
           'modal_title': __('Change chat status'),
           'placeholder_status_message': __('Personal status message')
         }));
@@ -80797,10 +80794,15 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
         ev.preventDefault();
         const data = new FormData(ev.target);
         this.model.save({
-          'status_message': data.get('status_message'),
-          'status': data.get('chat_status')
+          'statusMessage': data.get('status_message'),
+          'pageMeStatus': data.get('chat_status')
         });
         this.modal.hide();
+
+        _converse.emit('statusFormSubmitted', {
+          status: data.get('chat_status'),
+          statusMessage: data.get('status_message')
+        });
       }
 
     });
@@ -80820,7 +80822,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
       tagName: "div",
       events: {
         // "click a.show-profile": "showProfileModal",
-        // "click a.change-status": "showStatusChangeModal",
+        "click a.change-status": "showStatusChangeModal",
         "click .show-client-info": "showClientInfoModal",
         "click .logout": "logOut"
       },
@@ -83582,7 +83584,8 @@ const initialize = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21_
       onUploadFiles = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onUploadFiles,
       onMedicalReqButtonClicked = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onMedicalReqButtonClicked,
       sendFileXMPP = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].sendFileXMPP,
-      inviteToGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].inviteToGroup;
+      inviteToGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].inviteToGroup,
+      onStatusFormSubmitted = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onStatusFormSubmitted;
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].initialize = function (settings, callback) {
   if (_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].env._.isArray(settings.whitelisted_plugins)) {
@@ -83652,6 +83655,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onMedi
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].sendFileXMPP = function (jid, mediaId) {
   return sendFileXMPP(jid, mediaId);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onStatusFormSubmitted = function (callback) {
+  return onStatusFormSubmitted(callback);
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"]);
@@ -88127,6 +88134,12 @@ const converse = {
 
     const attrs = chatbox.getOutgoingMessageAttributes('');
     chatbox.sendMessage(_objectSpread({}, attrs, medicalRequest));
+  },
+
+  'onStatusFormSubmitted'(callback) {
+    _converse.on('statusFormSubmitted', data => {
+      callback(data);
+    });
   },
 
   /**
@@ -117240,35 +117253,23 @@ __e(o.modal_title) +
 '</h5>\n                <button type="button" class="close" data-dismiss="modal" aria-label="' +
 __e(o.label_close) +
 '">\n                    <span aria-hidden="true">×</span>\n                </button>\n            </div>\n            <div class="modal-body">\n                <form class="converse-form set-xmpp-status" id="set-xmpp-status">\n                    <div class="form-group">\n                        <div class="custom-control custom-radio">\n                            <input ';
- if (o.status === 'online') { ;
+ if (o.pageMeStatus === 'OFF_CALL') { ;
 __p += ' checked="checked" ';
  } ;
-__p += '\n                                   type="radio" id="radio-online" value="online" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-online">\n                                <span class="fa fa-circle chat-status chat-status--online"></span>' +
-__e(o.label_online) +
-'</label>\n                        </div>\n                        <div class="custom-control custom-radio">\n                            <input ';
- if (o.status === 'busy') { ;
+__p += '\n                                   type="radio" id="radio-off-call" value="OFF_CALL" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-off-call">\n                                <span class="fa fa-circle chat-status chat-status--online"></span>Not on call</label>\n                        </div>\n\n                        <div class="custom-control custom-radio">\n                            <input ';
+ if (o.pageMeStatus === 'ON_CALL') { ;
 __p += ' checked="checked" ';
  } ;
-__p += '\n                                   type="radio" id="radio-busy" value="dnd" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-busy">\n                                <span class="fa fa-minus-circle  chat-status chat-status--busy"></span>' +
-__e(o.label_busy) +
-'</label>\n                        </div>\n                        <div class="custom-control custom-radio">\n                            <input ';
- if (o.status === 'away') { ;
+__p += '\n                                   type="radio" id="radio-on-call" value="ON_CALL" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-on-call">\n                                <span class="fa fa-circle chat-status chat-status--online"></span>On call</label>\n                        </div>\n\n                        <div class="custom-control custom-radio">\n                            <input ';
+ if (o.pageMeStatus === 'BUSY') { ;
 __p += ' checked="checked" ';
  } ;
-__p += '\n                                   type="radio" id="radio-away" value="away" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-away">\n                                <span class="fa fa-circle chat-status chat-status--away"></span>' +
-__e(o.label_away) +
-'</label>\n                        </div>\n                        <div class="custom-control custom-radio">\n                            <input ';
- if (o.status === 'xa') { ;
-__p += ' checked="checked" ';
- } ;
-__p += '\n                                   type="radio" id="radio-xa" value="xa" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-xa">\n                                <span class="far fa-circle chat-status chat-status--xa"></span>' +
-__e(o.label_xa) +
-'</label>\n                        </div>\n                    </div>\n                    <div class="form-group">\n                        <div class="btn-group w-100">\n                            <input name="status_message" type="text" class="form-control" \n                                value="' +
-__e(o.status_message) +
+__p += '\n                                   type="radio" id="radio-busy" value="BUSY" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-busy">\n                                <span class="fa fa-circle chat-status chat-status--online"></span>Busy</label>\n                        </div>\n                    </div>\n                    <div class="form-group">\n                        <div class="btn-group w-100">\n                            <input name="status_message" type="text" class="form-control"\n                                value="' +
+__e(o.statusMessage) +
 '" placeholder="' +
 __e(o.placeholder_status_message) +
 '"/>\n                            <span class="clear-input fa fa-times ';
- if (!o.status_message) { ;
+ if (!o.statusMessage) { ;
 __p += ' hidden ';
  } ;
 __p += '"></span>\n                        </div>\n                    </div>\n                    <button type="submit" class="btn btn-primary">' +
@@ -119243,7 +119244,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/profile_view.html -->\n<div class="userinfo controlbox-padded">\n<div class="controlbox-section profile d-flex">\n    <a class="show-profile">\n        <canvas class="avatar align-self-center" height="40" width="40"></canvas>\n    </a>\n    <div class="d-flex flex-row w-100">\n      <div class="d-flex flex-column infos">\n        ';
+__p += '<!-- src/templates/profile_view.html -->\n<div class="userinfo controlbox-padded">\n<div class="controlbox-section profile xmpp-status d-flex">\n    <a class="show-profile">\n        <canvas class="avatar align-self-center" height="40" width="40"></canvas>\n    </a>\n    <div class="d-flex flex-row w-100">\n      <div class="d-flex flex-column infos">\n        ';
  if (o.organizations && o.organizations.length) { ;
 __p += '\n          <span class="username">' +
 __e(o.organizations) +
@@ -119251,35 +119252,11 @@ __e(o.organizations) +
  } ;
 __p += '\n        <!-- <a class="controlbox-heading__btn show-client-info fa fa-info-circle align-self-center" title="' +
 __e(o.info_details) +
-'"></a> -->\n        <span class="' +
-__e(o.chat_status) +
-'" data-value="' +
-__e(o.chat_status) +
-'">\n        <!-- <span class="\n        ';
- if (o.chat_status === 'online') { ;
-__p += ' fa fa-circle chat-status chat-status--online';
- } ;
-__p += '\n        ';
- if (o.chat_status === 'dnd') { ;
-__p += ' fa fa-minus-circle chat-status chat-status--busy ';
- } ;
-__p += '\n        ';
- if (o.chat_status === 'away') { ;
-__p += ' fa fa-circle chat-status chat-status--away';
- } ;
-__p += '\n        ';
- if (o.chat_status === 'xa') { ;
-__p += ' far fa-circle chat-status chat-status--xa ';
- } ;
-__p += '\n        ';
- if (o.chat_status === 'offline') { ;
-__p += ' fa fa-circle chat-status chat-status--offline';
- } ;
-__p += '"></span>' +
+'"></a> -->\n        <span>\n          <span class="fa fa-circle chat-status chat-status--' +
+__e(o.pageMeStatus) +
+'"></span> ' +
 __e(o.fullname) +
-'</span> -->\n        <span class="fa fa-circle chat-status chat-status--offline"></span> ' +
-__e(o.fullname) +
-'</span>\n      </div>\n      <div class="d-flex flex-column control-buttons">\n        ';
+'\n        </span>\n      </div>\n      <div class="d-flex flex-column control-buttons">\n        ';
  if (o._converse.allow_logout) { ;
 __p += '\n            <a class="controlbox-heading__btn logout fa fa-sign-out-alt" title="' +
 __e(o.title_log_out) +

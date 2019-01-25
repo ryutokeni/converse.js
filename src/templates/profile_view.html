@@ -1,5 +1,5 @@
 <div class="userinfo controlbox-padded">
-<div class="controlbox-section profile d-flex">
+<div class="controlbox-section profile xmpp-status d-flex">
     <a class="show-profile">
         <canvas class="avatar align-self-center" height="40" width="40"></canvas>
     </a>
@@ -9,14 +9,9 @@
           <span class="username">{{{o.organizations}}}</span>
         {[ } ]}
         <!-- <a class="controlbox-heading__btn show-client-info fa fa-info-circle align-self-center" title="{{{o.info_details}}}"></a> -->
-        <span class="{{{o.chat_status}}}" data-value="{{{o.chat_status}}}">
-        <!-- <span class="
-        {[ if (o.chat_status === 'online') { ]} fa fa-circle chat-status chat-status--online{[ } ]}
-        {[ if (o.chat_status === 'dnd') { ]} fa fa-minus-circle chat-status chat-status--busy {[ } ]}
-        {[ if (o.chat_status === 'away') { ]} fa fa-circle chat-status chat-status--away{[ } ]}
-        {[ if (o.chat_status === 'xa') { ]} far fa-circle chat-status chat-status--xa {[ } ]}
-        {[ if (o.chat_status === 'offline') { ]} fa fa-circle chat-status chat-status--offline{[ } ]}"></span>{{{o.fullname}}}</span> -->
-        <span class="fa fa-circle chat-status chat-status--offline"></span> {{{o.fullname}}}</span>
+        <span>
+          <span class="fa fa-circle chat-status chat-status--{{{o.pageMeStatus}}}"></span> {{{o.fullname}}}
+        </span>
       </div>
       <div class="d-flex flex-column control-buttons">
         {[ if (o._converse.allow_logout) { ]}

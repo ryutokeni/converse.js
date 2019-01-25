@@ -1,5 +1,6 @@
 #conversejs {
     #converse-modals {
+        z-index: 2000 !important;
         .set-xmpp-status {
             margin: 1em;
             .custom-control-label {
@@ -43,7 +44,7 @@
             width: 100%;
             margin-bottom: 1em;
         }
-        
+
         .fingerprint-trust {
             display: flex;
             justify-content: space-between;
