@@ -776,7 +776,7 @@ converse.plugins.add('converse-muc', {
                 this.getJidsWithAffiliations(affiliations)
                     .then(old_members => this.setAffiliations(deltaFunc(members, old_members)))
                     .then(() => {
-                      // this.occupants.fetchMembers()
+                        // this.occupants.fetchMembers()
                     })
                     .catch(_.partial(_converse.log, _, Strophe.LogLevel.ERROR));
             },

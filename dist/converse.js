@@ -20034,7 +20034,7 @@ utils.intFromLE = intFromLE;
 /*! exports provided: _args, _development, _from, _id, _inBundle, _integrity, _location, _phantomChildren, _requested, _requiredBy, _resolved, _spec, _where, author, bugs, dependencies, description, devDependencies, files, homepage, keywords, license, main, name, repository, scripts, version, default */
 /***/ (function(module) {
 
-module.exports = {"_args":[["elliptic@6.4.0","/Users/admin/Ant-Tech/Projects/converse-test/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/admin/Ant-Tech/Projects/converse-test/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
+module.exports = {"_args":[["elliptic@6.4.0","/Users/macuser/Desktop/pageme/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/macuser/Desktop/pageme/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
 
 /***/ }),
 
@@ -77151,6 +77151,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         'change input.fileupload': 'onFileSelection',
         'click .chat-msg__action-edit': 'onMessageEditButtonClicked',
         'click .chatbox-navback': 'showControlBox',
+        'click .sign-out-button': 'leaveRoom',
         'click .close-chatbox-button': 'closeRoom',
         'click .add-group-member': 'showInviteMemberModal',
         'click .configure-chatroom-button': 'getAndRenderConfigurationForm',
@@ -77283,7 +77284,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         return _converse.ChatBoxView.prototype.keyPressed.apply(this, arguments);
       },
 
-      closeRoom(ev) {
+      leaveRoom(ev) {
         ev.preventDefault(); // const jid = ev.target.getAttribute('data-room-jid');
 
         if (confirm(__("Are you sure you want to leave the groupchat %1$s?", name))) {
@@ -77291,6 +77292,12 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
           // const chatbox = _converse.chatboxviews.get(jid);
           this.closePageMeGroup(); // chatbox.close();
         }
+      },
+
+      closeRoom(ev) {
+        ev.preventDefault();
+        this.hide();
+        return this;
       },
 
       showInviteMemberModal(ev) {
@@ -77389,7 +77396,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
          */
         return templates_chatroom_head_html__WEBPACK_IMPORTED_MODULE_13___default()(_.extend(this.model.toJSON(), {
           'Strophe': Strophe,
-          'info_close': __('Close and leave this groupchat'),
+          'info_close': __('Close this groupchat'),
+          'sign_out': __('Leave this groupchat'),
           'info_configure': __('Configure this groupchat'),
           'info_details': __('Show more details about this groupchat'),
           'description': u.addHyperlinks(xss__WEBPACK_IMPORTED_MODULE_27___default.a.filterXSS(_.get(this.model.get('subject'), 'text'), {
@@ -82118,7 +82126,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       openRoom(ev) {
         ev.preventDefault();
         const name = ev.target.textContent;
-        const jid = ev.target.getAttribute('data-room-jid');
+        const jid = ev.delegateTarget.dataset.roomJid;
+        console.log(ev);
+        console.log(name, jid);
         const data = {
           'name': name || Strophe.unescapeNode(Strophe.getNodeFromJid(jid)) || jid
         };
@@ -84888,22 +84898,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           }
 
           if (!vcard) {
-            let jid;
-            const occupant = chatbox.occupants.findWhere({
-              'nick': nick
-            });
-
-            if (occupant && occupant.get('jid')) {
-              jid = occupant.get('jid');
-              this.save({
-                'vcard_jid': jid
-              }, {
-                'silent': true
-              });
-            } else {
-              jid = this.get('from');
-            }
-
+            let jid = this.get('from');
             jid = jid.replace(`${chatbox.get('jid')}/`, ''); // remove conference's jid
 
             vcard = _converse.vcards.findWhere({
@@ -88002,15 +87997,81 @@ const converse = {
   },
 
   'onLeaveGroup'(callback) {
-    return _converse.on('leavePageMeGroup', jid => callback(jid));
+    return _converse.on('leavePageMeGroup', jid => {
+      jid = jid.toLowerCase();
+
+      const chatbox = _converse.chatboxes.getChatBox(jid, {
+        type: _converse.CHATROOMS_TYPE,
+        id: jid,
+        box_id: b64_sha1(jid)
+      }, true);
+
+      let arrayParticipants = chatbox.get('users');
+
+      let currentUser = _converse.user_settings.jid.split('@')[0];
+
+      let arrayUser = arrayParticipants.filter(e => e.userName !== currentUser); // console.log(chatbox);
+      // chatbox.save({
+      //     users: arrayUser,
+      //     latestMessageTime: null
+      // })
+
+      return callback(jid);
+    });
   },
 
   'createNewGroup'(jid, attrs, participants) {
-    _converse.api.rooms.open(jid, attrs, participants); // const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
+    _converse.api.rooms.open(jid, attrs, participants);
 
+    jid = jid.toLowerCase();
+    attrs.type = _converse.CHATROOMS_TYPE;
+    attrs.id = jid;
+    attrs.box_id = b64_sha1(jid);
+
+    const chatbox = _converse.chatboxes.getChatBox(jid, attrs, true);
+
+    if (!chatbox) {
+      return;
+    }
+
+    let arrayParticipants = participants.map(e => e.split('@')[0]);
+
+    let arrayUser = _converse.user_settings.imported_contacts.filter(e => arrayParticipants.includes(e.userName));
+
+    arrayUser = arrayUser.map(e => {
+      e['joinedDate'] = moment__WEBPACK_IMPORTED_MODULE_7___default()(e['joinedDate'], 'YYYYMMDDHHmmssZ');
+      return e;
+    }); // console.log(chatbox);
+
+    chatbox.save({
+      users: arrayUser,
+      latestMessageTime: null
+    }); // const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
   },
 
-  'inviteToGroup'(jid, participants) {},
+  'inviteToGroup'(jid, participants) {
+    const chatbox = _converse.chatboxes.findWhere({
+      'jid': jid
+    });
+
+    if (!chatbox) {
+      return;
+    }
+
+    participants.forEach(user => {
+      chatbox.directInvite(user, 'pageme invite');
+    });
+    let arrayParticipants = participants.map(e => e.split('@')[0]);
+    let arrayUser = (_converse.user_settings.imported_contacts || []).filter(e => arrayParticipants.includes(e.userName));
+    arrayUser = arrayUser.map(e => {
+      e['joinedDate'] = moment__WEBPACK_IMPORTED_MODULE_7___default()(e['joinedDate'], 'YYYYMMDDHHmmssZ');
+      return e;
+    });
+    chatbox.save({
+      users: arrayUser,
+      latestMessageTime: null
+    });
+  },
 
   'onShowPageMeMediaViewer'(callback) {
     _converse.on('showPageMeMediaViewer', callback);
@@ -92850,6 +92911,9 @@ _converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins.add('converse-vca
      * loaded by converse.js's plugin machinery.
      */
     const _converse = this._converse;
+
+    _converse.api.promises.add(['vcardInitialized']);
+
     _converse.VCard = Backbone.Model.extend({
       defaults: {
         'image': _converse.DEFAULT_IMAGE,
@@ -92974,6 +93038,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins.add('converse-vca
       _converse.vcards.browserStorage = new Backbone.BrowserStorage[_converse.config.get('storage')](id);
 
       _converse.vcards.fetch();
+
+      _converse.emit('vcardInitialized');
     };
 
     _converse.api.listen.on('sessionInitialized', _converse.initVCardCollection);
@@ -116938,7 +117004,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       openChatbox(ev) {
         ev.preventDefault();
         const name = ev.target.textContent;
-        const jid = ev.target.getAttribute('data-jid');
+        const jid = ev.delegateTarget.dataset.jid;
         const data = {
           'name': name || Strophe.unescapeNode(Strophe.getNodeFromJid(jid)) || jid
         };
@@ -117349,9 +117415,9 @@ __p += '\n                    </a>\n                ';
  } ;
 __p += '\n                <p class="user-custom-message">' +
 __e( o.status ) +
-'</p>\n            </div>\n        </div>\n    </div>\n    <div class="chatbox-buttons row no-gutters">\n        <!-- <a class="chatbox-btn close-chatbox-button fa fa-times" title="' +
+'</p>\n            </div>\n        </div>\n    </div>\n    <div class="chatbox-buttons row no-gutters">\n        <a class="chatbox-btn close-chatbox-button fa fa-times" title="' +
 __e(o.info_close) +
-'"></a> -->\n        <a class="chatbox-btn show-user-details-modal fa fa-info-circle" title="' +
+'"></a>\n        <a class="chatbox-btn show-user-details-modal fa fa-info-circle" title="' +
 __e(o.info_details) +
 '"></a>\n    </div>\n</div>\n';
 return __p
@@ -117898,9 +117964,13 @@ __p += '\n            Loading...\n        ';
  } ;
 __p += '\n    </div>\n    <!-- Sanitized in converse-muc-views. We want to render links. -->\n    <!-- <p class="chatroom-description">' +
 ((__t = (o.description)) == null ? '' : __t) +
-'</p> -->\n</div>\n<div class="chatbox-buttons row no-gutters">\n    <a class="chatbox-btn close-chatbox-button fa fa-sign-out-alt" title="' +
+'</p> -->\n</div>\n<div class="chatbox-buttons row no-gutters">\n    <!-- <a class="chatbox-btn close-chatbox-button fa fa-sign-out-alt" title="' +
 __e(o.info_close) +
-'"></a>\n    <!-- ';
+'"></a> -->\n\n    <a class="chatbox-btn sign-out-button fa fa-sign-out-alt" title="' +
+__e(o.sign_out) +
+'"></a>\n    <a class="chatbox-btn close-chatbox-button fa fa-times" title="' +
+__e(o.info_close) +
+'"></a>\n\n    <!-- ';
  if (o.affiliation == 'owner') { ;
 __p += '\n    <a class="chatbox-btn configure-chatroom-button fa fa-wrench" title="' +
 __e(o.info_configure) +
@@ -119298,11 +119368,11 @@ module.exports = function(o) {
 var __t, __p = '', __e = _.escape;
 __p += '<!-- src/templates/recent_messages_item.html -->\n<a class="list-item-link cbox-list-item open-chat w-100" data-jid="' +
 __e(o.jid) +
-'" href="#"><span class="chat-status ' +
+'" href="#">\n  <span class="chat-status ' +
 __e(o.status_icon) +
-'"></span><span class="contact-name">' +
+'"></span>\n  <span class="contact-name">' +
 __e(o.name || 'Loading...') +
-'</span></a>\n';
+'</span>\n</a>\n';
 return __p
 };
 

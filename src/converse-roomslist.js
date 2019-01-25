@@ -222,7 +222,7 @@ converse.plugins.add('converse-roomslist', {
             openRoom (ev) {
                 ev.preventDefault();
                 const name = ev.target.textContent;
-                const jid = ev.target.getAttribute('data-room-jid');
+                const jid = ev.delegateTarget.dataset.roomJid;
                 const data = {
                     'name': name || Strophe.unescapeNode(Strophe.getNodeFromJid(jid)) || jid
                 }

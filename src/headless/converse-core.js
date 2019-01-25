@@ -1752,14 +1752,67 @@ const converse = {
       return _converse.on('openInviteMemberModal', callback);
     },
     'onLeaveGroup' (callback) {
-      return _converse.on('leavePageMeGroup', (jid) => callback(jid));
+      return _converse.on('leavePageMeGroup', (jid) => {
+        jid = jid.toLowerCase();
+        const chatbox = _converse.chatboxes.getChatBox(jid, {
+          type: _converse.CHATROOMS_TYPE,
+          id: jid,
+          box_id: b64_sha1(jid)
+        }, true)
+        let arrayParticipants =  chatbox.get('users');
+        let currentUser = _converse.user_settings.jid.split('@')[0];
+        let arrayUser = arrayParticipants.filter(e => (e.userName !== currentUser))
+       // console.log(chatbox);
+        // chatbox.save({
+        //     users: arrayUser,
+        //     latestMessageTime: null
+        // })
+          return callback(jid)
+      });
     },
     'createNewGroup' (jid, attrs, participants) {
-      _converse.api.rooms.open(jid, attrs, participants);
+        _converse.api.rooms.open(jid, attrs, participants);
+         jid = jid.toLowerCase();
+         attrs.type = _converse.CHATROOMS_TYPE;
+         attrs.id = jid;
+         attrs.box_id = b64_sha1(jid)
+         const chatbox = _converse.chatboxes.getChatBox(jid, attrs, true)
+         if (!chatbox) {
+             return;
+         }
+         let arrayParticipants = participants.map(e => (e.split('@')[0]))
+         let arrayUser = _converse.user_settings.imported_contacts.filter(e  => (arrayParticipants.includes(e.userName)))
+         arrayUser = arrayUser.map(e => {
+             e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
+             return e;
+         })
+
+        // console.log(chatbox);
+        chatbox.save({
+            users: arrayUser,
+            latestMessageTime: null
+        })
       // const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
     },
     'inviteToGroup' (jid, participants) {
-
+        const chatbox = _converse.chatboxes.findWhere({'jid': jid});
+        if (!chatbox) {
+            return;
+        }
+        participants.forEach(user => {
+            chatbox.directInvite(user, 'pageme invite');            
+        });
+        let arrayParticipants = participants.map(e => (e.split('@')[0]))
+        
+        let arrayUser = (_converse.user_settings.imported_contacts || []).filter(e => (arrayParticipants.includes(e.userName)))
+        arrayUser = arrayUser.map(e => {
+          e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
+          return e;
+        })
+        chatbox.save({
+            users: arrayUser,
+            latestMessageTime: null
+        })
     },
     'onShowPageMeMediaViewer' (callback) {
       _converse.on('showPageMeMediaViewer', callback);
