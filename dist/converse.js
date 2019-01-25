@@ -72724,13 +72724,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         'click .toggle-compose-spoiler': 'toggleComposeSpoilerMessage',
         'click .toggle-smiley ul.emoji-picker li': 'insertEmoji',
         'click .toggle-smiley': 'toggleEmojiMenu',
+        'click .toogle-toolbox-wrapper': 'toggleToolboxMenu',
         'click .upload-file': 'toggleFileUpload',
         'input .chat-textarea': 'inputChanged',
         'keydown .chat-textarea': 'keyPressed',
         'dragover .chat-textarea': 'onDragOver',
         'drop .chat-textarea': 'onDrop',
-        'click .load-more-messages': 'loadMoreMessages',
-        'click .toogle-toolbox-wrapper': 'toggleToolboxMenu'
+        'click .load-more-messages': 'loadMoreMessages'
       },
 
       initialize() {
@@ -72786,8 +72786,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         }));
         this.el.querySelector('.chat-toolbar.right-toolbar').innerHTML = toolbar(_.assign(options, {
           toolbar_side: 'right'
-        })); // this.addSpoilerButton(options);
-        // this.addFileUploadButton();
+        })); //  this.addSpoilerButton(options);
+        //  this.addFileUploadButton();
 
         _converse.emit('renderToolbar', this);
 
@@ -73580,9 +73580,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       },
 
       toggleToolboxMenu(ev) {
-        const dropdown_el = this.el.querySelector('.toggle-toolbox.dropup');
+        ev.preventDefault();
+        const dropdown_el = this.el.querySelector('.toggle-toolbox');
         const toolbox_dropdown = new bootstrap__WEBPACK_IMPORTED_MODULE_4___default.a.Dropdown(dropdown_el, true);
-        console.log(toolbox_dropdown);
         toolbox_dropdown.toggle();
       },
 
@@ -77165,6 +77165,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         'click .toggle-occupants': 'toggleOccupants',
         'click .toggle-smiley ul.emoji-picker li': 'insertEmoji',
         'click .toggle-smiley': 'toggleEmojiMenu',
+        'click .toogle-toolbox-wrapper': 'toggleToolboxMenu',
+        'click .toggle-photos': 'toggleFiles',
+        'click .toggle-videos': 'toggleFiles',
         'click .upload-file': 'toggleFileUpload',
         'keydown .chat-textarea': 'keyPressed',
         'keyup .chat-textarea': 'keyUp',
@@ -77177,6 +77180,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         this.model.messages.on('add', this.onMessageAdded, this);
         this.model.messages.on('rendered', this.scrollDown, this);
         this.model.on('change:affiliation', this.renderHeading, this);
+        this.model.on('change:users', this.renderHeading, this);
         this.model.on('change:connection_status', this.afterConnected, this);
         this.model.on('change:jid', this.renderHeading, this);
         this.model.on('change:name', this.renderHeading, this);
@@ -77184,7 +77188,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
 
         this.model.on('configurationNeeded', this.getAndRenderConfigurationForm, this);
         this.model.on('destroy', this.hide, this);
-        this.model.on('show', this.show, this); // this.model.occupants.on('add', this.onOccupantAdded, this);
+        this.model.on('show', this.show, this);
+        this.model.attributes.from_groupChat = true; // this.model.occupants.on('add', this.onOccupantAdded, this);
         // this.model.occupants.on('remove', this.onOccupantRemoved, this);
         // this.model.occupants.on('change:show', this.showJoinOrLeaveNotification, this);
         // this.model.occupants.on('change:role', this.informOfOccupantsRoleChange, this);
@@ -77395,6 +77400,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         /* Returns the heading HTML to be rendered.
          */
         return templates_chatroom_head_html__WEBPACK_IMPORTED_MODULE_13___default()(_.extend(this.model.toJSON(), {
+          'members_length': this.model.pagemeGroupMembers.length,
+          'list_members': __('List members'),
+          'add_member': __('Add member'),
           'Strophe': Strophe,
           'info_close': __('Close this groupchat'),
           'sign_out': __('Leave this groupchat'),
@@ -78852,6 +78860,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
           'allow_muc_invitations': _converse.allow_muc_invitations,
           'label_occupants': __('Member list')
         }));
+
+        _converse.emit('members_rendered', this.chatroomview.model.toJSON());
+
         return this;
       },
 
@@ -82125,8 +82136,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         ev.preventDefault();
         const name = ev.target.textContent;
         const jid = ev.delegateTarget.dataset.roomJid;
-        console.log(ev);
-        console.log(name, jid);
         const data = {
           'name': name || Strophe.unescapeNode(Strophe.getNodeFromJid(jid)) || jid
         };
@@ -88028,9 +88037,10 @@ const converse = {
     }
 
     let arrayParticipants = participants.map(e => e.split('@')[0]);
-
-    let arrayUser = _converse.user_settings.imported_contacts.filter(e => arrayParticipants.includes(e.userName));
-
+    let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => arrayParticipants.includes(e.userName));
+    let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => arrayParticipants.includes(e.userName));
+    let arrayUser = arrayAddressBook.concat(arrayOrganization);
+    arrayUser = _lodash_noconflict__WEBPACK_IMPORTED_MODULE_4___default.a.uniq(arrayUser);
     arrayUser = arrayUser.map(e => {
       e['joinedDate'] = moment__WEBPACK_IMPORTED_MODULE_7___default()(e['joinedDate'], 'YYYYMMDDHHmmssZ');
       return e;
@@ -88055,7 +88065,10 @@ const converse = {
       chatbox.directInvite(user, 'pageme invite');
     });
     let arrayParticipants = participants.map(e => e.split('@')[0]);
-    let arrayUser = (_converse.user_settings.imported_contacts || []).filter(e => arrayParticipants.includes(e.userName));
+    let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => arrayParticipants.includes(e.userName));
+    let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => arrayParticipants.includes(e.userName));
+    let arrayUser = arrayAddressBook.concat(arrayOrganization);
+    arrayUser = _lodash_noconflict__WEBPACK_IMPORTED_MODULE_4___default.a.uniq(arrayUser);
     arrayUser = arrayUser.map(e => {
       e['joinedDate'] = moment__WEBPACK_IMPORTED_MODULE_7___default()(e['joinedDate'], 'YYYYMMDDHHmmssZ');
       return e;
@@ -117961,7 +117974,13 @@ __e( o.name ) +
  } else { ;
 __p += '\n            Loading...\n        ';
  } ;
-__p += '\n    </div>\n    <!-- Sanitized in converse-muc-views. We want to render links. -->\n    <!-- <p class="chatroom-description">' +
+__p += '\n    </div>\n    <div class="row" style="width: 12%">\n        <span class="col-4 text-center" style="border-right: 1px solid; width: 100%;     display: flex; align-items: flex-start; justify-content: center;">\n            <span class=" row">\n                <i class="fa fa-user toggle-occupants" aria-hidden="true" style="font-size: 15px; margin-top: 7px;" title="' +
+__e(o.list_members) +
+'"></i>\n                <strong style="font-size: 16px; margin-top: 5px">&nbsp ' +
+__e(o.members_length) +
+'</strong>\n            </span>\n        </span>\n        <span class="col-4 text-center" style="border-right: 1px solid">\n            <i class="fa fa-star"  style="font-size: 15px" aria-hidden="true"></i>\n        </span>\n        <span class="col-4 text-center" style="border-right: 1px solid">\n            <i class="fa fa-plus add-group-member"  style="font-size: 15px" aria-hidden="true" title="' +
+__e(o.add_member) +
+'"></i>\n        </span>\n    </div>\n    <!-- Sanitized in converse-muc-views. We want to render links. -->\n    <!-- <p class="chatroom-description">' +
 ((__t = (o.description)) == null ? '' : __t) +
 '</p> -->\n</div>\n<div class="chatbox-buttons row no-gutters">\n    <!-- <a class="chatbox-btn close-chatbox-button fa fa-sign-out-alt" title="' +
 __e(o.info_close) +
@@ -118066,7 +118085,7 @@ module.exports = function(o) {
 var __t, __p = '', __e = _.escape;
 __p += '<!-- src/templates/chatroom_sidebar.html -->\n<!-- <div class="occupants"> -->\n<div class="occupants-header">\n    <i class="hide-occupants fa fa-times"></i>\n    <p class="occupants-heading">\n      ' +
 __e(o.label_occupants) +
-'\n      <!-- <i class="fa fa-sign-out-alt close-chatbox-button"></i> -->\n      <i class="fa fa-user-plus add-group-member"></i>\n    </p>\n</div>\n<ul class="occupant-list"></ul>\n<div class="chatroom-features"></div>\n<!-- </div> -->\n';
+'\n      <!-- <i class="fa fa-sign-out-alt close-chatbox-button"></i> -->\n      <!-- <i class="fa fa-user-plus add-group-member"></i> -->\n    </p>\n</div>\n<ul class="occupant-list"></ul>\n<div class="chatroom-features"></div>\n<!-- </div> -->\n';
 return __p
 };
 
@@ -118218,7 +118237,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/emojis.html -->\n<div class="emoji-picker-container">\n';
+__p += '<!-- src/templates/emojis.html -->\n<div class="emoji-picker-container text-left">\n';
  o._.forEach(o.emojis_by_category, function (obj, category) { ;
 __p += '\n    <ul class="emoji-picker emoji-picker-' +
 __e(category) +
@@ -118590,7 +118609,7 @@ __p += ' fa-caret-down ';
  } else { ;
 __p += ' fa-caret-right ';
  } ;
-__p += '"> -->\n    </span> ' +
+__p += '"> -->\n     ' +
 __e(o.label_group) +
 '</a>\n\n<ul class="items-list roster-group-contacts ';
  if (o.toggle_state === o._converse.CLOSED) { ;
@@ -120186,13 +120205,19 @@ __p += '\n  <!-- <li class="toggle-medical-requests fa fa-stethoscope" title="' 
 __e(o.label_medical_requests) +
 '"></li>\n  <li class="toggle-files fa fa-file-upload" title="' +
 __e(o.label_file_upload) +
-'"></li> -->\n  <li class="toogle-toolbox-wrapper fa fa-plus dropup">\n    <button class="toggle-toolbox dropup hidden" id="toggleToolbox" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">+</button>\n    <div class="dropdown-menu toolbox-menu" aria-labelledby="toggleToolbox">\n      <div class="group-item">\n        <span class="toolbox-item toolbox-photo toggle-photos"></span>\n        <span class="toolbox-item toolbox-video toggle-videos"></span>\n      </div>\n      <div class="dropdown-divider"></div>\n      <span class="group-item-name"><b>Extensions:</b></span>\n      <div class="group-item">\n        <span class="toolbox-item toolbox-medical-request toggle-medical-requests"></span>\n      </div>\n\n    </div>\n  </li>\n';
+'"></li> -->\n  <li class="toogle-toolbox-wrapper fa fa-plus dropup">\n    <button class="toggle-toolbox dropup hidden" id="toggleToolbox" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">+</button>\n    <div class="dropdown-menu toolbox-menu" aria-labelledby="toggleToolbox">\n      <div class="group-item">\n        <div style="padding: 0px 20px 0px 20px;" class="group">\n          <span class="toolbox-item toolbox-photo toggle-photos"></span>\n          <h5 class="text-center">Quick Photo</h5>\n        </div>\n          \n          <div style="padding: 0px 20px 0px 20px;" class="group">\n            <span class="toolbox-item toolbox-video toggle-videos"></span>\n            <h5 class="text-center">Video Clip</h5>\n          </div>\n      </div>\n      ';
+if (o.from_groupChat) {;
+__p += '\n      ';
+ } else { ;
+__p += '\n      <div>\n        <div class="dropdown-divider"></div>\n        <span class="group-item-name"><b>Extensions:</b></span>\n        <div class="group-item">\n          <div style="padding: 0px 20px 0px 20px;" class="group">\n            <span class="toolbox-item toolbox-medical-request toggle-medical-requests"></span>\n            <h5 class="text-center">Medical Request</h5>\n          </div>\n        </div>\n      </div>\n      ';
+};
+__p += '\n      \n    </div>\n  </li>\n';
  } else { ;
 __p += '\n  ';
  if (o.use_emoji)  { ;
 __p += '\n  <li class="toggle-toolbar-menu toggle-smiley dropup">\n      <a class="toggle-smiley far fa-smile" title="' +
 __e(o.tooltip_insert_smiley) +
-'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>\n      <div class="emoji-picker dropdown-menu toolbar-menu"></div>\n  </li>\n  ';
+'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></a>\n      <div class="emoji-picker dropdown-menu toolbar-menu" style="left: -200px !important"></div>\n  </li>\n  ';
  } ;
 __p += '\n  ';
  if (o.show_call_button)  { ;
