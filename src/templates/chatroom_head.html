@@ -9,6 +9,20 @@
             Loading...
         {[ } ]}
     </div>
+    <div class="row" style="width: 12%">
+        <span class="col-4 text-center" style="border-right: 1px solid; width: 100%;     display: flex; align-items: flex-start; justify-content: center;">
+            <span class=" row">
+                <i class="fa fa-user toggle-occupants" aria-hidden="true" style="font-size: 15px; margin-top: 7px;" title="{{{o.list_members}}}"></i>
+                <strong style="font-size: 16px; margin-top: 5px">&nbsp {{{o.members_length}}}</strong>
+            </span>
+        </span>
+        <span class="col-4 text-center" style="border-right: 1px solid">
+            <i class="fa fa-star"  style="font-size: 15px" aria-hidden="true"></i>
+        </span>
+        <span class="col-4 text-center" style="border-right: 1px solid">
+            <i class="fa fa-plus add-group-member"  style="font-size: 15px" aria-hidden="true" title="{{{o.add_member}}}"></i>
+        </span>
+    </div>
     <!-- Sanitized in converse-muc-views. We want to render links. -->
     <!-- <p class="chatroom-description">{{o.description}}</p> -->
 </div>

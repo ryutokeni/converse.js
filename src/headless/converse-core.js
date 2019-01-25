@@ -1780,12 +1780,15 @@ const converse = {
          if (!chatbox) {
              return;
          }
-         let arrayParticipants = participants.map(e => (e.split('@')[0]))
-         let arrayUser = _converse.user_settings.imported_contacts.filter(e  => (arrayParticipants.includes(e.userName)))
-         arrayUser = arrayUser.map(e => {
-             e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
-             return e;
-         })
+        let arrayParticipants = participants.map(e => (e.split('@')[0]))
+        let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => (arrayParticipants.includes(e.userName)))
+        let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => (arrayParticipants.includes(e.userName)))
+        let arrayUser = arrayAddressBook.concat(arrayOrganization);
+        arrayUser = _.uniq(arrayUser);
+        arrayUser = arrayUser.map(e => {
+          e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
+          return e;
+        })
 
         // console.log(chatbox);
         chatbox.save({
@@ -1803,8 +1806,10 @@ const converse = {
             chatbox.directInvite(user, 'pageme invite');
         });
         let arrayParticipants = participants.map(e => (e.split('@')[0]))
-
-        let arrayUser = (_converse.user_settings.imported_contacts || []).filter(e => (arrayParticipants.includes(e.userName)))
+        let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => (arrayParticipants.includes(e.userName)))
+        let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => (arrayParticipants.includes(e.userName)))
+        let arrayUser = arrayAddressBook.concat(arrayOrganization);
+        arrayUser = _.uniq(arrayUser);
         arrayUser = arrayUser.map(e => {
           e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
           return e;

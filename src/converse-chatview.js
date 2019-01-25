@@ -304,13 +304,13 @@ converse.plugins.add('converse-chatview', {
                 'click .toggle-compose-spoiler': 'toggleComposeSpoilerMessage',
                 'click .toggle-smiley ul.emoji-picker li': 'insertEmoji',
                 'click .toggle-smiley': 'toggleEmojiMenu',
+                'click .toogle-toolbox-wrapper': 'toggleToolboxMenu',
                 'click .upload-file': 'toggleFileUpload',
                 'input .chat-textarea': 'inputChanged',
                 'keydown .chat-textarea': 'keyPressed',
                 'dragover .chat-textarea': 'onDragOver',
                 'drop .chat-textarea': 'onDrop',
-                'click .load-more-messages': 'loadMoreMessages',
-                'click .toogle-toolbox-wrapper': 'toggleToolboxMenu'
+                'click .load-more-messages': 'loadMoreMessages'
             },
 
             initialize () {
@@ -361,6 +361,7 @@ converse.plugins.add('converse-chatview', {
                 if (!_converse.show_toolbar) {
                     return this;
                 }
+               
                 toolbar = toolbar || tpl_toolbar;
                 options = _.assign(
                     this.model.toJSON(),
@@ -368,8 +369,8 @@ converse.plugins.add('converse-chatview', {
                 );
                 this.el.querySelector('.chat-toolbar.left-toolbar').innerHTML = toolbar(_.assign(options, { toolbar_side: 'left' }));
                 this.el.querySelector('.chat-toolbar.right-toolbar').innerHTML = toolbar(_.assign(options, { toolbar_side: 'right' }));
-                // this.addSpoilerButton(options);
-                // this.addFileUploadButton();
+                //  this.addSpoilerButton(options);
+                //  this.addFileUploadButton();
                 _converse.emit('renderToolbar', this);
                 return this;
             },
@@ -1118,9 +1119,10 @@ converse.plugins.add('converse-chatview', {
             },
 
             toggleToolboxMenu (ev) {
-                const dropdown_el = this.el.querySelector('.toggle-toolbox.dropup');
+                ev.preventDefault();
+
+                const dropdown_el = this.el.querySelector('.toggle-toolbox');
                 const toolbox_dropdown = new bootstrap.Dropdown(dropdown_el, true);
-                console.log(toolbox_dropdown);
                 toolbox_dropdown.toggle();
             },
 

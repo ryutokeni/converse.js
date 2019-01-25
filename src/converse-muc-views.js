@@ -490,6 +490,9 @@ converse.plugins.add('converse-muc-views', {
                 'click .toggle-occupants': 'toggleOccupants',
                 'click .toggle-smiley ul.emoji-picker li': 'insertEmoji',
                 'click .toggle-smiley': 'toggleEmojiMenu',
+                'click .toogle-toolbox-wrapper': 'toggleToolboxMenu',
+                'click .toggle-photos': 'toggleFiles',
+                'click .toggle-videos': 'toggleFiles',
                 'click .upload-file': 'toggleFileUpload',
                 'keydown .chat-textarea': 'keyPressed',
                 'keyup .chat-textarea': 'keyUp',
@@ -504,6 +507,7 @@ converse.plugins.add('converse-muc-views', {
                 this.model.messages.on('rendered', this.scrollDown, this);
 
                 this.model.on('change:affiliation', this.renderHeading, this);
+                this.model.on('change:users', this.renderHeading, this);
                 this.model.on('change:connection_status', this.afterConnected, this);
                 this.model.on('change:jid', this.renderHeading, this);
                 this.model.on('change:name', this.renderHeading, this);
@@ -512,13 +516,13 @@ converse.plugins.add('converse-muc-views', {
                 this.model.on('configurationNeeded', this.getAndRenderConfigurationForm, this);
                 this.model.on('destroy', this.hide, this);
                 this.model.on('show', this.show, this);
+                this.model.attributes.from_groupChat = true;
 
                 // this.model.occupants.on('add', this.onOccupantAdded, this);
                 // this.model.occupants.on('remove', this.onOccupantRemoved, this);
                 // this.model.occupants.on('change:show', this.showJoinOrLeaveNotification, this);
                 // this.model.occupants.on('change:role', this.informOfOccupantsRoleChange, this);
                 // this.model.occupants.on('change:affiliation', this.informOfOccupantsAffiliationChange, this);
-
                 this.createEmojiPicker();
                 this.createOccupantsView();
                 this.render().insertIntoDOM();
@@ -697,6 +701,9 @@ converse.plugins.add('converse-muc-views', {
                  */
                 return tpl_chatroom_head(
                     _.extend(this.model.toJSON(), {
+                        'members_length': this.model.pagemeGroupMembers.length,
+                        'list_members': __('List members'),
+                        'add_member': __('Add member'),
                         'Strophe': Strophe,
                         'info_close': __('Close this groupchat'),
                         'sign_out': __('Leave this groupchat'),
@@ -2079,6 +2086,7 @@ converse.plugins.add('converse-muc-views', {
                         'label_occupants': __('Member list')
                     })
                 );
+                _converse.emit('members_rendered', this.chatroomview.model.toJSON())
                 return this;
             },
 
