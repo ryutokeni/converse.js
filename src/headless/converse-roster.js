@@ -616,6 +616,7 @@ converse.plugins.add('converse-roster', {
             },
 
             compareContacts(contacts, group, sync) {
+              console.log(contacts, group, sync);
               if (!currentItems || !currentItems.length) {
                 currentItems = _.cloneDeep(rawItems);
               }

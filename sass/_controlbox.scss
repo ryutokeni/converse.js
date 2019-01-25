@@ -45,8 +45,11 @@
         }
     }
 
-    #recent-messages .list-item {
-      color: var(--controlbox-heading-color);
+    #recent-messages {
+      margin-top: 0 !important;
+      .list-item {
+        color: var(--controlbox-heading-color);
+      }
     }
 
     .room-info {

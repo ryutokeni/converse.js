@@ -92479,6 +92479,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       },
 
       compareContacts(contacts, group, sync) {
+        console.log(contacts, group, sync);
+
         if (!currentItems || !currentItems.length) {
           currentItems = _.cloneDeep(rawItems);
         }
