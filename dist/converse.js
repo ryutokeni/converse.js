@@ -20034,7 +20034,7 @@ utils.intFromLE = intFromLE;
 /*! exports provided: _args, _development, _from, _id, _inBundle, _integrity, _location, _phantomChildren, _requested, _requiredBy, _resolved, _spec, _where, author, bugs, dependencies, description, devDependencies, files, homepage, keywords, license, main, name, repository, scripts, version, default */
 /***/ (function(module) {
 
-module.exports = {"_args":[["elliptic@6.4.0","/Users/macuser/Desktop/pageme/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/macuser/Desktop/pageme/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
+module.exports = {"_args":[["elliptic@6.4.0","/Users/admin/Ant-Tech/Projects/converse-test/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/admin/Ant-Tech/Projects/converse-test/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
 
 /***/ }),
 
@@ -80770,10 +80770,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
       },
 
       toHTML() {
-        return templates_chat_status_modal_html__WEBPACK_IMPORTED_MODULE_5___default()(_.extend({
-          'pageMeStatus': _converse.user_settings.pageMeStatus,
-          'statusMessage': _converse.user_settings.statusMessage
-        }, this.model.toJSON(), this.model.vcard.toJSON(), {
+        return templates_chat_status_modal_html__WEBPACK_IMPORTED_MODULE_5___default()(_.extend(this.model.toJSON(), this.model.vcard.toJSON(), {
           'label_close': __('Close'),
           'label_cancel': __('Cancel'),
           'label_save': __('Save'),
@@ -80830,7 +80827,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
       tagName: "div",
       events: {
         // "click a.show-profile": "showProfileModal",
-        "click a.change-status": "showStatusChangeModal",
+        "click .change-status": "showStatusChangeModal",
         "click .show-client-info": "showClientInfoModal",
         "click .logout": "logOut"
       },
@@ -82127,8 +82124,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         ev.preventDefault();
         const name = ev.target.textContent;
         const jid = ev.delegateTarget.dataset.roomJid;
-        console.log(ev);
-        console.log(name, jid);
         const data = {
           'name': name || Strophe.unescapeNode(Strophe.getNodeFromJid(jid)) || jid
         };
@@ -83595,7 +83590,8 @@ const initialize = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21_
       onMedicalReqButtonClicked = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onMedicalReqButtonClicked,
       sendFileXMPP = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].sendFileXMPP,
       inviteToGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].inviteToGroup,
-      onStatusFormSubmitted = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onStatusFormSubmitted;
+      onStatusFormSubmitted = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onStatusFormSubmitted,
+      updateProfile = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].updateProfile;
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].initialize = function (settings, callback) {
   if (_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].env._.isArray(settings.whitelisted_plugins)) {
@@ -83669,6 +83665,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].sendFi
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onStatusFormSubmitted = function (callback) {
   return onStatusFormSubmitted(callback);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].updateProfile = function (data) {
+  return updateProfile(data);
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"]);
@@ -88200,6 +88200,12 @@ const converse = {
   'onStatusFormSubmitted'(callback) {
     _converse.on('statusFormSubmitted', data => {
       callback(data);
+    });
+  },
+
+  'updateProfile'(data) {
+    _converse.api.waitUntil('statusInitialized').then(() => {
+      _converse.xmppstatus.save(data);
     });
   },
 
@@ -119322,7 +119328,7 @@ __e(o.organizations) +
  } ;
 __p += '\n        <!-- <a class="controlbox-heading__btn show-client-info fa fa-info-circle align-self-center" title="' +
 __e(o.info_details) +
-'"></a> -->\n        <span>\n          <span class="fa fa-circle chat-status chat-status--' +
+'"></a> -->\n        <span>\n          <span class="fa fa-circle chat-status change-status chat-status--' +
 __e(o.pageMeStatus) +
 '"></span> ' +
 __e(o.fullname) +
@@ -119332,9 +119338,9 @@ __p += '\n            <a class="controlbox-heading__btn logout fa fa-sign-out-al
 __e(o.title_log_out) +
 '"></a>\n        ';
  } ;
-__p += '\n\n        <a class="controlbox-heading__btn change-status fa fa-pencil-alt" title="' +
+__p += '\n\n        <!-- <a class="controlbox-heading__btn change-status fa fa-pencil-alt" title="' +
 __e(o.title_change_status) +
-'" data-toggle="modal" data-target="#changeStatusModal"></a>\n      </div>\n    </div>\n</div>\n\n</div>\n';
+'" data-toggle="modal" data-target="#changeStatusModal"></a> -->\n      </div>\n    </div>\n</div>\n\n</div>\n';
 return __p
 };
 

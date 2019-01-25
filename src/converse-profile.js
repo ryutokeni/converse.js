@@ -144,10 +144,6 @@ converse.plugins.add('converse-profile', {
             toHTML () {
                 return tpl_chat_status_modal(
                     _.extend(
-                        {
-                          'pageMeStatus': _converse.user_settings.pageMeStatus,
-                          'statusMessage': _converse.user_settings.statusMessage
-                        },
                         this.model.toJSON(),
                         this.model.vcard.toJSON(),
                         {
@@ -219,7 +215,7 @@ converse.plugins.add('converse-profile', {
             tagName: "div",
             events: {
                 // "click a.show-profile": "showProfileModal",
-                "click a.change-status": "showStatusChangeModal",
+                "click .change-status": "showStatusChangeModal",
                 "click .show-client-info": "showClientInfoModal",
                 "click .logout": "logOut"
             },

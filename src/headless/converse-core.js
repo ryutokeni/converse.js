@@ -1800,10 +1800,10 @@ const converse = {
             return;
         }
         participants.forEach(user => {
-            chatbox.directInvite(user, 'pageme invite');            
+            chatbox.directInvite(user, 'pageme invite');
         });
         let arrayParticipants = participants.map(e => (e.split('@')[0]))
-        
+
         let arrayUser = (_converse.user_settings.imported_contacts || []).filter(e => (arrayParticipants.includes(e.userName)))
         arrayUser = arrayUser.map(e => {
           e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
@@ -1906,6 +1906,11 @@ const converse = {
     'onStatusFormSubmitted' (callback) {
       _converse.on('statusFormSubmitted', (data) => {
         callback(data);
+      })
+    },
+    'updateProfile' (data) {
+      _converse.api.waitUntil('statusInitialized').then(() => {
+        _converse.xmppstatus.save(data)
       })
     },
     /**

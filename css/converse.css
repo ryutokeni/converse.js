@@ -10678,9 +10678,9 @@ body.reset {
 #conversejs .roster-contacts .chat-status {
   color: var(--text-color); }
 
-#conversejs .set-xmpp-status .chat-status::before,
-#conversejs .xmpp-status .chat-status::before,
-#conversejs .roster-contacts .chat-status::before {
+#conversejs .set-xmpp-status .fa-circle::before,
+#conversejs .xmpp-status .fa-circle::before,
+#conversejs .roster-contacts .fa-circle::before {
   border: 2px solid white !important;
   border-radius: 50%; }
 

@@ -71,7 +71,8 @@ const {
   onMedicalReqButtonClicked,
   sendFileXMPP,
   inviteToGroup,
-  onStatusFormSubmitted
+  onStatusFormSubmitted,
+  updateProfile
 } = converse;
 
 converse.initialize = function (settings, callback) {
@@ -143,6 +144,10 @@ converse.sendFileXMPP = function(jid, mediaId) {
 
 converse.onStatusFormSubmitted = function(callback) {
   return onStatusFormSubmitted(callback);
+}
+
+converse.updateProfile = function(data) {
+  return updateProfile(data);
 }
 
 export default converse;
