@@ -270,7 +270,21 @@ converse.plugins.add('converse-roomslist', {
                 }
             }
         });
-
+        // _converse.api.listen.on('messageAdded', data => {
+        //     if (data.message.attributes.sender !== 'me') {
+        //          console.log(data);
+        //         // const model = new _converse.OpenRooms();
+        //         // model.id = data.chatbox.id;
+        //         // let modelRoster = new _converse.RoomsListView({'model': model});
+        //         // let index = modelRoster.model.models.findIndex(e => (data.chatbox.id === e.get('jid')))
+        //         // if (index) {
+        //         //     modelRoster.model.models[index].save({
+        //         //         'num_unread': 1,
+        //         //         'num_unread_general': 1
+        //         //     })
+        //         // }
+        //     }
+        // })
         const initRoomsListView = function () {
             const storage = _converse.config.get('storage'),
                   id = b64_sha1(`converse.open-rooms-{_converse.bare_jid}`),

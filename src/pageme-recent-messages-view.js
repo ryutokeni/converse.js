@@ -33,6 +33,7 @@ converse.plugins.add('pageme-recent-messages-view', {
             initialize () {
                 this.model.on('change', this.render, this);
                 this.model.on('change:latestMessageTime', this.showOrHide, this);
+                this.model.on('change:num_unread_general', this.render, this)
                 this.model.on("highlight", this.highlight, this);
                 this.model.on('addToRecent', this.show, this);
                 this.model.on('hideFromRecent', this.hide, this);

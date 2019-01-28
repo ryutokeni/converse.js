@@ -20034,7 +20034,7 @@ utils.intFromLE = intFromLE;
 /*! exports provided: _args, _development, _from, _id, _inBundle, _integrity, _location, _phantomChildren, _requested, _requiredBy, _resolved, _spec, _where, author, bugs, dependencies, description, devDependencies, files, homepage, keywords, license, main, name, repository, scripts, version, default */
 /***/ (function(module) {
 
-module.exports = {"_args":[["elliptic@6.4.0","/Users/admin/Ant-Tech/Projects/converse-test/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/admin/Ant-Tech/Projects/converse-test/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
+module.exports = {"_args":[["elliptic@6.4.0","/Users/macuser/Desktop/pageme/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/macuser/Desktop/pageme/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
 
 /***/ }),
 
@@ -73208,6 +73208,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
          *  (Backbone.Model) message: The message object
          */
         if (!this.model.messageViews) {
+          //  console.log('this model dont have message Views', this.model);
           this.model.messageViews = new Backbone.Collection();
         }
 
@@ -73259,10 +73260,17 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           this.insertIntoTextArea(message.get('message'), true, true);
         }
 
-        _converse.emit('messageAdded', {
-          'message': message,
-          'chatbox': this.model
-        });
+        if (!message.attributes.silent && this.model.attributes.chat_state === 'active' && this.model.messages.length > 0) {
+          this.model.save({
+            // 'num_unread': 1,
+            'num_unread_general': 1
+          });
+
+          _converse.emit('messageAdded', {
+            'message': message,
+            'chatbox': this.model
+          });
+        }
       },
 
       parseMessageForCommands(text) {
@@ -82192,7 +82200,21 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         }
       }
 
-    });
+    }); // _converse.api.listen.on('messageAdded', data => {
+    //     if (data.message.attributes.sender !== 'me') {
+    //          console.log(data);
+    //         // const model = new _converse.OpenRooms();
+    //         // model.id = data.chatbox.id;
+    //         // let modelRoster = new _converse.RoomsListView({'model': model});
+    //         // let index = modelRoster.model.models.findIndex(e => (data.chatbox.id === e.get('jid')))
+    //         // if (index) {
+    //         //     modelRoster.model.models[index].save({
+    //         //         'num_unread': 1,
+    //         //         'num_unread_general': 1
+    //         //     })
+    //         // }
+    //     }
+    // })
 
     const initRoomsListView = function initRoomsListView() {
       const storage = _converse.config.get('storage'),
@@ -89949,7 +89971,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         this.constructor.__super__.initialize.apply(this, arguments);
 
         this.on('change:connection_status', this.onConnectionStatusChanged, this);
-        this.on('change:users', this.updateGroupMembers, this);
+        this.on('change:users', this.updateGroupMembers);
         this.occupants = new _converse.ChatRoomOccupants();
         this.occupants.browserStorage = new Backbone.BrowserStorage.session(b64_sha1(`converse.occupants-${_converse.bare_jid}${this.get('jid')}`));
         this.occupants.chatroom = this;
@@ -92479,8 +92501,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       },
 
       compareContacts(contacts, group, sync) {
-        console.log(contacts, group, sync);
-
         if (!currentItems || !currentItems.length) {
           currentItems = _.cloneDeep(rawItems);
         }
@@ -116916,6 +116936,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       initialize() {
         this.model.on('change', this.render, this);
         this.model.on('change:latestMessageTime', this.showOrHide, this);
+        this.model.on('change:num_unread_general', this.render, this);
         this.model.on("highlight", this.highlight, this);
         this.model.on('addToRecent', this.show, this);
         this.model.on('hideFromRecent', this.hide, this);
@@ -117971,7 +117992,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/chatroom_head.html -->\n<div class="chatbox-navback"><i class="fa fa-arrow-left"></i></div>\n<div class="chatbox-title">\n    <div class="chat-title" title="' +
+__p += '<!-- src/templates/chatroom_head.html -->\n<style>\n    .title-feature {\n        width: 50%;\n    }\n    @media (max-width: 1500px) {\n    .title-feature {\n        width: 60% !important;\n    }\n    }\n\n    @media (max-width: 1300px) {\n    .title-feature {\n        width: 100% !important;\n    }\n    }\n</style>\n<div class="chatbox-navback"><i class="fa fa-arrow-left"></i></div>\n<div class="chatbox-title">\n    <div class="chat-title" title="' +
 __e(o.nickname) +
 '">\n        ';
   if (o.subject && o.subject.text) { ;
@@ -117985,11 +118006,11 @@ __e( o.name ) +
  } else { ;
 __p += '\n            Loading...\n        ';
  } ;
-__p += '\n    </div>\n    <div class="row" style="width: 12%">\n        <span class="col-4 text-center" style="border-right: 1px solid; width: 100%;     display: flex; align-items: flex-start; justify-content: center;">\n            <span class=" row">\n                <i class="fa fa-user toggle-occupants" aria-hidden="true" style="font-size: 15px; margin-top: 7px;" title="' +
+__p += '\n    </div>\n    <div class="row title-feature" >\n        <span class="col-1 text-center" style="border-right: 1px solid; width: 100%; padding: 0px;">\n            <span class="row text-center" style="margin: 0px;padding: 0px;display: flex;justify-content: center;">\n                <i class="fa fa-user toggle-occupants" aria-hidden="true" style="font-size: 15px; margin-top: 7px;" title="' +
 __e(o.list_members) +
 '"></i>\n                <strong style="font-size: 16px; margin-top: 5px">&nbsp ' +
 __e(o.members_length) +
-'</strong>\n            </span>\n        </span>\n        <span class="col-4 text-center" style="border-right: 1px solid">\n            <i class="fa fa-star"  style="font-size: 15px" aria-hidden="true"></i>\n        </span>\n        <span class="col-4 text-center" style="border-right: 1px solid">\n            <i class="fa fa-plus add-group-member"  style="font-size: 15px" aria-hidden="true" title="' +
+'</strong>\n            </span>\n        </span>\n        <span class="col-1 text-center" style="border-right: 1px solid; padding: 0px;">\n            <i class="fa fa-star"  style="font-size: 15px" aria-hidden="true"></i>\n        </span>\n        <span class="col-1 text-center" style="border-right: 1px solid; padding: 0px">\n            <i class="fa fa-plus add-group-member"  style="font-size: 15px" aria-hidden="true" title="' +
 __e(o.add_member) +
 '"></i>\n        </span>\n    </div>\n    <!-- Sanitized in converse-muc-views. We want to render links. -->\n    <!-- <p class="chatroom-description">' +
 ((__t = (o.description)) == null ? '' : __t) +
@@ -119394,8 +119415,13 @@ return __p
 
 var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./node_modules/lodash/escape.js")};
 module.exports = function(o) {
-var __t, __p = '', __e = _.escape;
-__p += '<!-- src/templates/recent_messages_item.html -->\n<a class="list-item-link cbox-list-item open-chat w-100" data-jid="' +
+var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
+__p += '<!-- src/templates/recent_messages_item.html -->\n<a class="list-item-link cbox-list-item open-chat w-100 ';
+ if (o.num_unread) { ;
+__p += ' unread-msgs ';
+ } ;
+__p += '" data-jid="' +
 __e(o.jid) +
 '" href="#">\n  <span class="chat-status ' +
 __e(o.status_icon) +
@@ -119759,13 +119785,13 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/rooms_list_item.html -->\n<div class="list-item controlbox-padded available-chatroom d-flex flex-row\n    ';
+__p += '<!-- src/templates/rooms_list_item.html -->\n<style>\n.ping{\n        background-color: #ffffff !important;\n        color: black !important;\n    }\n</style>\n<div class="list-item controlbox-padded available-chatroom d-flex flex-row\n    ';
  if (o.currently_open) { ;
 __p += ' open ';
  } ;
 __p += '\n    ';
  if (o.num_unread_general) { ;
-__p += ' unread-msgs ';
+__p += ' unread-msgs ping ';
  } ;
 __p += '"\n    data-room-jid="' +
 __e(o.jid) +

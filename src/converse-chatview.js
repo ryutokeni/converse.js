@@ -774,7 +774,8 @@ converse.plugins.add('converse-chatview', {
                  *  (Backbone.Model) message: The message object
                  */
                  if (!this.model.messageViews) {
-                   this.model.messageViews = new Backbone.Collection;
+                    //  console.log('this model dont have message Views', this.model);
+                    this.model.messageViews = new Backbone.Collection;
                  }
                 const view = new _converse.MessageView({ 'model': message });
                 await view.render();
@@ -816,15 +817,22 @@ converse.plugins.add('converse-chatview', {
                  * Parameters:
                  *    (Object) message - The message Backbone object that was added.
                  */
-
                 this.showMessage(message);
                 if (message.get('correcting')) {
                     this.insertIntoTextArea(message.get('message'), true, true);
                 }
-                _converse.emit('messageAdded', {
+                if (!message.attributes.silent && this.model.attributes.chat_state === 'active' && this.model.messages.length > 0) {
+                    this.model.save({
+                        'num_unread': 1,
+                        'num_unread_general': 1
+                    })
+                    _converse.emit('messageAdded', {
                     'message': message,
                     'chatbox': this.model
-                });
+                    });
+                }
+                
+               
             },
 
             parseMessageForCommands (text) {
