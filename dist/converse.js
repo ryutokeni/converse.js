@@ -79317,7 +79317,18 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       }
 
       if (document.visibilityState == "hidden") {
-        _converse.playSoundNotification('blastwave');
+        if (_converse.xmppstatus.get('pageMeStatus') === 'ON_CALL') {
+          let interval;
+          interval = setInterval(() => {
+            _converse.playSoundNotification('blastwave');
+
+            if (document.visibilityState !== "hidden") {
+              clearInterval(interval);
+            }
+          }, 1500);
+        } else {
+          _converse.playSoundNotification('blastwave');
+        }
       } else {
         _converse.playSoundNotification('chimenotification');
       }

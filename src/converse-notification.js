@@ -275,7 +275,17 @@ converse.plugins.add('converse-notification', {
                 return false;
             }
             if (document.visibilityState == "hidden") {
-              _converse.playSoundNotification('blastwave');
+              if (_converse.xmppstatus.get('pageMeStatus') === 'ON_CALL') {
+                let interval;
+                interval = setInterval(() => {
+                  _converse.playSoundNotification('blastwave');
+                  if (document.visibilityState !== "hidden") {
+                    clearInterval(interval)
+                  }
+                }, 1500);
+              } else {
+                _converse.playSoundNotification('blastwave');
+              }
             } else {
               _converse.playSoundNotification('chimenotification');
             }
