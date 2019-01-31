@@ -11460,6 +11460,14 @@ body.reset {
     #conversejs.converse-embedded .chat-head-chatroom .chat-title .chatroom-jid,
     #conversejs .chat-head-chatroom .chat-title .chatroom-jid {
       font-size: var(--font-size-small); }
+    #conversejs.converse-embedded .chat-head-chatroom .chat-title .chat-feature,
+    #conversejs .chat-head-chatroom .chat-title .chat-feature {
+      font-size: 15px;
+      padding: 3px 10px;
+      border-right: 2px solid var(--subdued-color); }
+    #conversejs.converse-embedded .chat-head-chatroom .chat-title .chat-feature:first-child,
+    #conversejs .chat-head-chatroom .chat-title .chat-feature:first-child {
+      padding-left: 0; }
 
 #conversejs.converse-embedded .chatroom,
 #conversejs .chatroom {

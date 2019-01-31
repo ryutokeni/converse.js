@@ -20034,7 +20034,7 @@ utils.intFromLE = intFromLE;
 /*! exports provided: _args, _development, _from, _id, _inBundle, _integrity, _location, _phantomChildren, _requested, _requiredBy, _resolved, _spec, _where, author, bugs, dependencies, description, devDependencies, files, homepage, keywords, license, main, name, repository, scripts, version, default */
 /***/ (function(module) {
 
-module.exports = {"_args":[["elliptic@6.4.0","/Users/macuser/Desktop/pageme/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/macuser/Desktop/pageme/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
+module.exports = {"_args":[["elliptic@6.4.0","/Users/admin/Ant-Tech/Projects/converse-test/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/admin/Ant-Tech/Projects/converse-test/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
 
 /***/ }),
 
@@ -73262,7 +73262,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
         if (!message.attributes.silent && this.model.attributes.chat_state === 'active' && this.model.messages.length > 0) {
           this.model.save({
-            // 'num_unread': 1,
+            'num_unread': 1,
             'num_unread_general': 1
           });
 
@@ -89971,7 +89971,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         this.constructor.__super__.initialize.apply(this, arguments);
 
         this.on('change:connection_status', this.onConnectionStatusChanged, this);
-        this.on('change:users', this.updateGroupMembers);
+        this.on('change:users', this.updateGroupMembers, this);
         this.occupants = new _converse.ChatRoomOccupants();
         this.occupants.browserStorage = new Backbone.BrowserStorage.session(b64_sha1(`converse.occupants-${_converse.bare_jid}${this.get('jid')}`));
         this.occupants.chatroom = this;
@@ -91735,7 +91735,13 @@ _converse_core__WEBPACK_IMPORTED_MODULE_1__["default"].plugins.add('converse-pin
     _converse.pong = function (ping) {
       if (ping.getAttribute('CustomType') === 'VerificationRequest') {
         const verification = ping.querySelector('VerificationRequest');
-        const chatboxId = `${verification.getAttribute('sender')}${_converse.user_settings.domain}`;
+        let chatboxId = verification.getAttribute('sender');
+
+        if (chatboxId === Strophe.getNodeFromJid(_converse.bare_jid)) {
+          chatboxId = verification.getAttribute('recipient');
+        }
+
+        chatboxId = `${chatboxId}${_converse.user_settings.domain}`;
         _converse_core__WEBPACK_IMPORTED_MODULE_1__["default"].updateMessage(chatboxId, {
           medialRequestKey: verification.getAttribute('key')
         }, {
@@ -117362,15 +117368,15 @@ __p += '<!-- src/templates/chat_status_modal.html -->\n<!-- Change status Modal 
 __e(o.modal_title) +
 '</h5>\n                <button type="button" class="close" data-dismiss="modal" aria-label="' +
 __e(o.label_close) +
-'">\n                    <span aria-hidden="true">×</span>\n                </button>\n            </div>\n            <div class="modal-body">\n                <form class="converse-form set-xmpp-status" id="set-xmpp-status">\n                    <div class="form-group">\n                        <div class="custom-control custom-radio">\n                            <input ';
+'">\n                    <span aria-hidden="true">×</span>\n                </button>\n            </div>\n            <div class="modal-body">\n                <form class="converse-form set-xmpp-status" id="set-xmpp-status">\n                    <div class="form-group">\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
  if (o.pageMeStatus === 'OFF_CALL') { ;
 __p += ' checked="checked" ';
  } ;
-__p += '\n                                   type="radio" id="radio-off-call" value="OFF_CALL" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-off-call">\n                                <span class="fa fa-circle chat-status chat-status--online"></span>Not on call</label>\n                        </div>\n\n                        <div class="custom-control custom-radio">\n                            <input ';
+__p += '\n                                   type="radio" id="radio-off-call" value="OFF_CALL" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-off-call">\n                                <span class="fa fa-circle chat-status chat-status--online"></span>Not on call</label>\n                        </div>\n\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
  if (o.pageMeStatus === 'ON_CALL') { ;
 __p += ' checked="checked" ';
  } ;
-__p += '\n                                   type="radio" id="radio-on-call" value="ON_CALL" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-on-call">\n                                <span class="fa fa-circle chat-status chat-status--online"></span>On call</label>\n                        </div>\n\n                        <div class="custom-control custom-radio">\n                            <input ';
+__p += '\n                                   type="radio" id="radio-on-call" value="ON_CALL" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-on-call">\n                                <span class="fa fa-circle chat-status chat-status--online"></span>On call</label>\n                        </div>\n\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
  if (o.pageMeStatus === 'BUSY') { ;
 __p += ' checked="checked" ';
  } ;
@@ -117378,11 +117384,11 @@ __p += '\n                                   type="radio" id="radio-busy" value=
 __e(o.statusMessage) +
 '" placeholder="' +
 __e(o.placeholder_status_message) +
-'"/>\n                            <span class="clear-input fa fa-times ';
+'"/>\n                            <!-- <span class="clear-input fa fa-times ';
  if (!o.statusMessage) { ;
 __p += ' hidden ';
  } ;
-__p += '"></span>\n                        </div>\n                    </div>\n                    <button type="submit" class="btn btn-primary">' +
+__p += '"></span> -->\n                        </div>\n                    </div>\n                    <button type="submit" class="btn btn-primary">' +
 __e(o.label_save) +
 '</button>\n                </form>\n            </div>\n        </div>\n    </div>\n</div>\n';
 return __p
@@ -117992,7 +117998,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/chatroom_head.html -->\n<style>\n    .title-feature {\n        width: 50%;\n    }\n    @media (max-width: 1500px) {\n    .title-feature {\n        width: 60% !important;\n    }\n    }\n\n    @media (max-width: 1300px) {\n    .title-feature {\n        width: 100% !important;\n    }\n    }\n</style>\n<div class="chatbox-navback"><i class="fa fa-arrow-left"></i></div>\n<div class="chatbox-title">\n    <div class="chat-title" title="' +
+__p += '<!-- src/templates/chatroom_head.html -->\n<div class="chatbox-navback"><i class="fa fa-arrow-left"></i></div>\n<div class="chatbox-title">\n    <div class="chat-title" title="' +
 __e(o.nickname) +
 '">\n        ';
   if (o.subject && o.subject.text) { ;
@@ -118006,13 +118012,19 @@ __e( o.name ) +
  } else { ;
 __p += '\n            Loading...\n        ';
  } ;
-__p += '\n    </div>\n    <div class="row title-feature" >\n        <span class="col-1 text-center" style="border-right: 1px solid; width: 100%; padding: 0px;">\n            <span class="row text-center" style="margin: 0px;padding: 0px;display: flex;justify-content: center;">\n                <i class="fa fa-user toggle-occupants" aria-hidden="true" style="font-size: 15px; margin-top: 7px;" title="' +
+__p += '\n    </div>\n    <div class="chat-title">\n      <span class="chat-feature">\n        <i class="fa fa-user toggle-occupants" aria-hidden="true" title="' +
+__e(o.list_members) +
+'"></i>\n        <strong> ' +
+__e(o.members_length) +
+'</strong>\n      </span>\n      <span class="chat-feature">\n        <i class="fa fa-star" aria-hidden="true"></i>\n      </span>\n      <span class="chat-feature">\n        <i class="fa fa-plus add-group-member" aria-hidden="true" title="' +
+__e(o.add_member) +
+'"></i>\n      </span>\n        <!-- <span class="col-1 text-center" style="border-right: 1px solid; width: 100%; padding: 0px;">\n            <span class="row text-center" style="margin: 0px;padding: 0px;display: flex;justify-content: center;">\n                <i class="fa fa-user toggle-occupants" aria-hidden="true" style="font-size: 15px; margin-top: 7px;" title="' +
 __e(o.list_members) +
 '"></i>\n                <strong style="font-size: 16px; margin-top: 5px">&nbsp ' +
 __e(o.members_length) +
 '</strong>\n            </span>\n        </span>\n        <span class="col-1 text-center" style="border-right: 1px solid; padding: 0px;">\n            <i class="fa fa-star"  style="font-size: 15px" aria-hidden="true"></i>\n        </span>\n        <span class="col-1 text-center" style="border-right: 1px solid; padding: 0px">\n            <i class="fa fa-plus add-group-member"  style="font-size: 15px" aria-hidden="true" title="' +
 __e(o.add_member) +
-'"></i>\n        </span>\n    </div>\n    <!-- Sanitized in converse-muc-views. We want to render links. -->\n    <!-- <p class="chatroom-description">' +
+'"></i>\n        </span> -->\n    </div>\n    <!-- Sanitized in converse-muc-views. We want to render links. -->\n    <!-- <p class="chatroom-description">' +
 ((__t = (o.description)) == null ? '' : __t) +
 '</p> -->\n</div>\n<div class="chatbox-buttons row no-gutters">\n    <!-- <a class="chatbox-btn close-chatbox-button fa fa-sign-out-alt" title="' +
 __e(o.info_close) +

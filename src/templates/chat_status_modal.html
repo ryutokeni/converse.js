@@ -11,21 +11,21 @@
             <div class="modal-body">
                 <form class="converse-form set-xmpp-status" id="set-xmpp-status">
                     <div class="form-group">
-                        <div class="custom-control custom-radio">
+                        <div class="custom-control custom-radio p-0">
                             <input {[ if (o.pageMeStatus === 'OFF_CALL') { ]} checked="checked" {[ } ]}
                                    type="radio" id="radio-off-call" value="OFF_CALL" name="chat_status" class="custom-control-input"/>
                             <label class="custom-control-label" for="radio-off-call">
                                 <span class="fa fa-circle chat-status chat-status--online"></span>Not on call</label>
                         </div>
 
-                        <div class="custom-control custom-radio">
+                        <div class="custom-control custom-radio p-0">
                             <input {[ if (o.pageMeStatus === 'ON_CALL') { ]} checked="checked" {[ } ]}
                                    type="radio" id="radio-on-call" value="ON_CALL" name="chat_status" class="custom-control-input"/>
                             <label class="custom-control-label" for="radio-on-call">
                                 <span class="fa fa-circle chat-status chat-status--online"></span>On call</label>
                         </div>
 
-                        <div class="custom-control custom-radio">
+                        <div class="custom-control custom-radio p-0">
                             <input {[ if (o.pageMeStatus === 'BUSY') { ]} checked="checked" {[ } ]}
                                    type="radio" id="radio-busy" value="BUSY" name="chat_status" class="custom-control-input"/>
                             <label class="custom-control-label" for="radio-busy">
@@ -36,7 +36,7 @@
                         <div class="btn-group w-100">
                             <input name="status_message" type="text" class="form-control"
                                 value="{{{o.statusMessage}}}" placeholder="{{{o.placeholder_status_message}}}"/>
-                            <span class="clear-input fa fa-times {[ if (!o.statusMessage) { ]} hidden {[ } ]}"></span>
+                            <!-- <span class="clear-input fa fa-times {[ if (!o.statusMessage) { ]} hidden {[ } ]}"></span> -->
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary">{{{o.label_save}}}</button>

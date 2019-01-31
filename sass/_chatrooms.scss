@@ -75,6 +75,14 @@
             .chatroom-jid {
                 font-size: var(--font-size-small);
             }
+            .chat-feature {
+                font-size: 15px;
+                padding: 3px 10px;
+                border-right: 2px solid var(--subdued-color);
+            }
+            .chat-feature:first-child {
+                padding-left: 0;
+            }
         }
     }
 

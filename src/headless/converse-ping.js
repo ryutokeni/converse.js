@@ -50,7 +50,11 @@ converse.plugins.add('converse-ping', {
         _converse.pong = function (ping) {
             if (ping.getAttribute('CustomType') === 'VerificationRequest') {
               const verification = ping.querySelector('VerificationRequest');
-              const chatboxId = `${verification.getAttribute('sender')}${_converse.user_settings.domain}`
+              let chatboxId = verification.getAttribute('sender');
+              if (chatboxId === Strophe.getNodeFromJid(_converse.bare_jid)) {
+                chatboxId = verification.getAttribute('recipient');
+              }
+              chatboxId = `${chatboxId}${_converse.user_settings.domain}`
               converse.updateMessage(
                 chatboxId,
                 { medialRequestKey: verification.getAttribute('key') },
