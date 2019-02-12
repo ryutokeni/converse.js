@@ -117407,9 +117407,7 @@ __p += '<!-- src/templates/chat_status_modal.html -->\n<!-- Change status Modal 
 __e(o.modal_title) +
 '</h5>\n                <button type="button" class="close" data-dismiss="modal" aria-label="' +
 __e(o.label_close) +
-'">\n                    <span aria-hidden="true">×</span>\n                </button>\n            </div>\n            <div class="modal-body">\n                <form class="converse-form set-xmpp-status" id="set-xmpp-status">\n                    <div class="form-group">\n                      ' +
-__e(o.pageMeStatus) +
-'\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
+'">\n                    <span aria-hidden="true">×</span>\n                </button>\n            </div>\n            <div class="modal-body">\n                <form class="converse-form set-xmpp-status" id="set-xmpp-status">\n                    <div class="form-group">\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
  if (o.pageMeStatus === 'OFF_CALL') { ;
 __p += ' checked="checked" ';
  } ;
