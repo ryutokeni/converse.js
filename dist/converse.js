@@ -80930,11 +80930,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
       },
 
       showStatusChangeModal(ev) {
-        if (_.isUndefined(this.status_modal)) {
-          this.status_modal = new _converse.ChatStatusModal({
-            model: this.model
-          });
-        }
+        // if (_.isUndefined(this.status_modal)) {
+        this.status_modal = new _converse.ChatStatusModal({
+          model: this.model
+        }); // }
 
         this.status_modal.show(ev);
       },
@@ -117408,19 +117407,21 @@ __p += '<!-- src/templates/chat_status_modal.html -->\n<!-- Change status Modal 
 __e(o.modal_title) +
 '</h5>\n                <button type="button" class="close" data-dismiss="modal" aria-label="' +
 __e(o.label_close) +
-'">\n                    <span aria-hidden="true">×</span>\n                </button>\n            </div>\n            <div class="modal-body">\n                <form class="converse-form set-xmpp-status" id="set-xmpp-status">\n                    <div class="form-group">\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
+'">\n                    <span aria-hidden="true">×</span>\n                </button>\n            </div>\n            <div class="modal-body">\n                <form class="converse-form set-xmpp-status" id="set-xmpp-status">\n                    <div class="form-group">\n                      ' +
+__e(o.pageMeStatus) +
+'\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
  if (o.pageMeStatus === 'OFF_CALL') { ;
 __p += ' checked="checked" ';
  } ;
-__p += '\n                                   type="radio" id="radio-off-call" value="OFF_CALL" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-off-call">\n                                <span class="fa fa-circle chat-status chat-status--online"></span>Not on call</label>\n                        </div>\n\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
+__p += '\n                                   type="radio" id="radio-off-call" value="OFF_CALL" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-off-call">\n                                <span class="fa fa-circle chat-status chat-status--OFF_CALL"></span>Not on call</label>\n                        </div>\n\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
  if (o.pageMeStatus === 'ON_CALL') { ;
 __p += ' checked="checked" ';
  } ;
-__p += '\n                                   type="radio" id="radio-on-call" value="ON_CALL" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-on-call">\n                                <span class="fa fa-circle chat-status chat-status--online"></span>On call</label>\n                        </div>\n\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
+__p += '\n                                   type="radio" id="radio-on-call" value="ON_CALL" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-on-call">\n                                <span class="fa fa-circle chat-status chat-status--ON_CALL"></span>On call</label>\n                        </div>\n\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
  if (o.pageMeStatus === 'BUSY') { ;
 __p += ' checked="checked" ';
  } ;
-__p += '\n                                   type="radio" id="radio-busy" value="BUSY" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-busy">\n                                <span class="fa fa-circle chat-status chat-status--online"></span>Busy</label>\n                        </div>\n                    </div>\n                    <div class="form-group">\n                        <div class="btn-group w-100">\n                            <input name="status_message" type="text" class="form-control"\n                                value="' +
+__p += '\n                                   type="radio" id="radio-busy" value="BUSY" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-busy">\n                                <span class="fa fa-circle chat-status chat-status--BUSY"></span>Busy</label>\n                        </div>\n                    </div>\n                    <div class="form-group">\n                        <div class="btn-group w-100">\n                            <input name="status_message" type="text" class="form-control"\n                                value="' +
 __e(o.statusMessage) +
 '" placeholder="' +
 __e(o.placeholder_status_message) +

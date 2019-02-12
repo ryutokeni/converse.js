@@ -15,21 +15,21 @@
                             <input {[ if (o.pageMeStatus === 'OFF_CALL') { ]} checked="checked" {[ } ]}
                                    type="radio" id="radio-off-call" value="OFF_CALL" name="chat_status" class="custom-control-input"/>
                             <label class="custom-control-label" for="radio-off-call">
-                                <span class="fa fa-circle chat-status chat-status--online"></span>Not on call</label>
+                                <span class="fa fa-circle chat-status chat-status--OFF_CALL"></span>Not on call</label>
                         </div>
 
                         <div class="custom-control custom-radio p-0">
                             <input {[ if (o.pageMeStatus === 'ON_CALL') { ]} checked="checked" {[ } ]}
                                    type="radio" id="radio-on-call" value="ON_CALL" name="chat_status" class="custom-control-input"/>
                             <label class="custom-control-label" for="radio-on-call">
-                                <span class="fa fa-circle chat-status chat-status--online"></span>On call</label>
+                                <span class="fa fa-circle chat-status chat-status--ON_CALL"></span>On call</label>
                         </div>
 
                         <div class="custom-control custom-radio p-0">
                             <input {[ if (o.pageMeStatus === 'BUSY') { ]} checked="checked" {[ } ]}
                                    type="radio" id="radio-busy" value="BUSY" name="chat_status" class="custom-control-input"/>
                             <label class="custom-control-label" for="radio-busy">
-                                <span class="fa fa-circle chat-status chat-status--online"></span>Busy</label>
+                                <span class="fa fa-circle chat-status chat-status--BUSY"></span>Busy</label>
                         </div>
                     </div>
                     <div class="form-group">
