@@ -582,7 +582,26 @@
         background-color: var(--chatbox-title-background-color);
         font-size: var(--font-size-huge);
         * {
-          color: var(--text-color) !important;
+          color: var(--text-color);
+        }
+        .chat-status {
+          color: var(--text-color);
+          position: absolute;
+          bottom: 5px;
+          left: 95px;
+        }
+        .fa-circle::before {
+          border: 2px solid white !important;
+          border-radius: 50%;
+        }
+        .chat-status--online, .chat-status--ON_CALL {
+            color: var(--chat-status-online);
+        }
+        .chat-status--busy, .chat-status--BUSY {
+            color: var(--chat-status-busy);
+        }
+        .chat-status--away {
+            color: var(--chat-status-away);
         }
         .user-custom-message {
             font-size: 70%;
@@ -594,6 +613,9 @@
         }
         .chatbox-buttons {
             @include make-col(2);
+            * {
+              color: var(--text-color) !important;
+            }
         }
     }
     .chat-textarea {

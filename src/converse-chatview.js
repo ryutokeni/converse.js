@@ -162,7 +162,9 @@ converse.plugins.add('converse-chatview', {
         _converse.ChatBoxHeading = _converse.ViewWithAvatar.extend({
             initialize () {
                 this.model.on('change:status', this.onStatusMessageChanged, this);
+                this.model.on('change:pageMeStatus', this.render, this);
                 this.model.vcard.on('change', this.render, this);
+                this.getPageMeStatus();
             },
 
             render () {
@@ -175,11 +177,32 @@ converse.plugins.add('converse-chatview', {
                         }
                     )
                 );
+                _converse.api.waitUntil()
                 const jid = Strophe.getNodeFromJid(this.model.vcard.get('jid'));
                 this.image = `${_converse.user_settings.avatarUrl}${jid}`;
                 this.width = this.height = 60;
                 this.renderAvatar();
                 return this;
+            },
+
+            getPageMeStatus () {
+              const jid = Strophe.getNodeFromJid(this.model.vcard.get('jid'));
+              let result;
+              _converse.on('load-done', (labelName) => {
+                if (labelName === 'My Organization') {
+                  result = _.find(_converse.user_settings.my_organization, contact => contact.userName === jid);
+                } else {
+                  result = _.find(_converse.user_settings.imported_contacts, contact => contact.userName === jid);
+                }
+                if (result) {
+                  this.model.set('pageMeStatus', result.pageMeStatus)
+                }
+              })
+              const contacts = (_converse.user_settings.my_organization || []).concat(_converse.user_settings.imported_contacts || []);
+              result = _.find(contacts, contact => contact.userName === jid);
+              if (result) {
+                this.model.set('pageMeStatus', result.pageMeStatus)
+              }
             },
 
             onStatusMessageChanged (item) {
@@ -361,7 +384,7 @@ converse.plugins.add('converse-chatview', {
                 if (!_converse.show_toolbar) {
                     return this;
                 }
-               
+
                 toolbar = toolbar || tpl_toolbar;
                 options = _.assign(
                     this.model.toJSON(),
@@ -831,8 +854,8 @@ converse.plugins.add('converse-chatview', {
                     'chatbox': this.model
                     });
                 }
-                
-               
+
+
             },
 
             parseMessageForCommands (text) {

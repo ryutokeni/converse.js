@@ -10515,7 +10515,21 @@ body.reset {
   background-color: var(--chatbox-title-background-color);
   font-size: var(--font-size-huge); }
   #conversejs.converse-fullscreen .chat-head * {
-    color: var(--text-color) !important; }
+    color: var(--text-color); }
+  #conversejs.converse-fullscreen .chat-head .chat-status {
+    color: var(--text-color);
+    position: absolute;
+    bottom: 5px;
+    left: 95px; }
+  #conversejs.converse-fullscreen .chat-head .fa-circle::before {
+    border: 2px solid white !important;
+    border-radius: 50%; }
+  #conversejs.converse-fullscreen .chat-head .chat-status--online, #conversejs.converse-fullscreen .chat-head .chat-status--ON_CALL {
+    color: var(--chat-status-online); }
+  #conversejs.converse-fullscreen .chat-head .chat-status--busy, #conversejs.converse-fullscreen .chat-head .chat-status--BUSY {
+    color: var(--chat-status-busy); }
+  #conversejs.converse-fullscreen .chat-head .chat-status--away {
+    color: var(--chat-status-away); }
   #conversejs.converse-fullscreen .chat-head .user-custom-message {
     font-size: 70%;
     height: auto;
@@ -10526,6 +10540,8 @@ body.reset {
   #conversejs.converse-fullscreen .chat-head .chatbox-buttons {
     flex: 0 0 16.66667%;
     max-width: 16.66667%; }
+    #conversejs.converse-fullscreen .chat-head .chatbox-buttons * {
+      color: var(--text-color) !important; }
 
 #conversejs.converse-fullscreen .chat-textarea {
   max-height: var(--chatbox-background-color); }

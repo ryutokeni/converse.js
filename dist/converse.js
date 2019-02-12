@@ -72586,7 +72586,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
     _converse.ChatBoxHeading = _converse.ViewWithAvatar.extend({
       initialize() {
         this.model.on('change:status', this.onStatusMessageChanged, this);
+        this.model.on('change:pageMeStatus', this.render, this);
         this.model.vcard.on('change', this.render, this);
+        this.getPageMeStatus();
       },
 
       render() {
@@ -72594,11 +72596,38 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           '_converse': _converse,
           'info_close': __('Close this chat box')
         }));
+
+        _converse.api.waitUntil();
+
         const jid = Strophe.getNodeFromJid(this.model.vcard.get('jid'));
         this.image = `${_converse.user_settings.avatarUrl}${jid}`;
         this.width = this.height = 60;
         this.renderAvatar();
         return this;
+      },
+
+      getPageMeStatus() {
+        const jid = Strophe.getNodeFromJid(this.model.vcard.get('jid'));
+        let result;
+
+        _converse.on('load-done', labelName => {
+          if (labelName === 'My Organization') {
+            result = _.find(_converse.user_settings.my_organization, contact => contact.userName === jid);
+          } else {
+            result = _.find(_converse.user_settings.imported_contacts, contact => contact.userName === jid);
+          }
+
+          if (result) {
+            this.model.set('pageMeStatus', result.pageMeStatus);
+          }
+        });
+
+        const contacts = (_converse.user_settings.my_organization || []).concat(_converse.user_settings.imported_contacts || []);
+        result = _.find(contacts, contact => contact.userName === jid);
+
+        if (result) {
+          this.model.set('pageMeStatus', result.pageMeStatus);
+        }
       },
 
       onStatusMessageChanged(item) {
@@ -117460,7 +117489,9 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/chatbox_head.html -->\n<div class="chat-head chat-head-chatbox row no-gutters">\n    <div class="chatbox-navback"><i class="fa fa-arrow-left"></i></div>\n    <div class="chatbox-title">\n        <div class="row no-gutters">\n            <canvas class="avatar" height="36" width="36"></canvas>\n            <div class="col chat-title" title="' +
+__p += '<!-- src/templates/chatbox_head.html -->\n<div class="chat-head chat-head-chatbox row no-gutters">\n    <div class="chatbox-navback"><i class="fa fa-arrow-left"></i></div>\n    <div class="chatbox-title">\n        <div class="row no-gutters">\n            <canvas class="avatar" height="36" width="36"></canvas>\n            <span class="fa fa-circle chat-status chat-status--' +
+__e(o.pageMeStatus) +
+'"></span>\n            <div class="col chat-title" title="' +
 __e(o.nickname || o.fullname) +
 '">\n                ';
  if (o.url) { ;
