@@ -2399,7 +2399,7 @@ tbody.collapse.show {
   margin-bottom: 0; }
   .custom-control-label::before {
     position: absolute;
-    top: 0.25rem;
+    top: 0.2rem;
     left: 0;
     display: block;
     width: 1rem;
@@ -2410,7 +2410,7 @@ tbody.collapse.show {
     background-color: #dee2e6; }
   .custom-control-label::after {
     position: absolute;
-    top: 0.25rem;
+    top: 0.2rem;
     left: 0;
     display: block;
     width: 1rem;

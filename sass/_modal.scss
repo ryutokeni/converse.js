@@ -4,7 +4,10 @@
         .set-xmpp-status {
             margin: 1em;
             .custom-control-label {
-                margin-top: 0.25em;
+                margin-top: 0.2em;
+            }
+            .custom-control-label:before, .custom-control-label:after {
+                top: 0.2em;
             }
         }
 

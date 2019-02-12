@@ -11195,7 +11195,9 @@ body.reset {
   #conversejs #converse-modals .set-xmpp-status {
     margin: 1em; }
     #conversejs #converse-modals .set-xmpp-status .custom-control-label {
-      margin-top: 0.25em; }
+      margin-top: 0.2em; }
+    #conversejs #converse-modals .set-xmpp-status .custom-control-label:before, #conversejs #converse-modals .set-xmpp-status .custom-control-label:after {
+      top: 0.2em; }
   #conversejs #converse-modals #omemo-tabpanel {
     margin-top: 1em; }
   #conversejs #converse-modals .btn {
