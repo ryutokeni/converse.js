@@ -1,16 +1,10 @@
-<style>
-.ping{
-        background-color: #ffffff !important;
-        color: black !important;
-    }
-</style>
+
 <div class="list-item controlbox-padded available-chatroom d-flex flex-row
-    {[ if (o.currently_open) { ]} open {[ } ]}
-    {[ if (o.num_unread_general) { ]} unread-msgs ping {[ } ]}"
+    {[ if (o.currently_open) { ]} open {[ } ]}"
     data-room-jid="{{{o.jid}}}">
-{[ if (o.num_unread) { ]}
+<!-- {[ if (o.num_unread) { ]}
     <span class="msgs-indicator badge badge-info">{{{ o.num_unread }}}</span>
-{[ } ]}
+{[ } ]} -->
 <a class="list-item-link chat-status open-room available-room w-100"
     data-room-jid="{{{o.jid}}}"
     title="{{{o.open_title}}}" href="#"><span class="contact-name">{{{o.name || o.jid}}}</span></a>

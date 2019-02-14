@@ -426,7 +426,10 @@ converse.plugins.add('converse-rosterview', {
                         if (chatbox.get('hidden')) {
                             this.el.classList.remove('open');
                         } else {
-                            this.el.classList.add('open');
+                            if (!chatbox.get('latestMessageTime')) {
+                              //  console.log('it dont have messages yet');
+                                this.el.classList.add('open');
+                            }
                         }
                     }
                 }

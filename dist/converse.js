@@ -73287,21 +73287,23 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
         if (message.get('correcting')) {
           this.insertIntoTextArea(message.get('message'), true, true);
-        }
+        } // console.log('message: ', message, 'model: ', this.model);
 
-        if (!message.attributes.silent && this.model.attributes.chat_state === 'active' && this.model.messages.length > 0 && message.get('sender') !== 'me') {
+
+        if (!message.attributes.silent && !message.get('received') && this.model.attributes.chat_state === 'active' && this.model.get('hidden') && this.model.messages.length > 0 && message.get('sender') !== 'me') {
+          // console.log('an unread message comming!!');
           _converse.incrementMsgCounter();
 
           this.model.save({
             'num_unread': this.model.get('num_unread') + 1,
             'num_unread_general': 1
           });
-
-          _converse.emit('messageAdded', {
-            'message': message,
-            'chatbox': this.model
-          });
         }
+
+        _converse.emit('messageAdded', {
+          'message': message,
+          'chatbox': this.model
+        });
       },
 
       parseMessageForCommands(text) {
@@ -82064,7 +82066,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           // supported by the XMPP server. So we can use it
           // as a check for support (other ways of checking are async).
           'allow_bookmarks': _converse.allow_bookmarks && _converse.bookmarks,
-          'currently_open': _converse.isSingleton() && !this.model.get('hidden'),
+          'currently_open': _converse.isSingleton() && !this.model.get('hidden') && !this.model.get('latestMessageTime'),
           'info_leave_room': __('Leave this groupchat'),
           'info_remove_bookmark': __('Unbookmark this groupchat'),
           'info_add_bookmark': __('Bookmark this groupchat'),
@@ -82183,6 +82185,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
 
       openRoom(ev) {
         ev.preventDefault();
+
+        _converse.clearMsgCounter();
+
         const name = ev.target.textContent;
         const jid = ev.delegateTarget.dataset.roomJid;
         const data = {
@@ -82798,7 +82803,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
             if (chatbox.get('hidden')) {
               this.el.classList.remove('open');
             } else {
-              this.el.classList.add('open');
+              if (!chatbox.get('latestMessageTime')) {
+                //  console.log('it dont have messages yet');
+                this.el.classList.add('open');
+              }
             }
           }
         }
@@ -91001,6 +91009,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
         if (sender !== this.get('nick')) {
           // We only emit an event if it's not our own message
+          console.log('received a message');
+
           _converse.emit('message', {
             'stanza': original_stanza,
             'chatbox': this
@@ -116984,7 +116994,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       initialize() {
         this.model.on('change', this.render, this);
         this.model.on('change:latestMessageTime', this.showOrHide, this);
-        this.model.on('change:num_unread_general', this.render, this);
         this.model.on("highlight", this.highlight, this);
         this.model.on('addToRecent', this.show, this);
         this.model.on('hideFromRecent', this.hide, this);
@@ -119473,7 +119482,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/recent_messages_item.html -->\n<a class="list-item-link cbox-list-item open-chat w-100 ';
+__p += '<!-- src/templates/recent_messages_item.html -->\n<style>\n  .unread-msgs {\n    font-weight: bold !important;\n    color: #ffffff !important;\n  }\n</style>\n<a class="list-item-link cbox-list-item open-chat w-100 ';
  if (o.num_unread) { ;
 __p += ' unread-msgs ';
  } ;
@@ -119481,7 +119490,13 @@ __p += '" data-jid="' +
 __e(o.jid) +
 '" href="#">\n  <span class="chat-status ' +
 __e(o.status_icon) +
-'"></span>\n  <span class="contact-name">' +
+'"></span>\n  ';
+ if (o.num_unread) { ;
+__p += '\n  <span class="msgs-indicator badge badge-info">' +
+__e( o.num_unread ) +
+'</span>\n  ';
+ } ;
+__p += '\n  <span class="contact-name">' +
 __e(o.name || 'Loading...') +
 '</span>\n</a>\n';
 return __p
@@ -119841,23 +119856,19 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/rooms_list_item.html -->\n<style>\n.ping{\n        background-color: #ffffff !important;\n        color: black !important;\n    }\n</style>\n<div class="list-item controlbox-padded available-chatroom d-flex flex-row\n    ';
+__p += '<!-- src/templates/rooms_list_item.html -->\n\n<div class="list-item controlbox-padded available-chatroom d-flex flex-row\n    ';
  if (o.currently_open) { ;
 __p += ' open ';
  } ;
-__p += '\n    ';
- if (o.num_unread_general) { ;
-__p += ' unread-msgs ping ';
- } ;
 __p += '"\n    data-room-jid="' +
 __e(o.jid) +
-'">\n';
+'">\n<!-- ';
  if (o.num_unread) { ;
 __p += '\n    <span class="msgs-indicator badge badge-info">' +
 __e( o.num_unread ) +
 '</span>\n';
  } ;
-__p += '\n<a class="list-item-link chat-status open-room available-room w-100"\n    data-room-jid="' +
+__p += ' -->\n<a class="list-item-link chat-status open-room available-room w-100"\n    data-room-jid="' +
 __e(o.jid) +
 '"\n    title="' +
 __e(o.open_title) +
@@ -120062,27 +120073,23 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/roster_item.html -->\n<a class="list-item-link cbox-list-item open-chat w-100 ';
+__p += '<!-- src/templates/roster_item.html -->\n<!-- <a class="list-item-link cbox-list-item open-chat w-100 ';
  if (o.num_unread) { ;
 __p += ' unread-msgs ';
  } ;
 __p += '"\n   title="' +
 __e(o.desc_chat) +
-'" href="#">\n    <span class="' +
+'" href="#"> -->\n<a class="list-item-link cbox-list-item open-chat w-100 " href="#">\n    <span class="' +
 __e(o.status_icon) +
 '" title="' +
 __e(o.desc_status) +
-'"></span>\n    ';
+'"></span>\n    <!-- ';
  if (o.num_unread) { ;
 __p += '\n    <span class="msgs-indicator">' +
 __e( o.num_unread ) +
 '</span>\n    ';
  } ;
-__p += '\n    <span class="contact-name ';
- if (o.num_unread) { ;
-__p += ' unread-msgs ';
- } ;
-__p += '">' +
+__p += ' -->\n    <span class="contact-name">' +
 __e(o.display_name) +
 '</span></a>\n<!-- ';
  if (o.allow_contact_removal) { ;
