@@ -300,6 +300,7 @@ converse.plugins.add('converse-muc-views', {
                 const jid = ev.target.getAttribute('data-room-jid');
                 const name = ev.target.getAttribute('data-room-name');
                 this.modal.hide();
+                this.clearUnreadMsgCounter();
                 _converse.api.rooms.open(jid, {'name': name});
             },
 

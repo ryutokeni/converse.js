@@ -844,9 +844,10 @@ converse.plugins.add('converse-chatview', {
                 if (message.get('correcting')) {
                     this.insertIntoTextArea(message.get('message'), true, true);
                 }
-                if (!message.attributes.silent && this.model.attributes.chat_state === 'active' && this.model.messages.length > 0) {
+                if (!message.attributes.silent && this.model.attributes.chat_state === 'active' && this.model.messages.length > 0 && message.get('sender') !== 'me') {
+                    _converse.incrementMsgCounter();
                     this.model.save({
-                        'num_unread': 1,
+                        'num_unread': this.model.get('num_unread') + 1,
                         'num_unread_general': 1
                     })
                     _converse.emit('messageAdded', {
