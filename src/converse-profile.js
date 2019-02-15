@@ -259,9 +259,10 @@ converse.plugins.add('converse-profile', {
             },
 
             showStatusChangeModal (ev) {
-                // if (_.isUndefined(this.status_modal)) {
-                    this.status_modal = new _converse.ChatStatusModal({model: this.model});
-                // }
+                if (!_.isUndefined(this.status_modal)) {
+                    this.status_modal.remove();
+                }
+                this.status_modal = new _converse.ChatStatusModal({model: this.model});
                 this.status_modal.show(ev);
             },
 

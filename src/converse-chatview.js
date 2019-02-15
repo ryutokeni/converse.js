@@ -350,6 +350,10 @@ converse.plugins.add('converse-chatview', {
 
                 this.render();
                 this.fetchMessages();
+                // this.model.save({
+                //     num_unread: 0,
+                //     num_unread_general: 0
+                // });
 
                 _converse.emit('chatBoxOpened', this);
                 _converse.emit('chatBoxInitialized', this);
@@ -844,19 +848,18 @@ converse.plugins.add('converse-chatview', {
                 if (message.get('correcting')) {
                     this.insertIntoTextArea(message.get('message'), true, true);
                 }
-                // console.log('message: ', message, 'model: ', this.model);
-                if (!message.attributes.silent && !message.get('received') && this.model.attributes.chat_state === 'active' && this.model.get('hidden') && this.model.messages.length > 0 && message.get('sender') !== 'me') {
-                    // console.log('an unread message comming!!');
-                    _converse.incrementMsgCounter();
+                if (!message.attributes.silent && !message.get('received')  && this.model.get('hidden') && this.model.messages.length > 0 && message.get('sender') !== 'me') {
+                     _converse.incrementMsgCounter();
                     this.model.save({
                         'num_unread': this.model.get('num_unread') + 1,
                         'num_unread_general': 1
                     })
+                   
                 }
-                _converse.emit('messageAdded', {
-                  'message': message,
-                  'chatbox': this.model
-                });
+                 _converse.emit('messageAdded', {
+                      'message': message,
+                      'chatbox': this.model
+                    });
 
 
             },

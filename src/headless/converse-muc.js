@@ -1017,7 +1017,7 @@ converse.plugins.add('converse-muc', {
                 }
                 if (sender !== this.get('nick')) {
                     // We only emit an event if it's not our own message
-                    console.log('received a message');
+                    // this.incrementUnreadMsgCounter(msg);
                     _converse.emit('message', {'stanza': original_stanza, 'chatbox': this});
                 }
             },

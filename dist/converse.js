@@ -72771,7 +72771,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         this.model.presence.on('change:show', this.onPresenceChanged, this);
         this.model.on('showHelpMessages', this.showHelpMessages, this);
         this.render();
-        this.fetchMessages();
+        this.fetchMessages(); // this.model.save({
+        //     num_unread: 0,
+        //     num_unread_general: 0
+        // });
 
         _converse.emit('chatBoxOpened', this);
 
@@ -73287,13 +73290,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
         if (message.get('correcting')) {
           this.insertIntoTextArea(message.get('message'), true, true);
-        } // console.log('message: ', message, 'model: ', this.model);
+        }
 
-
-        if (!message.attributes.silent && !message.get('received') && this.model.attributes.chat_state === 'active' && this.model.get('hidden') && this.model.messages.length > 0 && message.get('sender') !== 'me') {
-          // console.log('an unread message comming!!');
-          _converse.incrementMsgCounter();
-
+        if (!message.attributes.silent && !message.get('received') && this.model.get('hidden') && this.model.messages.length > 0 && message.get('sender') !== 'me') {
+          // _converse.incrementMsgCounter();
           this.model.save({
             'num_unread': this.model.get('num_unread') + 1,
             'num_unread_general': 1
@@ -80935,11 +80935,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
       },
 
       showStatusChangeModal(ev) {
-        // if (_.isUndefined(this.status_modal)) {
+        if (!_.isUndefined(this.status_modal)) {
+          this.status_modal.remove();
+        }
+
         this.status_modal = new _converse.ChatStatusModal({
           model: this.model
-        }); // }
-
+        });
         this.status_modal.show(ev);
       },
 
@@ -82816,6 +82818,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         let status_icon = `fa chat-status ${group === 'Address Book' ? 'open-single' : 'open-organization'}`;
         const show = 'online';
         const display_name = item.getDisplayName();
+        console.log('number message unread : ', item.get('num_unread'));
         this.el.innerHTML = templates_roster_item_html__WEBPACK_IMPORTED_MODULE_12___default()(_.extend(item.toJSON(), {
           'display_name': display_name,
           'desc_status': STATUSES[show],
@@ -91009,8 +91012,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
         if (sender !== this.get('nick')) {
           // We only emit an event if it's not our own message
-          console.log('received a message');
-
+          // this.incrementUnreadMsgCounter(msg);
           _converse.emit('message', {
             'stanza': original_stanza,
             'chatbox': this
@@ -117118,6 +117120,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
         if (jid && jid !== _converse.bare_jid) {
           if (item.get('latestMessageTime')) {
+            console.log('show tag recent message!');
             item.trigger('addToRecent');
             return;
           }
@@ -118067,9 +118070,7 @@ __p += '\n            Loading...\n        ';
  } ;
 __p += '\n    </div>\n    <div class="chat-title">\n      <span class="chat-feature">\n        <i class="fa fa-user toggle-occupants" aria-hidden="true" title="' +
 __e(o.list_members) +
-'"></i>\n        <strong> ' +
-__e(o.members_length) +
-'</strong>\n      </span>\n      <span class="chat-feature">\n        <i class="fa fa-star" aria-hidden="true"></i>\n      </span>\n      <span class="chat-feature">\n        <i class="fa fa-plus add-group-member" aria-hidden="true" title="' +
+'"></i>\n      </span>\n      <span class="chat-feature">\n        <i class="fa fa-plus add-group-member" aria-hidden="true" title="' +
 __e(o.add_member) +
 '"></i>\n      </span>\n        <!-- <span class="col-1 text-center" style="border-right: 1px solid; width: 100%; padding: 0px;">\n            <span class="row text-center" style="margin: 0px;padding: 0px;display: flex;justify-content: center;">\n                <i class="fa fa-user toggle-occupants" aria-hidden="true" style="font-size: 15px; margin-top: 7px;" title="' +
 __e(o.list_members) +
@@ -119482,7 +119483,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/recent_messages_item.html -->\n<style>\n  .unread-msgs {\n    font-weight: bold !important;\n    color: #ffffff !important;\n  }\n</style>\n<a class="list-item-link cbox-list-item open-chat w-100 ';
+__p += '<!-- src/templates/recent_messages_item.html -->\n<style>\n  .unread-msgs {\n    font-weight: bold !important;\n    color: #ffffff !important;\n  }\n.badge-info {\n  background-color: #ec5057 !important;\n  border-radius: 10px !important;\n  margin-left: 30% !important;\n  width: 20px !important;\n}\n</style>\n<a class="list-item-link cbox-list-item open-chat w-100 ';
  if (o.num_unread) { ;
 __p += ' unread-msgs ';
  } ;
@@ -119490,15 +119491,15 @@ __p += '" data-jid="' +
 __e(o.jid) +
 '" href="#">\n  <span class="chat-status ' +
 __e(o.status_icon) +
-'"></span>\n  ';
+'"></span>\n  <span class="contact-name">' +
+__e(o.name || 'Loading...') +
+'</span>\n  ';
  if (o.num_unread) { ;
 __p += '\n  <span class="msgs-indicator badge badge-info">' +
 __e( o.num_unread ) +
 '</span>\n  ';
  } ;
-__p += '\n  <span class="contact-name">' +
-__e(o.name || 'Loading...') +
-'</span>\n</a>\n';
+__p += '\n</a>\n';
 return __p
 };
 

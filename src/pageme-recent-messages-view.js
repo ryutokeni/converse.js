@@ -153,6 +153,7 @@ converse.plugins.add('pageme-recent-messages-view', {
               const jid = item.get('jid');
               if (jid && jid !== _converse.bare_jid) {
                 if (item.get('latestMessageTime')) {
+                  console.log('show tag recent message!');
                   item.trigger('addToRecent');
                   return;
                 }
