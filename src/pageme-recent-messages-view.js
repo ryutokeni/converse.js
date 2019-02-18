@@ -36,25 +36,37 @@ converse.plugins.add('pageme-recent-messages-view', {
                 this.model.on("highlight", this.highlight, this);
                 this.model.on('addToRecent', this.show, this);
                 this.model.on('hideFromRecent', this.hide, this);
-                if (this.tryToGetDisplayName()) {
-
-                } else {
-                  _converse.on('load-done', (labelName) => {
-                    if (this.model.get('name')) {
-                      return;
-                    }
-                    if (labelName === 'My Organization') {
-                      this.model.set('name', this.getDisplayName(_converse.user_settings.my_organization));
-                    } else {
-                      this.model.set('name', this.getDisplayName(_converse.user_settings.imported_contacts));
-                    }
-                  })
+                if (this.model.get('name')) {
+                  console.log('this is a model with Vcard');
                 }
+                else {
+                  if (this.tryToGetDisplayName()) {
+
+                  } else {
+                    _converse.on('load-done', (labelName) => {
+                      if (this.model.get('name')) {
+                        return;
+                      }
+                      else {
+                        if (labelName === 'My Organization') {
+                        this.model.set('name', this.getDisplayName(_converse.user_settings.my_organization));
+                        } else {
+                          this.model.set('name', this.getDisplayName(_converse.user_settings.imported_contacts));
+                        }
+                      }
+                     
+                    })
+                  }
+                }
+                
             },
 
             render () {
                 this.el.innerHTML = tpl_recent_messages_item(
-                  _.extend(this.model.toJSON(), this.getConfig())
+                  _.extend(
+                    this.model.toJSON(),
+                    this.getConfig()
+                    )
                 );
                 return this;
             },
@@ -79,10 +91,19 @@ converse.plugins.add('pageme-recent-messages-view', {
 
             getConfig () {
               const isChatroom =  this.model.get('type') === 'chatroom';
-              return {
+              if (this.model.vcard) {
+                return {
+                  name: isChatroom ? (this.model.get('subject') || {}).text : this.model.vcard.get('fullname'),
+                  status_icon: isChatroom ? 'open-room' : 'open-single'
+                }
+              }
+              else {
+                return {
                   name: isChatroom ? (this.model.get('subject') || {}).text : this.model.get('name'),
                   status_icon: isChatroom ? 'open-room' : 'open-single'
-              };
+                };
+              }
+              
             },
 
             hide () {
@@ -153,7 +174,7 @@ converse.plugins.add('pageme-recent-messages-view', {
               const jid = item.get('jid');
               if (jid && jid !== _converse.bare_jid) {
                 if (item.get('latestMessageTime')) {
-                  console.log('show tag recent message!');
+                 
                   item.trigger('addToRecent');
                   return;
                 }
@@ -170,6 +191,8 @@ converse.plugins.add('pageme-recent-messages-view', {
 
 
         /************************ BEGIN Event Handlers ************************/
+        
+
         _converse.api.listen.on('chatBoxesInitialized', () => {
             if (_converse.authentication === _converse.ANONYMOUS) {
                 return;
@@ -177,6 +200,86 @@ converse.plugins.add('pageme-recent-messages-view', {
             _converse.recentMessagesViews = new _converse.RecentMessagesViews({
                 'model': _converse.chatboxes
             });
+            _converse.api.listen.on('vcardInitialized', () => {
+              console.log(_converse.vcards);
+              console.log(_converse.user_settings);
+              //  let ping = {
+              //    'userName': 'c4d6d576-6c75-4f49-8342-d1f31ae811641452576034568'
+              //  }
+
+
+              //  fetch(`${_converse.user_settings.baseUrl}/userProfile`, {
+              //    method: "POST",
+              //    body: ping,
+
+              //  }).then(res => {
+              //    console.log(res);
+              //  })
+
+
+           
+              // var ping = {
+              //   'user': 'd49ac40f-c664-406d-9a65-a817580759c61475058311816'
+              // }
+                
+
+              // var xhr = new XMLHttpRequest();
+              //  xhr.setRequestHeader("securityToken", `${_converse.user_settings.password}`);
+              // xhr.open('POST', `${_converse.user_settings.baseUrl}/userProfile`, true);
+              // xhr.onreadystatechange = function () { // Call a function when the state changes.
+              //   if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+              //     // Request finished. Do processing here.
+              //     console.log('done');
+              //   }
+              // }
+              // xhr.send(ping);
+
+
+
+              _converse.api.listen.on('messageAdded', data => {
+                if (data.message.attributes.sender !== 'me'  && !data.message.get('received')) {
+                  const chatbox = _converse.chatboxes.where('jid', data.chatbox.get('jid'))
+                  if (chatbox) {
+                    let vcard =  _converse.vcards.findWhere({'jid': data.chatbox.get('jid')})
+     
+                      // if (!vcard.get('fullname')) {
+
+
+                      //   let ping = {
+                      //     'userName': 'c4d6d576-6c75-4f49-8342-d1f31ae811641452576034568'
+                      //   }
+
+
+                      //   fetch(`${_converse.user_settings.baseUrl}/userProfile`, {
+                      //     method: "POST",
+                      //     body: ping
+                      //   }).then(res => {
+                      //     console.log(res);
+                      //   })
+
+                      //   // var xhr = new XMLHttpRequest();
+                      //   // xhr.open('POST', , true);
+                      //   // xhr.onload = function () {
+                      //   //   // do something to response
+                      //   //   console.log(this.responseText);
+                      //   // };
+                      //   // xhr.send(data);
+                      // }
+                    chatbox.save('vcard', vcard);
+                    console.log(vcard);
+                  }
+                  else {
+                    console.log('a new', data.chatbox);
+                    data.chatbox.save('vcard', _converse.vcards.findWhere({
+                      'jid': data.chatbox.get('jid')
+                    }))
+                    _converse.chatboxes.create({
+                      'model': data.chatbox.toJSON()
+                    })
+                  }
+                }
+              })
+            })
             _converse.chatboxes.on('change:hidden', (chatbox) => {
                 const contact = _converse.roster.findWhere({'jid': chatbox.get('jid')});
                 chatbox.trigger('highlight');

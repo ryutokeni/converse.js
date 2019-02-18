@@ -73292,7 +73292,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           this.insertIntoTextArea(message.get('message'), true, true);
         }
 
-        if (!message.attributes.silent && !message.get('received') && this.model.get('hidden') && this.model.messages.length > 0 && message.get('sender') !== 'me') {
+        if (!message.attributes.silent && !message.get('received') && this.model.get('hidden') && !message.is_delayed && this.model.messages.length > 0 && message.get('sender') !== 'me') {
           // _converse.incrementMsgCounter();
           this.model.save({
             'num_unread': this.model.get('num_unread') + 1,
@@ -82818,7 +82818,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         let status_icon = `fa chat-status ${group === 'Address Book' ? 'open-single' : 'open-organization'}`;
         const show = 'online';
         const display_name = item.getDisplayName();
-        console.log('number message unread : ', item.get('num_unread'));
         this.el.innerHTML = templates_roster_item_html__WEBPACK_IMPORTED_MODULE_12___default()(_.extend(item.toJSON(), {
           'display_name': display_name,
           'desc_status': STATUSES[show],
@@ -117000,18 +116999,22 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         this.model.on('addToRecent', this.show, this);
         this.model.on('hideFromRecent', this.hide, this);
 
-        if (this.tryToGetDisplayName()) {} else {
-          _converse.on('load-done', labelName => {
-            if (this.model.get('name')) {
-              return;
-            }
-
-            if (labelName === 'My Organization') {
-              this.model.set('name', this.getDisplayName(_converse.user_settings.my_organization));
-            } else {
-              this.model.set('name', this.getDisplayName(_converse.user_settings.imported_contacts));
-            }
-          });
+        if (this.model.get('name')) {
+          console.log('this is a model with Vcard');
+        } else {
+          if (this.tryToGetDisplayName()) {} else {
+            _converse.on('load-done', labelName => {
+              if (this.model.get('name')) {
+                return;
+              } else {
+                if (labelName === 'My Organization') {
+                  this.model.set('name', this.getDisplayName(_converse.user_settings.my_organization));
+                } else {
+                  this.model.set('name', this.getDisplayName(_converse.user_settings.imported_contacts));
+                }
+              }
+            });
+          }
         }
       },
 
@@ -117042,10 +117045,18 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
       getConfig() {
         const isChatroom = this.model.get('type') === 'chatroom';
-        return {
-          name: isChatroom ? (this.model.get('subject') || {}).text : this.model.get('name'),
-          status_icon: isChatroom ? 'open-room' : 'open-single'
-        };
+
+        if (this.model.vcard) {
+          return {
+            name: isChatroom ? (this.model.get('subject') || {}).text : this.model.vcard.get('fullname'),
+            status_icon: isChatroom ? 'open-room' : 'open-single'
+          };
+        } else {
+          return {
+            name: isChatroom ? (this.model.get('subject') || {}).text : this.model.get('name'),
+            status_icon: isChatroom ? 'open-room' : 'open-single'
+          };
+        }
       },
 
       hide() {
@@ -117120,7 +117131,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
         if (jid && jid !== _converse.bare_jid) {
           if (item.get('latestMessageTime')) {
-            console.log('show tag recent message!');
             item.trigger('addToRecent');
             return;
           }
@@ -117147,6 +117157,78 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
       _converse.recentMessagesViews = new _converse.RecentMessagesViews({
         'model': _converse.chatboxes
+      });
+
+      _converse.api.listen.on('vcardInitialized', () => {
+        console.log(_converse.vcards);
+        console.log(_converse.user_settings); //  let ping = {
+        //    'userName': 'c4d6d576-6c75-4f49-8342-d1f31ae811641452576034568'
+        //  }
+        //  fetch(`${_converse.user_settings.baseUrl}/userProfile`, {
+        //    method: "POST",
+        //    body: ping,
+        //  }).then(res => {
+        //    console.log(res);
+        //  })
+
+        var ping = {
+          'user': 'd49ac40f-c664-406d-9a65-a817580759c61475058311816'
+        };
+        var xhr = new XMLHttpRequest();
+        xhr.setRequestHeader("securityToken", `${_converse.user_settings.password}`);
+        xhr.open('POST', `${_converse.user_settings.baseUrl}/userProfile`, true);
+
+        xhr.onreadystatechange = function () {
+          // Call a function when the state changes.
+          if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+            // Request finished. Do processing here.
+            console.log('done');
+          }
+        };
+
+        xhr.send(ping);
+
+        _converse.api.listen.on('messageAdded', data => {
+          if (data.message.attributes.sender !== 'me' && !data.message.get('received')) {
+            const chatbox = _converse.chatboxes.where('jid', data.chatbox.get('jid'));
+
+            if (chatbox) {
+              let vcard = _converse.vcards.findWhere({
+                'jid': data.chatbox.get('jid')
+              }); // if (!vcard.get('fullname')) {
+              //   let ping = {
+              //     'userName': 'c4d6d576-6c75-4f49-8342-d1f31ae811641452576034568'
+              //   }
+              //   fetch(`${_converse.user_settings.baseUrl}/userProfile`, {
+              //     method: "POST",
+              //     body: ping
+              //   }).then(res => {
+              //     console.log(res);
+              //   })
+              //   // var xhr = new XMLHttpRequest();
+              //   // xhr.open('POST', , true);
+              //   // xhr.onload = function () {
+              //   //   // do something to response
+              //   //   console.log(this.responseText);
+              //   // };
+              //   // xhr.send(data);
+              // }
+
+
+              chatbox.save('vcard', vcard);
+              console.log(vcard);
+            } else {
+              console.log('a new', data.chatbox);
+              data.chatbox.save('vcard', _converse.vcards.findWhere({
+                'jid': data.chatbox.get('jid')
+              }));
+
+              _converse.chatboxes.create({
+                'model': data.chatbox.toJSON()
+              });
+            }
+          }
+        });
       });
 
       _converse.chatboxes.on('change:hidden', chatbox => {
@@ -119483,7 +119565,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/recent_messages_item.html -->\n<style>\n  .unread-msgs {\n    font-weight: bold !important;\n    color: #ffffff !important;\n  }\n.badge-info {\n  background-color: #ec5057 !important;\n  border-radius: 10px !important;\n  margin-left: 30% !important;\n  width: 20px !important;\n}\n</style>\n<a class="list-item-link cbox-list-item open-chat w-100 ';
+__p += '<!-- src/templates/recent_messages_item.html -->\n<style>\n  .unread-msgs {\n    font-weight: bold !important;\n    color: #ffffff !important;\n  }\n.badge-info {\n  background-color: #ec5057 !important;\n  border-radius: 10px !important;\n  margin-left: 30% !important;\n  min-width: 25px !important;\n}\n</style>\n<a class="list-item-link cbox-list-item open-chat w-100 ';
  if (o.num_unread) { ;
 __p += ' unread-msgs ';
  } ;
