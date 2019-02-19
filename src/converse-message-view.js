@@ -198,7 +198,9 @@ converse.plugins.add('converse-message-view', {
                   if (this.model.get('time')) {
                     const expiration = new Date(this.model.get('time')).getTime() + parseInt(this.model.get('time_to_read')) * 1000;
                     if (expiration - (new Date()).getTime() <= 0) {
-                      this.model.destroy();
+                      if (this.model) {
+                        this.model.destroy();
+                      }
                       return;
                     }
                   }

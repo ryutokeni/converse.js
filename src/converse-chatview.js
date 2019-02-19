@@ -367,6 +367,8 @@ converse.plugins.add('converse-chatview', {
                 this.scrollDown = _.debounce(this._scrollDown, 250);
                 this.markScrolled = _.debounce(this._markScrolled, 100);
                 this.show = _.debounce(this._show, 250, {'leading': true});
+                this.model.set('num_unread', 0)
+                this.model.set('num_unread_general', 0)
             },
 
             render () {
@@ -848,18 +850,19 @@ converse.plugins.add('converse-chatview', {
                 if (message.get('correcting')) {
                     this.insertIntoTextArea(message.get('message'), true, true);
                 }
-                if (!message.attributes.silent && !message.get('received') && this.model.get('hidden') && !message.is_delayed && this.model.messages.length > 0 && message.get('sender') !== 'me') {
+                if (!message.attributes.silent && !message.get('received') && this.model.get('hidden') && this.model.messages.length > 0 && message.get('sender') !== 'me') {
                     // _converse.incrementMsgCounter();
                     this.model.save({
                         'num_unread': this.model.get('num_unread') + 1,
                         'num_unread_general': 1
                     })
-                   
                 }
+
                  _converse.emit('messageAdded', {
-                      'message': message,
-                      'chatbox': this.model
-                    });
+                   'message': message,
+                   'chatbox': this.model
+                 });
+                
 
 
             },

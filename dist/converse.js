@@ -72792,6 +72792,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         this.show = _.debounce(this._show, 250, {
           'leading': true
         });
+        this.model.set('num_unread', 0);
+        this.model.set('num_unread_general', 0);
       },
 
       render() {
@@ -73292,7 +73294,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           this.insertIntoTextArea(message.get('message'), true, true);
         }
 
-        if (!message.attributes.silent && !message.get('received') && this.model.get('hidden') && !message.is_delayed && this.model.messages.length > 0 && message.get('sender') !== 'me') {
+        if (!message.attributes.silent && !message.get('received') && this.model.get('hidden') && this.model.messages.length > 0 && message.get('sender') !== 'me') {
           // _converse.incrementMsgCounter();
           this.model.save({
             'num_unread': this.model.get('num_unread') + 1,
@@ -75649,7 +75651,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
             const expiration = new Date(this.model.get('time')).getTime() + parseInt(this.model.get('time_to_read')) * 1000;
 
             if (expiration - new Date().getTime() <= 0) {
-              this.model.destroy();
+              if (this.model) {
+                this.model.destroy();
+              }
+
               return;
             }
           }
@@ -116997,25 +117002,25 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         this.model.on('change:latestMessageTime', this.showOrHide, this);
         this.model.on("highlight", this.highlight, this);
         this.model.on('addToRecent', this.show, this);
-        this.model.on('hideFromRecent', this.hide, this);
+        this.model.on('hideFromRecent', this.hide, this); // if (this.model.get('name')) {
+        //   console.log('this is a model with Vcard');
+        // }
+        // else {
 
-        if (this.model.get('name')) {
-          console.log('this is a model with Vcard');
-        } else {
-          if (this.tryToGetDisplayName()) {} else {
-            _converse.on('load-done', labelName => {
-              if (this.model.get('name')) {
-                return;
+        if (this.tryToGetDisplayName()) {} else {
+          _converse.on('load-done', labelName => {
+            if (this.model.get('name')) {
+              return;
+            } else {
+              if (labelName === 'My Organization') {
+                this.model.set('name', this.getDisplayName(_converse.user_settings.my_organization));
               } else {
-                if (labelName === 'My Organization') {
-                  this.model.set('name', this.getDisplayName(_converse.user_settings.my_organization));
-                } else {
-                  this.model.set('name', this.getDisplayName(_converse.user_settings.imported_contacts));
-                }
+                this.model.set('name', this.getDisplayName(_converse.user_settings.imported_contacts));
               }
-            });
-          }
-        }
+            }
+          });
+        } // }
+
       },
 
       render() {
@@ -117025,7 +117030,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
       tryToGetDisplayName() {
         const contacts = (_converse.user_settings.my_organization || []).concat(_converse.user_settings.imported_contacts || []);
-        const name = this.getDisplayName(contacts);
+        let name = this.getDisplayName(contacts);
         this.model.set('name', name);
         return !!name;
       },
@@ -117045,18 +117050,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
       getConfig() {
         const isChatroom = this.model.get('type') === 'chatroom';
-
-        if (this.model.vcard) {
-          return {
-            name: isChatroom ? (this.model.get('subject') || {}).text : this.model.vcard.get('fullname'),
-            status_icon: isChatroom ? 'open-room' : 'open-single'
-          };
-        } else {
-          return {
-            name: isChatroom ? (this.model.get('subject') || {}).text : this.model.get('name'),
-            status_icon: isChatroom ? 'open-room' : 'open-single'
-          };
-        }
+        return {
+          name: isChatroom ? (this.model.get('subject') || {}).text : this.model.get('name'),
+          status_icon: isChatroom ? 'open-room' : 'open-single'
+        };
       },
 
       hide() {
@@ -117159,76 +117156,56 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         'model': _converse.chatboxes
       });
 
-      _converse.api.listen.on('vcardInitialized', () => {
-        console.log(_converse.vcards);
-        console.log(_converse.user_settings); //  let ping = {
-        //    'userName': 'c4d6d576-6c75-4f49-8342-d1f31ae811641452576034568'
-        //  }
-        //  fetch(`${_converse.user_settings.baseUrl}/userProfile`, {
-        //    method: "POST",
-        //    body: ping,
-        //  }).then(res => {
-        //    console.log(res);
-        //  })
-
-        var ping = {
-          'user': 'd49ac40f-c664-406d-9a65-a817580759c61475058311816'
-        };
-        var xhr = new XMLHttpRequest();
-        xhr.setRequestHeader("securityToken", `${_converse.user_settings.password}`);
-        xhr.open('POST', `${_converse.user_settings.baseUrl}/userProfile`, true);
-
-        xhr.onreadystatechange = function () {
-          // Call a function when the state changes.
-          if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-            // Request finished. Do processing here.
-            console.log('done');
-          }
-        };
-
-        xhr.send(ping);
-
-        _converse.api.listen.on('messageAdded', data => {
-          if (data.message.attributes.sender !== 'me' && !data.message.get('received')) {
-            const chatbox = _converse.chatboxes.where('jid', data.chatbox.get('jid'));
+      _converse.api.listen.on('messageAdded', data => {
+        if (data.message.get('sender') !== 'me' && !data.message.get('received')) {
+          if (data.chatbox.get('jid').includes('conference')) {
+            console.log('this is a group chat');
+          } else {
+            let chatbox = _converse.chatboxes.findWhere({
+              'jid': data.chatbox.get('jid')
+            });
 
             if (chatbox) {
-              let vcard = _converse.vcards.findWhere({
-                'jid': data.chatbox.get('jid')
-              }); // if (!vcard.get('fullname')) {
-              //   let ping = {
-              //     'userName': 'c4d6d576-6c75-4f49-8342-d1f31ae811641452576034568'
-              //   }
-              //   fetch(`${_converse.user_settings.baseUrl}/userProfile`, {
-              //     method: "POST",
-              //     body: ping
-              //   }).then(res => {
-              //     console.log(res);
-              //   })
-              //   // var xhr = new XMLHttpRequest();
-              //   // xhr.open('POST', , true);
-              //   // xhr.onload = function () {
-              //   //   // do something to response
-              //   //   console.log(this.responseText);
-              //   // };
-              //   // xhr.send(data);
-              // }
+              if (!data.chatbox.get('name')) {
+                var ping = {};
+                ping.userName = `${chatbox.get('jid').split('@')[0]}`;
+                var json = JSON.stringify(ping);
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", `${_converse.user_settings.baseUrl}/userProfile`, false);
+                xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+                xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
 
+                xhr.onload = function () {
+                  // Call a function when the state changes.
+                  if (xhr.status >= 200 && xhr.status < 400) {
+                    // Request finished. Do processing here.
+                    const res = JSON.parse(xhr.responseText);
 
-              chatbox.save('vcard', vcard);
-              console.log(vcard);
+                    if (res.response) {
+                      chatbox.set('name', res.response.fullName);
+                    } else {
+                      console.log('nothing here');
+                    }
+                  } else {
+                    xhr.onerror();
+                  }
+                };
+
+                xhr.send(json);
+              } else {
+                console.log('this converse already had a name');
+              }
             } else {
-              console.log('a new', data.chatbox);
-              data.chatbox.save('vcard', _converse.vcards.findWhere({
-                'jid': data.chatbox.get('jid')
-              }));
-
+              // let name;
+              // data.chatbox.get('jid').includes('conference') ? name = data.chatbox.get('subject').text : name = data.chatbox.get('name') || 'PARIS'
               _converse.chatboxes.create({
                 'model': data.chatbox.toJSON()
               });
+
+              console.log('some thing handle later');
             }
           }
-        });
+        }
       });
 
       _converse.chatboxes.on('change:hidden', chatbox => {
