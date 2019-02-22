@@ -181,7 +181,7 @@ converse.plugins.add('converse-profile', {
                 this.modal.hide();
                 _converse.emit('statusFormSubmitted', {
                   status: data.get('chat_status'),
-                  statusMessage: data.get('status_message'),
+                  statusMessage: data.get('status_message')
                 });
             }
         });

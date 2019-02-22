@@ -729,8 +729,9 @@ converse.plugins.add('converse-chatboxes', {
                 /* Given a newly received message, update the unread counter if
                  * necessary.
                  */
+               
                 if (!message) { return; }
-                if (_.isNil(message.get('message'))) { return; }
+                // if (_.isNil(message.get('message'))) { return; }
                 if (utils.isNewMessage(message) && this.isHidden()) {
                     this.save({'num_unread': this.get('num_unread') + 1});
                     _converse.incrementMsgCounter();

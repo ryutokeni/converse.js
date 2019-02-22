@@ -165,6 +165,9 @@ converse.plugins.add('converse-chatview', {
                 this.model.on('change:pageMeStatus', this.render, this);
                 this.model.vcard.on('change', this.render, this);
                 this.getPageMeStatus();
+                _converse.on('StatusChatChanged', data => {
+                    this.model.set('pageMeStatus', data.status)
+                })
             },
 
             render () {
@@ -344,7 +347,7 @@ converse.plugins.add('converse-chatview', {
 
                 this.model.on('show', this.show, this);
                 this.model.on('destroy', this.remove, this);
-
+                // this.model.on('change:num_unread', this.render, this)
                 this.model.presence.on('change:show', this.onPresenceChanged, this);
                 this.model.on('showHelpMessages', this.showHelpMessages, this);
 
@@ -361,14 +364,21 @@ converse.plugins.add('converse-chatview', {
                     const loading = this.el.querySelector('.chat-loading');
                     uk.hideElement(loading);
                 })
+                //  this.model.set('num_unread', 0)
+                //  this.model.set('num_unread_general', 0)
             },
 
             initDebounced () {
                 this.scrollDown = _.debounce(this._scrollDown, 250);
                 this.markScrolled = _.debounce(this._markScrolled, 100);
                 this.show = _.debounce(this._show, 250, {'leading': true});
-                this.model.set('num_unread', 0)
-                this.model.set('num_unread_general', 0)
+                // this.model.save({
+                //     num_unread: this.model.messages.models.filter(e => (!e.get('silent') && e.get('sender') === 'them') && !e.get('received')).length,
+                //     num_unread_general: 1
+                // })
+                // _converse.on('clearAllUnreadMessage', model => {
+                //   if ()
+                // })
             },
 
             render () {
@@ -850,18 +860,28 @@ converse.plugins.add('converse-chatview', {
                 if (message.get('correcting')) {
                     this.insertIntoTextArea(message.get('message'), true, true);
                 }
-                if (!message.attributes.silent && !message.get('received') && this.model.get('hidden') && this.model.messages.length > 0 && message.get('sender') !== 'me') {
+                
+                if ( !message.get('received') && this.model.get('hidden')  && message.get('sender') !== 'me') {
                     // _converse.incrementMsgCounter();
-                    this.model.save({
-                        'num_unread': this.model.get('num_unread') + 1,
-                        'num_unread_general': 1
-                    })
-                }
+                    //  this.model.save({
+                    //    num_unread: this.model.messages.models.filter(e => (!e.get('silent') && !e.get('received'))).length,
+                    //    num_unread_general:  1
+                    //  });
 
-                 _converse.emit('messageAdded', {
-                   'message': message,
-                   'chatbox': this.model
-                 });
+                    // if (message.get('type') !== 'chat') {
+                    //     console.log(this.model);
+                    // }
+                    // this.model.save({
+                    //     'num_unread': this.model.get('num_unread') + 1,
+                    //     'num_unread_general': 1
+                    // })
+                   
+                }
+                _converse.emit('messageAdded', {
+                    'message': message,
+                    'chatbox': this.model
+                });
+                
                 
 
 

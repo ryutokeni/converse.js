@@ -13,7 +13,7 @@
 <a class="list-item-link cbox-list-item open-chat w-100 {[ if (o.num_unread) { ]} unread-msgs {[ } ]}" data-jid="{{{o.jid}}}" href="#">
   <span class="chat-status {{{o.status_icon}}}"></span>
   <span class="contact-name">{{{o.name || 'Loading...'}}}</span>
-  {[ if (o.num_unread) { ]}
-  <span class="msgs-indicator badge badge-info">{{{ o.num_unread }}}</span>
+  {[ if (o.num_unread_general || o.num_unread) { ]}
+  <span class="msgs-indicator badge badge-info">{{{ o.type === 'chatbox' ? o.num_unread : o.num_unread_general }}}</span>
   {[ } ]}
 </a>

@@ -72589,6 +72589,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         this.model.on('change:pageMeStatus', this.render, this);
         this.model.vcard.on('change', this.render, this);
         this.getPageMeStatus();
+
+        _converse.on('StatusChatChanged', data => {
+          this.model.set('pageMeStatus', data.status);
+        });
       },
 
       render() {
@@ -72767,7 +72771,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         this.model.messages.on('add', this.onMessageAdded, this);
         this.model.messages.on('rendered', this.scrollDown, this);
         this.model.on('show', this.show, this);
-        this.model.on('destroy', this.remove, this);
+        this.model.on('destroy', this.remove, this); // this.model.on('change:num_unread', this.render, this)
+
         this.model.presence.on('change:show', this.onPresenceChanged, this);
         this.model.on('showHelpMessages', this.showHelpMessages, this);
         this.render();
@@ -72783,7 +72788,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         _converse.on('message-rendered-!', () => {
           const loading = this.el.querySelector('.chat-loading');
           uk.hideElement(loading);
-        });
+        }); //  this.model.set('num_unread', 0)
+        //  this.model.set('num_unread_general', 0)
+
       },
 
       initDebounced() {
@@ -72791,9 +72798,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         this.markScrolled = _.debounce(this._markScrolled, 100);
         this.show = _.debounce(this._show, 250, {
           'leading': true
-        });
-        this.model.set('num_unread', 0);
-        this.model.set('num_unread_general', 0);
+        }); // this.model.save({
+        //     num_unread: this.model.messages.models.filter(e => (!e.get('silent') && e.get('sender') === 'them') && !e.get('received')).length,
+        //     num_unread_general: 1
+        // })
+        // _converse.on('clearAllUnreadMessage', model => {
+        //   if ()
+        // })
       },
 
       render() {
@@ -73294,12 +73305,18 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           this.insertIntoTextArea(message.get('message'), true, true);
         }
 
-        if (!message.attributes.silent && !message.get('received') && this.model.get('hidden') && this.model.messages.length > 0 && message.get('sender') !== 'me') {
-          // _converse.incrementMsgCounter();
-          this.model.save({
-            'num_unread': this.model.get('num_unread') + 1,
-            'num_unread_general': 1
-          });
+        if (!message.get('received') && this.model.get('hidden') && message.get('sender') !== 'me') {// _converse.incrementMsgCounter();
+          //  this.model.save({
+          //    num_unread: this.model.messages.models.filter(e => (!e.get('silent') && !e.get('received'))).length,
+          //    num_unread_general:  1
+          //  });
+          // if (message.get('type') !== 'chat') {
+          //     console.log(this.model);
+          // }
+          // this.model.save({
+          //     'num_unread': this.model.get('num_unread') + 1,
+          //     'num_unread_general': 1
+          // })
         }
 
         _converse.emit('messageAdded', {
@@ -77013,7 +77030,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         const jid = ev.target.getAttribute('data-room-jid');
         const name = ev.target.getAttribute('data-room-name');
         this.modal.hide();
-        this.clearUnreadMsgCounter();
+        this.model.clearUnreadMsgCounter();
 
         _converse.api.rooms.open(jid, {
           'name': name
@@ -77192,7 +77209,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
        */
       length: 300,
       tagName: 'div',
-      className: 'chatbox chatroom hidden',
+      className: 'chatbox chatroom',
       is_chatroom: true,
       events: {
         'change input.fileupload': 'onFileSelection',
@@ -77247,6 +77264,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         this.render().insertIntoDOM();
         this.registerHandlers();
         this.enterRoom();
+        this.model.set('hidden_occupants', true);
       },
 
       enterRoom(ev) {
@@ -77471,6 +77489,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
           this.model.clearUnreadMsgCounter();
           this.model.save();
         }
+
+        _converse.emit('clearAllUnreadMessage', this.model);
 
         this.occupantsview.setOccupantsHeight();
         this.scrollDown();
@@ -78726,7 +78746,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       render() {
         this.el.innerHTML = templates_chatroom_sidebar_html__WEBPACK_IMPORTED_MODULE_17___default()(_.extend(this.chatroomview.model.toJSON(), {
           'allow_muc_invitations': _converse.allow_muc_invitations,
-          'label_occupants': __('Member list')
+          'label_occupants': __('Members List')
         }));
 
         if (_converse.allow_muc_invitations) {
@@ -78876,11 +78896,27 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
 
       initialize() {
         this.model.on('change', this.render, this);
+        this.model.on('change:status', this.render, this);
       },
 
       toHTML() {
+        // console.log(this.model);
+        let status;
+
+        if (this.model.get('onCall')) {
+          status = 'ON_CALL';
+        } else {
+          if (this.model.get('busy')) {
+            status = "BUSY";
+          } else {
+            status = "OFF_CALL";
+          }
+        }
+
+        this.model.set('status', status);
         return templates_pageme_group_member_html__WEBPACK_IMPORTED_MODULE_21___default()(_.extend({
-          '_': _
+          '_': _,
+          'image': `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`
         }, this.model.toJSON()));
       },
 
@@ -78891,7 +78927,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
     });
     _converse.PagemeGroupMembersView = Backbone.OrderedListView.extend({
       tagName: 'div',
-      className: 'occupants col-md-3 col-4 test',
+      className: 'occupants col-md-3 col-4 test hidden',
       listItems: 'model',
       listSelector: '.occupant-list',
       ItemView: _converse.PagemeGroupMemberView,
@@ -78905,7 +78941,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       render() {
         this.el.innerHTML = templates_chatroom_sidebar_html__WEBPACK_IMPORTED_MODULE_17___default()(_.extend(this.chatroomview.model.toJSON(), {
           'allow_muc_invitations': _converse.allow_muc_invitations,
-          'label_occupants': __('Member list')
+          'label_occupants': __('Members List')
         }));
 
         _converse.emit('members_rendered', this.chatroomview.model.toJSON());
@@ -85696,11 +85732,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
          */
         if (!message) {
           return;
-        }
+        } // if (_.isNil(message.get('message'))) { return; }
 
-        if (_.isNil(message.get('message'))) {
-          return;
-        }
 
         if (utils.isNewMessage(message) && this.isHidden()) {
           this.save({
@@ -89990,6 +90023,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
        * are correct, for example that the "type" is set to
        * "chatroom".
        */
+      // this.clearUnreadMsgCounter();
       settings.type = _converse.CHATROOMS_TYPE;
       settings.id = jid;
       settings.box_id = b64_sha1(jid);
@@ -90012,6 +90046,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           // mention the user and `num_unread_general` to indicate
           // generally unread messages (which *includes* mentions!).
           'num_unread_general': 0,
+          'num_unread': 0,
           'affiliation': null,
           'connection_status': _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].ROOMSTATUS.DISCONNECTED,
           'name': '',
@@ -90031,7 +90066,30 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         this.on('change:users', this.updateGroupMembers, this);
         this.occupants = new _converse.ChatRoomOccupants();
         this.occupants.browserStorage = new Backbone.BrowserStorage.session(b64_sha1(`converse.occupants-${_converse.bare_jid}${this.get('jid')}`));
-        this.occupants.chatroom = this;
+        this.occupants.chatroom = this; // console.log(this);
+        // var ping = {};
+        // ping.id = `${this.get('id')}`;
+        // var json = JSON.stringify(ping);
+        // var xhr = new XMLHttpRequest();
+        // var url = `${_converse.user_settings.baseUrl}/group/userList`
+        // xhr.open("POST", url, false);
+        // xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+        // xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+        // xhr.onload = function () { // Call a function when the state changes.
+        //   if (xhr.status >= 200 && xhr.status < 400) {
+        //     // Request finished. Do processing here.
+        //     const res = JSON.parse(xhr.responseText);
+        //     if (res.response) {
+        //         console.log(res.response);
+        //     } else {
+        //       console.log('nothing here');
+        //     }
+        //   } else {
+        //     xhr.onerror();
+        //   }
+        // }
+        // xhr.send(json);
+
         this.pagemeGroupMembers = new _converse.PagemeGroupMembers();
         this.pagemeGroupMembers.browserStorage = new Backbone.BrowserStorage.session(b64_sha1(`converse.pageme-group-members-${_converse.bare_jid}${this.get('jid')}`));
         this.pagemeGroupMembers.chatroom = this;
@@ -90729,7 +90787,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
          *  updated or once it's been established there's no need
          *  to update the list.
          */
-        this.getJidsWithAffiliations(affiliations).then(old_members => this.setAffiliations(deltaFunc(members, old_members))).then(() => {// this.occupants.fetchMembers()
+        this.getJidsWithAffiliations(affiliations).then(old_members => this.setAffiliations(deltaFunc(members, old_members))).then(() => {
+          this.occupants.fetchMembers();
         }).catch(_.partial(_converse.log, _, Strophe.LogLevel.ERROR));
       },
 
@@ -91145,11 +91204,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           return;
         }
 
-        const body = message.get('message');
-
-        if (_.isNil(body)) {
-          return;
-        }
+        const body = message.get('message'); // if (_.isNil(body)) { return; }
 
         if (_utils_form__WEBPACK_IMPORTED_MODULE_7__["default"].isNewMessage(message) && this.isHidden()) {
           const settings = {
@@ -91809,6 +91864,21 @@ _converse_core__WEBPACK_IMPORTED_MODULE_1__["default"].plugins.add('converse-pin
           senderSignedMedReq: !!verification.getAttribute('senderSignatureUrl'),
           rcvrSignedMedReq: !!verification.getAttribute('recipientSignatureUrl')
         });
+      } else {
+        if (ping.getAttribute('customType') === 'get-status') {
+          //    if (_converse.user_settings.imported_contacts || _converse.user_settings.my_organization) {
+          //     //some thing can handdle now
+          //    }
+          //    else {
+          _converse.emit('StatusChatChanged', {
+            'status': ping.children[0].getAttribute('value') === 'Busy' ? 'BUSY' : ping.children[0].getAttribute('value') === 'OnCall' ? 'ON_CALL' : 'OFF_CALL',
+            'user': ping.getAttribute('username')
+          }); // _converse.user_settings.imported_contacts = _converse.user_settings.imported_contacts.map(e => {
+          //     if (e.get())
+          //     return e;
+          // })
+
+        }
       }
 
       _converse.lastStanzaDate = new Date();
@@ -92518,9 +92588,11 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
 
       async fetchFromServer() {
         /* Fetch the roster from the XMPP server */
+        let id = _converse.connection.getUniqueId('roster');
+
         const stanza = $iq({
           'type': 'get',
-          'id': _converse.connection.getUniqueId('roster')
+          'id': id
         }).c('query', {
           xmlns: Strophe.NS.ROSTER
         });
@@ -117158,9 +117230,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
       _converse.api.listen.on('messageAdded', data => {
         if (data.message.get('sender') !== 'me' && !data.message.get('received')) {
-          if (data.chatbox.get('jid').includes('conference')) {
-            console.log('this is a group chat');
-          } else {
+          if (data.chatbox.get('jid').includes('conference')) {} else {
             let chatbox = _converse.chatboxes.findWhere({
               'jid': data.chatbox.get('jid')
             });
@@ -117170,8 +117240,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
                 var ping = {};
                 ping.userName = `${chatbox.get('jid').split('@')[0]}`;
                 var json = JSON.stringify(ping);
+                var url = `${_converse.user_settings.baseUrl}/userProfile`;
                 var xhr = new XMLHttpRequest();
-                xhr.open("POST", `${_converse.user_settings.baseUrl}/userProfile`, false);
+                xhr.open("POST", url, false);
                 xhr.setRequestHeader("securityToken", _converse.user_settings.password);
                 xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
 
@@ -117192,9 +117263,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
                 };
 
                 xhr.send(json);
-              } else {
-                console.log('this converse already had a name');
-              }
+              } else {}
             } else {
               // let name;
               // data.chatbox.get('jid').includes('conference') ? name = data.chatbox.get('subject').text : name = data.chatbox.get('name') || 'PARIS'
@@ -119274,13 +119343,17 @@ return __p
 var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./node_modules/lodash/escape.js")};
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape;
-__p += '<!-- src/templates/pageme_group_member.html -->\n<li class="occupant" id="' +
+__p += '<!-- src/templates/pageme_group_member.html -->\n<style>\n@media only screen and (max-width: 1540px) {\n    .info-member {\n        padding-left: 0px !important;\n    }\n}\n</style>\n<li class="occupant" id="' +
 __e( o.id ) +
-'">\n    <div class="row no-gutters">\n        <div class="col occupant-nick-badge">\n            <span class="occupant-nick">' +
-__e(o.fullName || o.nick) +
-'</span>\n            <span class="badge badge-primary">' +
+'">\n    <div class="row no-gutters">\n        <div class="col occupant-nick-badge" style="display: flex; justify-content: flex-start; align-items: center;\n         border-bottom: 1px solid #B3B3B5; padding-bottom: 5px;">\n            <span class="avatar" style=" width: 30px !important; height: 30px !important">\n                <img src="' +
+__e(o.image) +
+'" onerror="this.src=\'./assets/appIcon.png\'" alt="">\n            </span>\n            <!-- <span style="display: flex !important;justify-content: center !important;align-items: center !important"\n            class="fa fa-circle chat-status change-status chat-status--' +
+__e(o.status) +
+'"></span> -->\n            <span class="info-member" style="display: flex; flex-direction: column; padding-left: 10px;">\n                <span style=" font-weight: bold; font-size: 18px;" class="occupant-nick">' +
+__e(o.fullName|| o.nick) +
+'</span>\n                <i  class="">' +
 __e(o.title) +
-'</span>\n        </div>\n    </div>\n</li>\n';
+'</i>\n            </span>\n        </div>\n    </div>\n</li>\n';
 return __p
 };
 
@@ -119553,9 +119626,9 @@ __e(o.status_icon) +
 '"></span>\n  <span class="contact-name">' +
 __e(o.name || 'Loading...') +
 '</span>\n  ';
- if (o.num_unread) { ;
+ if (o.num_unread_general || o.num_unread) { ;
 __p += '\n  <span class="msgs-indicator badge badge-info">' +
-__e( o.num_unread ) +
+__e( o.type === 'chatbox' ? o.num_unread : o.num_unread_general ) +
 '</span>\n  ';
  } ;
 __p += '\n</a>\n';

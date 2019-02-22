@@ -1,8 +1,23 @@
+<style>
+@media only screen and (max-width: 1540px) {
+    .info-member {
+        padding-left: 0px !important;
+    }
+}
+</style>
 <li class="occupant" id="{{{ o.id }}}">
     <div class="row no-gutters">
-        <div class="col occupant-nick-badge">
-            <span class="occupant-nick">{{{o.fullName || o.nick}}}</span>
-            <span class="badge badge-primary">{{{o.title}}}</span>
+        <div class="col occupant-nick-badge" style="display: flex; justify-content: flex-start; align-items: center;
+         border-bottom: 1px solid #B3B3B5; padding-bottom: 5px;">
+            <span class="avatar" style=" width: 30px !important; height: 30px !important">
+                <img src="{{{o.image}}}" onerror="this.src='./assets/appIcon.png'" alt="">
+            </span>
+            <!-- <span style="display: flex !important;justify-content: center !important;align-items: center !important"
+            class="fa fa-circle chat-status change-status chat-status--{{{o.status}}}"></span> -->
+            <span class="info-member" style="display: flex; flex-direction: column; padding-left: 10px;">
+                <span style=" font-weight: bold; font-size: 18px;" class="occupant-nick">{{{o.fullName|| o.nick}}}</span>
+                <i  class="">{{{o.title}}}</i>
+            </span>
         </div>
     </div>
 </li>

@@ -48,6 +48,7 @@ converse.plugins.add('converse-ping', {
         };
 
         _converse.pong = function (ping) {
+            
             if (ping.getAttribute('CustomType') === 'VerificationRequest') {
               const verification = ping.querySelector('VerificationRequest');
               let chatboxId = verification.getAttribute('sender');
@@ -66,6 +67,23 @@ converse.plugins.add('converse-ping', {
                   rcvrSignedMedReq: !!verification.getAttribute('recipientSignatureUrl')
                 }
               )
+            }
+            else {
+                if (ping.getAttribute('customType') === 'get-status') {
+                //    if (_converse.user_settings.imported_contacts || _converse.user_settings.my_organization) {
+                //     //some thing can handdle now
+                //    }
+                //    else {
+                    _converse.emit('StatusChatChanged', {
+                        'status': ping.children[0].getAttribute('value') === 'Busy' ? 'BUSY' : 
+                        (ping.children[0].getAttribute('value') === 'OnCall' ? 'ON_CALL': 'OFF_CALL'),
+                        'user': ping.getAttribute('username')
+                    } )
+                    // _converse.user_settings.imported_contacts = _converse.user_settings.imported_contacts.map(e => {
+                    //     if (e.get())
+                    //     return e;
+                    // })
+                }
             }
             _converse.lastStanzaDate = new Date();
             _converse.connection.ping.pong(ping);

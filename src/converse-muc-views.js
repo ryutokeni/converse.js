@@ -300,7 +300,7 @@ converse.plugins.add('converse-muc-views', {
                 const jid = ev.target.getAttribute('data-room-jid');
                 const name = ev.target.getAttribute('data-room-name');
                 this.modal.hide();
-                this.clearUnreadMsgCounter();
+                this.model.clearUnreadMsgCounter();
                 _converse.api.rooms.open(jid, {'name': name});
             },
 
@@ -471,7 +471,7 @@ converse.plugins.add('converse-muc-views', {
              */
             length: 300,
             tagName: 'div',
-            className: 'chatbox chatroom hidden',
+            className: 'chatbox chatroom',
             is_chatroom: true,
             events: {
                 'change input.fileupload': 'onFileSelection',
@@ -529,6 +529,7 @@ converse.plugins.add('converse-muc-views', {
                 this.render().insertIntoDOM();
                 this.registerHandlers();
                 this.enterRoom();
+                this.model.set('hidden_occupants', true);
             },
 
             enterRoom (ev) {
@@ -724,6 +725,7 @@ converse.plugins.add('converse-muc-views', {
                     this.model.clearUnreadMsgCounter();
                     this.model.save();
                 }
+                _converse.emit('clearAllUnreadMessage', this.model);
                 this.occupantsview.setOccupantsHeight();
                 this.scrollDown();
                 this.renderEmojiPicker();
@@ -1907,7 +1909,7 @@ converse.plugins.add('converse-muc-views', {
                 this.el.innerHTML = tpl_chatroom_sidebar(
                     _.extend(this.chatroomview.model.toJSON(), {
                         'allow_muc_invitations': _converse.allow_muc_invitations,
-                        'label_occupants': __('Member list')
+                        'label_occupants': __('Members List')
                     })
                 );
                 if (_converse.allow_muc_invitations) {
@@ -2050,12 +2052,28 @@ converse.plugins.add('converse-muc-views', {
             tagName: 'li',
             initialize () {
                 this.model.on('change', this.render, this);
+                this.model.on('change:status', this.render, this)
             },
 
             toHTML () {
+                // console.log(this.model);
+                let status;
+                if (this.model.get('onCall')) {
+                    status = 'ON_CALL'
+                }
+                else {
+                    if (this.model.get('busy')) {
+                        status = "BUSY"
+                    }
+                    else {
+                        status = "OFF_CALL"
+                    }
+                }
+                this.model.set('status', status)
               return tpl_pageme_group_member(
                   _.extend(
                       { '_': _,
+                        'image': `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`,
                       }, this.model.toJSON()
                   )
               );
@@ -2068,7 +2086,7 @@ converse.plugins.add('converse-muc-views', {
 
         _converse.PagemeGroupMembersView = Backbone.OrderedListView.extend({
             tagName: 'div',
-            className: 'occupants col-md-3 col-4 test',
+            className: 'occupants col-md-3 col-4 test hidden',
             listItems: 'model',
             listSelector: '.occupant-list',
 
@@ -2084,7 +2102,7 @@ converse.plugins.add('converse-muc-views', {
                 this.el.innerHTML = tpl_chatroom_sidebar(
                     _.extend(this.chatroomview.model.toJSON(), {
                         'allow_muc_invitations': _converse.allow_muc_invitations,
-                        'label_occupants': __('Member list')
+                        'label_occupants': __('Members List')
                     })
                 );
                 _converse.emit('members_rendered', this.chatroomview.model.toJSON())

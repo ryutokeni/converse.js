@@ -578,9 +578,10 @@ converse.plugins.add('converse-roster', {
 
             async fetchFromServer () {
                 /* Fetch the roster from the XMPP server */
+                let id = _converse.connection.getUniqueId('roster');
                 const stanza = $iq({
                     'type': 'get',
-                    'id': _converse.connection.getUniqueId('roster')
+                    'id': id
                 }).c('query', {xmlns: Strophe.NS.ROSTER});
                 if (this.rosterVersioningSupported()) {
                     stanza.attrs({'ver': this.data.get('version')});

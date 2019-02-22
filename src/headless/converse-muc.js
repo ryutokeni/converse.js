@@ -130,6 +130,7 @@ converse.plugins.add('converse-muc', {
              * are correct, for example that the "type" is set to
              * "chatroom".
              */
+            // this.clearUnreadMsgCounter();
             settings.type = _converse.CHATROOMS_TYPE;
             settings.id = jid;
             settings.box_id = b64_sha1(jid)
@@ -154,7 +155,7 @@ converse.plugins.add('converse-muc', {
                       // mention the user and `num_unread_general` to indicate
                       // generally unread messages (which *includes* mentions!).
                       'num_unread_general': 0,
-
+                      'num_unread': 0,
                       'affiliation': null,
                       'connection_status': converse.ROOMSTATUS.DISCONNECTED,
                       'name': '',
@@ -177,6 +178,32 @@ converse.plugins.add('converse-muc', {
                     b64_sha1(`converse.occupants-${_converse.bare_jid}${this.get('jid')}`)
                 );
                 this.occupants.chatroom  = this;
+                
+                // console.log(this);
+
+                // var ping = {};
+                // ping.id = `${this.get('id')}`;
+                // var json = JSON.stringify(ping);
+
+                // var xhr = new XMLHttpRequest();
+                // var url = `${_converse.user_settings.baseUrl}/group/userList`
+                // xhr.open("POST", url, false);
+                // xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+                // xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+                // xhr.onload = function () { // Call a function when the state changes.
+                //   if (xhr.status >= 200 && xhr.status < 400) {
+                //     // Request finished. Do processing here.
+                //     const res = JSON.parse(xhr.responseText);
+                //     if (res.response) {
+                //         console.log(res.response);
+                //     } else {
+                //       console.log('nothing here');
+                //     }
+                //   } else {
+                //     xhr.onerror();
+                //   }
+                // }
+                // xhr.send(json);
 
                 this.pagemeGroupMembers = new _converse.PagemeGroupMembers();
                 this.pagemeGroupMembers.browserStorage = new Backbone.BrowserStorage.session(
@@ -776,7 +803,7 @@ converse.plugins.add('converse-muc', {
                 this.getJidsWithAffiliations(affiliations)
                     .then(old_members => this.setAffiliations(deltaFunc(members, old_members)))
                     .then(() => {
-                        // this.occupants.fetchMembers()
+                         this.occupants.fetchMembers()
                     })
                     .catch(_.partial(_converse.log, _, Strophe.LogLevel.ERROR));
             },
@@ -984,7 +1011,7 @@ converse.plugins.add('converse-muc', {
                  * Parameters:
                  *  (XMLElement) stanza: The message stanza.
                  */
-                
+               
                 this.fetchFeaturesIfConfigurationChanged(stanza);
 
                 const original_stanza = stanza,
@@ -1130,7 +1157,7 @@ converse.plugins.add('converse-muc', {
                  */
                 if (!message) { return; }
                 const body = message.get('message');
-                if (_.isNil(body)) { return; }
+                // if (_.isNil(body)) { return; }
                 if (u.isNewMessage(message) && this.isHidden()) {
                     const settings = {'num_unread_general': this.get('num_unread_general') + 1};
                     if (this.isUserMentioned(message)) {
@@ -1144,7 +1171,7 @@ converse.plugins.add('converse-muc', {
             clearUnreadMsgCounter() {
                 u.safeSave(this, {
                     'num_unread': 0,
-                    'num_unread_general': 0
+                    'num_unread_general': 0,
                 });
             }
         });

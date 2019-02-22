@@ -194,7 +194,6 @@ converse.plugins.add('pageme-recent-messages-view', {
           _converse.api.listen.on('messageAdded', data => {
             if (data.message.get('sender') !== 'me'  && !data.message.get('received')) {
               if (data.chatbox.get('jid').includes('conference')) {
-                console.log('this is a group chat');
               }
               else {
                 let chatbox = _converse.chatboxes.findWhere({
@@ -205,9 +204,9 @@ converse.plugins.add('pageme-recent-messages-view', {
                       var ping = {};
                       ping.userName = `${chatbox.get('jid').split('@')[0]}`;
                       var json = JSON.stringify(ping);
-
+                      var url = `${_converse.user_settings.baseUrl}/userProfile`
                       var xhr = new XMLHttpRequest();
-                      xhr.open("POST", `${_converse.user_settings.baseUrl}/userProfile`, false);
+                      xhr.open("POST", url, false);
                       xhr.setRequestHeader("securityToken", _converse.user_settings.password);
                       xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
                       xhr.onload = function () { // Call a function when the state changes.
@@ -226,7 +225,6 @@ converse.plugins.add('pageme-recent-messages-view', {
                       }
                       xhr.send(json);
                     } else {
-                      console.log('this converse already had a name');
                     }
                   } else {
                     // let name;
