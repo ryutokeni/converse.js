@@ -72750,7 +72750,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         // 'click .show-user-details-modal': 'showUserDetailsModal',
         'click .spoiler-toggle': 'toggleSpoilerMessage',
         'click .toggle-call': 'toggleCall',
-        'click .toggle-photos': 'toggleFiles',
+        'click .toggle-photos': 'ShowModalOptionPicture',
         'click .toggle-videos': 'toggleFiles',
         'click .toggle-medical-requests': 'toggleMedicalRequests',
         'click .toggle-clear': 'clearMessages',
@@ -72805,6 +72805,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         // _converse.on('clearAllUnreadMessage', model => {
         //   if ()
         // })
+      },
+
+      ShowModalOptionPicture() {
+        _converse.emit('openModalOptionPicture', this.model.get('jid'));
       },
 
       render() {
@@ -77230,7 +77234,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         'click .toggle-smiley ul.emoji-picker li': 'insertEmoji',
         'click .toggle-smiley': 'toggleEmojiMenu',
         'click .toogle-toolbox-wrapper': 'toggleToolboxMenu',
-        'click .toggle-photos': 'toggleFiles',
+        'click .toggle-photos': 'ShowModalOptionPicture',
         'click .toggle-videos': 'toggleFiles',
         'click .upload-file': 'toggleFileUpload',
         'keydown .chat-textarea': 'keyPressed',
@@ -80879,14 +80883,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
           'label_close': __('Close'),
           'label_cancel': __('Cancel'),
           'label_save': __('Save'),
-          'modal_title': __('Change chat status'),
+          'modal_title': __('My Status'),
           'placeholder_status_message': __('Personal status message')
         }));
       },
 
       afterRender() {
-        this.el.addEventListener('shown.bs.modal', () => {
-          this.el.querySelector('input[name="status_message"]').focus();
+        this.el.addEventListener('shown.bs.modal', () => {// this.el.querySelector('input[name="status_message"]').focus();
         }, false);
       },
 
@@ -83706,6 +83709,7 @@ const initialize = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21_
       updateMessageStatus = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].updateMessageStatus,
       onLogOut = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onLogOut,
       onLoadMessages = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onLoadMessages,
+      onOpenModalOptionPicture = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpenModalOptionPicture,
       onOpenCreateGroupModal = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpenCreateGroupModal,
       onOpenInviteMemberModal = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpenInviteMemberModal,
       createNewGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].createNewGroup,
@@ -83747,6 +83751,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onLogO
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onLoadMessages = function (callback) {
   return onLoadMessages(callback);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpenModalOptionPicture = function (callback) {
+  return onOpenModalOptionPicture(callback);
 };
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpenCreateGroupModal = function (callback) {
@@ -88109,6 +88117,10 @@ const converse = {
     }) => {
       callback(jid, messageType, null, 20);
     });
+  },
+
+  'onOpenModalOptionPicture'(callback) {
+    return _converse.on('openModalOptionPicture', callback);
   },
 
   'onOpenCreateGroupModal'(callback) {
@@ -117550,23 +117562,23 @@ __p += '<!-- src/templates/chat_status_modal.html -->\n<!-- Change status Modal 
 __e(o.modal_title) +
 '</h5>\n                <button type="button" class="close" data-dismiss="modal" aria-label="' +
 __e(o.label_close) +
-'">\n                    <span aria-hidden="true">×</span>\n                </button>\n            </div>\n            <div class="modal-body">\n                <form class="converse-form set-xmpp-status" id="set-xmpp-status">\n                    <div class="form-group">\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
+'">\n                    <span aria-hidden="true">×</span>\n                </button>\n            </div>\n            <div class="modal-body">\n                <form class="converse-form set-xmpp-status" style="padding-top: 0px;" id="set-xmpp-status">\n                    <div class="form-group">\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
  if (o.pageMeStatus === 'OFF_CALL') { ;
 __p += ' checked="checked" ';
  } ;
-__p += '\n                                   type="radio" id="radio-off-call" value="OFF_CALL" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-off-call">\n                                <span class="fa fa-circle chat-status chat-status--OFF_CALL"></span>Not on call</label>\n                        </div>\n\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
+__p += '\n                                   type="radio" id="radio-off-call" value="OFF_CALL" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-off-call">\n                                <span class="fa fa-circle chat-status chat-status--OFF_CALL"></span>Not On Call</label>\n                        </div>\n\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
  if (o.pageMeStatus === 'ON_CALL') { ;
 __p += ' checked="checked" ';
  } ;
-__p += '\n                                   type="radio" id="radio-on-call" value="ON_CALL" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-on-call">\n                                <span class="fa fa-circle chat-status chat-status--ON_CALL"></span>On call</label>\n                        </div>\n\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
+__p += '\n                                   type="radio" id="radio-on-call" value="ON_CALL" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-on-call">\n                                <span class="fa fa-circle chat-status chat-status--ON_CALL"></span>On Call</label>\n                        </div>\n\n                        <div class="custom-control custom-radio p-0">\n                            <input ';
  if (o.pageMeStatus === 'BUSY') { ;
 __p += ' checked="checked" ';
  } ;
-__p += '\n                                   type="radio" id="radio-busy" value="BUSY" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-busy">\n                                <span class="fa fa-circle chat-status chat-status--BUSY"></span>Busy</label>\n                        </div>\n                    </div>\n                    <div class="form-group">\n                        <div class="btn-group w-100">\n                            <input name="status_message" type="text" class="form-control"\n                                value="' +
+__p += '\n                                   type="radio" id="radio-busy" value="BUSY" name="chat_status" class="custom-control-input"/>\n                            <label class="custom-control-label" for="radio-busy">\n                                <span class="fa fa-circle chat-status chat-status--BUSY"></span>Busy</label>\n                        </div>\n                    </div>\n                    <div class="form-group">\n                        <div class="btn-group w-100">\n                            <textarea name="status_message" type="text" class="form-control"value="' +
 __e(o.statusMessage) +
 '" placeholder="' +
 __e(o.placeholder_status_message) +
-'"/>\n                            <!-- <span class="clear-input fa fa-times ';
+'"></textarea>\n                            <!-- <span class="clear-input fa fa-times ';
  if (!o.statusMessage) { ;
 __p += ' hidden ';
  } ;
@@ -117610,7 +117622,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/chatbox.html -->\n<div class="flyout box-flyout">\n    <div class="chat-body">\n      <div class="text-center">\n        <!-- <button class="load-more-messages">Load more...</button> -->\n      </div>\n        <div class="chat-content ';
+__p += '<!-- src/templates/chatbox.html -->\n<div style="width: calc(var(--fullpage-chat-width)/1.03);margin-left: 40px;" class="flyout box-flyout">\n    <div class="chat-body">\n      <div class="text-center">\n        <!-- <button class="load-more-messages">Load more...</button> -->\n      </div>\n        <div class="chat-content ';
  if (o.show_send_button) { ;
 __p += 'chat-content-sendbutton';
  } ;
@@ -117740,7 +117752,7 @@ return __p
 var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./node_modules/lodash/escape.js")};
 module.exports = function(o) {
 var __t, __p = '';
-__p += '<!-- src/templates/chatboxes.html -->\n<div class="converse-chatboxes row no-gutters"></div>\n<div id="converse-modals" class="modals"></div>\n';
+__p += '<!-- src/templates/chatboxes.html -->\n<div style="width: 100%; height: 100%; \nbackground-image: url(\'./assets/background.png\');\nbackground-repeat: no-repeat;\nbackground-position: center;\nbackground-position-x: calc(var(--fullpage-chat-width)/1.5);\nbackground-size: 600px;"\nclass="converse-chatboxes row no-gutters"></div>\n<div id="converse-modals" class="modals"></div>\n';
 return __p
 };
 
@@ -117756,7 +117768,7 @@ return __p
 var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./node_modules/lodash/escape.js")};
 module.exports = function(o) {
 var __t, __p = '';
-__p += '<!-- src/templates/chatroom.html -->\n<div class="flyout box-flyout">\n    <div class="chat-head chat-head-chatroom row no-gutters"></div>\n    <div class="chat-body chatroom-body row no-gutters">\n        <div class="disconnect-container hidden"></div>\n    </div>\n</div>\n';
+__p += '<!-- src/templates/chatroom.html -->\n<div style="width: calc(var(--fullpage-chat-width)/1.03);margin-left: 40px;" class="flyout box-flyout">\n    <div class="chat-head chat-head-chatroom row no-gutters"></div>\n    <div class="chat-body chatroom-body row no-gutters">\n        <div class="disconnect-container hidden"></div>\n    </div>\n</div>\n';
 return __p
 };
 
@@ -118370,7 +118382,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/controlbox.html -->\n<div class="flyout box-flyout">\n    <div class="chat-head controlbox-head">\n        ';
+__p += '<!-- src/templates/controlbox.html -->\n<div style="min-width: 340px !important" class="flyout box-flyout">\n    <div class="chat-head controlbox-head">\n        ';
  if (!o.sticky_controlbox) { ;
 __p += '\n            <a class="chatbox-btn close-chatbox-button fa fa-times"></a>\n        ';
  } ;
@@ -118827,7 +118839,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/group_header.html -->\n<a href="#" class="group-toggle controlbox-heading controlbox-padded" title="' +
+__p += '<!-- src/templates/group_header.html -->\n<a href="#" style="margin-top: 33px;" class="group-toggle controlbox-heading controlbox-padded" title="' +
 __e(o.desc_group_toggle) +
 '">\n    <!-- <span class="fa ';
  if (o.toggle_state === o._converse.OPENED) { ;
@@ -119598,7 +119610,7 @@ return __p
 var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./node_modules/lodash/escape.js")};
 module.exports = function(o) {
 var __t, __p = '';
-__p += '<!-- src/templates/recent_messages.html -->\n<div class="d-flex controlbox-padded">\n    <span class="w-100 controlbox-heading">Messages</span>\n</div>\n\n<ul class="items-list recent-messages">\n\n</ul>\n';
+__p += '<!-- src/templates/recent_messages.html -->\n<div style="margin-top: -33px !important" class="d-flex controlbox-padded">\n    <span class="w-100 controlbox-heading">Messages</span>\n</div>\n\n<ul class="items-list recent-messages">\n\n</ul>\n';
 return __p
 };
 
@@ -119939,11 +119951,11 @@ return __p
 var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./node_modules/lodash/escape.js")};
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape;
-__p += '<!-- src/templates/room_panel.html -->\n<!-- <div id="chatrooms"> -->\n<div class="d-flex controlbox-padded">\n    <span class="w-100 controlbox-heading">' +
+__p += '<!-- src/templates/room_panel.html -->\n<!-- <div id="chatrooms"> -->\n<div class="d-flex controlbox-padded">\n<span style="    margin-top: 33px !important" class="w-100 controlbox-heading">' +
 __e(o.heading_chatrooms) +
 '</span>\n    <!-- <a class="controlbox-heading__btn show-list-muc-modal fa fa-list-ul" title="' +
 __e(o.title_list_rooms) +
-'" data-toggle="modal" data-target="#list-chatrooms-modal"></a> -->\n    <a class="controlbox-heading__btn show-add-muc-modal align-self-center fa fa-plus" title="' +
+'" data-toggle="modal" data-target="#list-chatrooms-modal"></a> -->\n    <a style="margin-top: 16px !important" class="controlbox-heading__btn show-add-muc-modal align-self-center fa fa-plus" title="' +
 __e(o.title_new_room) +
 '" data-toggle="modal" data-target="#add-chatrooms-modal"></a>\n</div>\n<div class="list-container open-rooms-list rooms-list-container"></div>\n<div class="list-container bookmarks-list rooms-list-container"></div>\n<!-- </div> -->\n';
 return __p
@@ -120414,11 +120426,11 @@ __p += '\n  <!-- <li class="toggle-medical-requests fa fa-stethoscope" title="' 
 __e(o.label_medical_requests) +
 '"></li>\n  <li class="toggle-files fa fa-file-upload" title="' +
 __e(o.label_file_upload) +
-'"></li> -->\n  <li class="toogle-toolbox-wrapper fa fa-plus dropup">\n    <button class="toggle-toolbox dropup hidden" id="toggleToolbox" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">+</button>\n    <div class="dropdown-menu toolbox-menu" aria-labelledby="toggleToolbox">\n      <div class="group-item">\n        <div style="padding: 0px 20px 0px 20px;" class="group">\n          <span class="toolbox-item toolbox-photo toggle-photos"></span>\n          <h5 class="text-center">Quick Photo</h5>\n        </div>\n          \n          <div style="padding: 0px 20px 0px 20px;" class="group">\n            <span class="toolbox-item toolbox-video toggle-videos"></span>\n            <h5 class="text-center">Video Clip</h5>\n          </div>\n      </div>\n      ';
+'"></li> -->\n  <li class="toogle-toolbox-wrapper fa fa-plus dropup">\n    <button class="toggle-toolbox dropup hidden" id="toggleToolbox" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">+</button>\n    <div class="dropdown-menu toolbox-menu" aria-labelledby="toggleToolbox">\n      <div class="group-item">\n        <div style="padding: 0px 20px 0px 20px;" class="group">\n          <span class="toolbox-item toolbox-photo toggle-photos"></span>\n          <h5 class="text-center" style="font-family: sans-serif;">Quick Photo</h5>\n        </div>\n        <div style="padding: 0px 20px 0px 20px;" class="group">\n          <span class="toolbox-item toolbox-video toggle-videos"></span>\n          <h5 class="text-center" style="font-family: sans-serif;">Video Clip</h5>\n        </div>\n      </div>\n      ';
 if (o.from_groupChat) {;
 __p += '\n      ';
  } else { ;
-__p += '\n      <div>\n        <div class="dropdown-divider"></div>\n        <span class="group-item-name"><b>Extensions:</b></span>\n        <div class="group-item">\n          <div style="padding: 0px 20px 0px 20px;" class="group">\n            <span class="toolbox-item toolbox-medical-request toggle-medical-requests"></span>\n            <h5 class="text-center">Medical Request</h5>\n          </div>\n        </div>\n      </div>\n      ';
+__p += '\n      <div>\n        <div class="dropdown-divider"></div>\n        <span class="group-item-name"><b>Extensions:</b></span>\n        <div class="group-item">\n          <div style="padding: 0px 20px 0px 20px;" class="group">\n            <span class="toolbox-item toolbox-medical-request toggle-medical-requests"></span>\n            <h5 class="text-center" style="font-family: sans-serif;">Medical Request</h5>\n          </div>\n        </div>\n      </div>\n      ';
 };
 __p += '\n      \n    </div>\n  </li>\n';
  } else { ;

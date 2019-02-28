@@ -492,7 +492,7 @@ converse.plugins.add('converse-muc-views', {
                 'click .toggle-smiley ul.emoji-picker li': 'insertEmoji',
                 'click .toggle-smiley': 'toggleEmojiMenu',
                 'click .toogle-toolbox-wrapper': 'toggleToolboxMenu',
-                'click .toggle-photos': 'toggleFiles',
+                'click .toggle-photos': 'ShowModalOptionPicture',
                 'click .toggle-videos': 'toggleFiles',
                 'click .upload-file': 'toggleFileUpload',
                 'keydown .chat-textarea': 'keyPressed',
@@ -531,7 +531,7 @@ converse.plugins.add('converse-muc-views', {
                 this.enterRoom();
                 this.model.set('hidden_occupants', true);
             },
-
+           
             enterRoom (ev) {
                 if (ev) { ev.preventDefault(); }
                 if (this.model.get('connection_status') !==  converse.ROOMSTATUS.ENTERED) {

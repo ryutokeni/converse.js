@@ -1745,6 +1745,9 @@ const converse = {
         callback(jid, messageType, null, 20);
       });
     },
+    'onOpenModalOptionPicture' (callback) {
+        return _converse.on('openModalOptionPicture', callback);
+    },
     'onOpenCreateGroupModal' (callback) {
       return _converse.on('openCreateGroupModal', callback);
     },

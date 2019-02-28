@@ -61,6 +61,7 @@ const {
   updateMessageStatus,
   onLogOut,
   onLoadMessages,
+  onOpenModalOptionPicture,
   onOpenCreateGroupModal,
   onOpenInviteMemberModal,
   createNewGroup,
@@ -101,7 +102,9 @@ converse.onLogOut = function (callback) {
 converse.onLoadMessages = function (callback) {
   return onLoadMessages(callback);
 }
-
+converse.onOpenModalOptionPicture = function (callback) {
+  return onOpenModalOptionPicture(callback);
+}
 converse.onOpenCreateGroupModal = function (callback) {
   return onOpenCreateGroupModal(callback);
 }

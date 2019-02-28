@@ -150,7 +150,7 @@ converse.plugins.add('converse-profile', {
                           'label_close': __('Close'),
                           'label_cancel': __('Cancel'),
                           'label_save': __('Save'),
-                          'modal_title': __('Change chat status'),
+                          'modal_title': __('My Status'),
                           'placeholder_status_message': __('Personal status message')
                         }
                     ));
@@ -158,7 +158,7 @@ converse.plugins.add('converse-profile', {
 
             afterRender () {
                 this.el.addEventListener('shown.bs.modal', () => {
-                    this.el.querySelector('input[name="status_message"]').focus();
+                    // this.el.querySelector('input[name="status_message"]').focus();
                 }, false);
             },
 

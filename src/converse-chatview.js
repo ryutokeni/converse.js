@@ -323,7 +323,7 @@ converse.plugins.add('converse-chatview', {
                 // 'click .show-user-details-modal': 'showUserDetailsModal',
                 'click .spoiler-toggle': 'toggleSpoilerMessage',
                 'click .toggle-call': 'toggleCall',
-                'click .toggle-photos': 'toggleFiles',
+                'click .toggle-photos': 'ShowModalOptionPicture',
                 'click .toggle-videos': 'toggleFiles',
                 'click .toggle-medical-requests': 'toggleMedicalRequests',
                 'click .toggle-clear': 'clearMessages',
@@ -379,6 +379,9 @@ converse.plugins.add('converse-chatview', {
                 // _converse.on('clearAllUnreadMessage', model => {
                 //   if ()
                 // })
+            },
+            ShowModalOptionPicture() {
+                _converse.emit('openModalOptionPicture', this.model.get('jid'));
             },
 
             render () {

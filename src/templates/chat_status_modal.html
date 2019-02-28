@@ -9,20 +9,20 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form class="converse-form set-xmpp-status" id="set-xmpp-status">
+                <form class="converse-form set-xmpp-status" style="padding-top: 0px;" id="set-xmpp-status">
                     <div class="form-group">
                         <div class="custom-control custom-radio p-0">
                             <input {[ if (o.pageMeStatus === 'OFF_CALL') { ]} checked="checked" {[ } ]}
                                    type="radio" id="radio-off-call" value="OFF_CALL" name="chat_status" class="custom-control-input"/>
                             <label class="custom-control-label" for="radio-off-call">
-                                <span class="fa fa-circle chat-status chat-status--OFF_CALL"></span>Not on call</label>
+                                <span class="fa fa-circle chat-status chat-status--OFF_CALL"></span>Not On Call</label>
                         </div>
 
                         <div class="custom-control custom-radio p-0">
                             <input {[ if (o.pageMeStatus === 'ON_CALL') { ]} checked="checked" {[ } ]}
                                    type="radio" id="radio-on-call" value="ON_CALL" name="chat_status" class="custom-control-input"/>
                             <label class="custom-control-label" for="radio-on-call">
-                                <span class="fa fa-circle chat-status chat-status--ON_CALL"></span>On call</label>
+                                <span class="fa fa-circle chat-status chat-status--ON_CALL"></span>On Call</label>
                         </div>
 
                         <div class="custom-control custom-radio p-0">
@@ -34,8 +34,7 @@
                     </div>
                     <div class="form-group">
                         <div class="btn-group w-100">
-                            <input name="status_message" type="text" class="form-control"
-                                value="{{{o.statusMessage}}}" placeholder="{{{o.placeholder_status_message}}}"/>
+                            <textarea name="status_message" type="text" class="form-control"value="{{{o.statusMessage}}}" placeholder="{{{o.placeholder_status_message}}}"></textarea>
                             <!-- <span class="clear-input fa fa-times {[ if (!o.statusMessage) { ]} hidden {[ } ]}"></span> -->
                         </div>
                     </div>
