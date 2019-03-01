@@ -476,6 +476,7 @@ converse.plugins.add('converse-rosterview', {
 
             openChat (ev) {
                 if (ev && ev.preventDefault) { ev.preventDefault(); }
+                 _converse.emit('aChatRoomOpen');
                 const attrs = this.model.attributes;
                 _converse.api.chats.open(attrs.jid, attrs);
             },
@@ -973,6 +974,7 @@ converse.plugins.add('converse-rosterview', {
             // _converse.rosterGroup = new _converse.RosterGroupView({
             //     'model': _converse.rostergroups
             // })
+            _converse.emit('justShowbackground');
             _converse.rosterview.render();
             _converse.emit('rosterViewInitialized');
             _converse.on('load-done', (labelName) => {

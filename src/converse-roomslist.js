@@ -221,6 +221,7 @@ converse.plugins.add('converse-roomslist', {
 
             openRoom (ev) {
                 ev.preventDefault();
+                _converse.emit('aChatRoomOpen');
                 _converse.clearMsgCounter();
                 const name = ev.target.textContent;
                 const jid = ev.delegateTarget.dataset.roomJid;

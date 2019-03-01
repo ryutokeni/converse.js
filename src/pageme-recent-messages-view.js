@@ -153,6 +153,7 @@ converse.plugins.add('pageme-recent-messages-view', {
 
             openChatbox (ev) {
                 ev.preventDefault();
+                _converse.emit('aChatRoomOpen');
                 const name = ev.target.textContent;
                 const jid = ev.delegateTarget.dataset.jid;
                 const data = {

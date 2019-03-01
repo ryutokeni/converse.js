@@ -469,6 +469,7 @@ converse.plugins.add('converse-bookmarks', {
 
             openRoom (ev) {
                 ev.preventDefault();
+                _converse.emit('aChatRoomOpen');
                 const name = ev.target.textContent;
                 const jid = ev.target.getAttribute('data-room-jid');
                 const data = {

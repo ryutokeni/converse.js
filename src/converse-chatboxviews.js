@@ -104,8 +104,25 @@ converse.plugins.add('converse-chatboxviews', {
 
             initialize () {
                 this.model.on("destroy", this.removeChat, this);
-                this.el.classList.add(`converse-${_converse.view_mode}`);
+                this.el.classList.add(`converse-${_converse.view_mode}`); 
+               
                 this.render();
+                 let backgroundEl = this.el.querySelector('.row');
+                 _converse.on('justShowbackground', () => {
+                   backgroundEl.style.backgroundPositionX = 'calc(var(--fullpage-chat-width)/1.45)'
+                 })
+               
+                _converse.on('aChatRoomClose', () => {
+                    backgroundEl.style.backgroundImage=  "url('./assets/background.png')";
+                })
+                _converse.on('aChatRoomOpen', () => {
+                    if (backgroundEl.style.backgroundImage === 'none') {
+                        return;
+                    }
+                    else {
+                        backgroundEl.style.backgroundImage = 'none';
+                    }
+                })
             },
 
             render () {
@@ -155,7 +172,6 @@ converse.plugins.add('converse-chatboxviews', {
                 }
             });
         });
-
 
         _converse.api.listen.on('chatBoxesInitialized', () => {
             _converse.chatboxviews = new _converse.ChatBoxViews({

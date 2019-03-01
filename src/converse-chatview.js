@@ -385,8 +385,8 @@ converse.plugins.add('converse-chatview', {
             },
 
             render () {
-                // XXX: Is this still needed?
-
+                // // XXX: Is this still needed?
+                // _converse.emit('aChatRoomOpen');
                 this.el.setAttribute('id', this.model.get('box_id'));
                 this.el.innerHTML = tpl_chatbox(
                     _.extend(this.model.toJSON(), {
@@ -1283,6 +1283,7 @@ converse.plugins.add('converse-chatview', {
                 }
                 this.remove();
                 _converse.emit('chatBoxClosed', this);
+                _converse.emit('aChatRoomClose')
                 return this;
             },
 

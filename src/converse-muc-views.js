@@ -297,6 +297,7 @@ converse.plugins.add('converse-muc-views', {
 
             openRoom (ev) {
                 ev.preventDefault();
+                _converse.emit('aChatRoomOpen');
                 const jid = ev.target.getAttribute('data-room-jid');
                 const name = ev.target.getAttribute('data-room-name');
                 this.modal.hide();
@@ -502,7 +503,8 @@ converse.plugins.add('converse-muc-views', {
             },
 
             initialize () {
-                this.model.set('hidden_occupants', true);
+                // this.model.set('hidden_occupants', false);
+               
                 this.initDebounced();
 
                 this.model.messages.on('add', this.onMessageAdded, this);
@@ -530,6 +532,7 @@ converse.plugins.add('converse-muc-views', {
                 this.render().insertIntoDOM();
                 this.registerHandlers();
                 this.enterRoom();
+                this.hideOccupants();
             },
            
             enterRoom (ev) {
@@ -618,6 +621,7 @@ converse.plugins.add('converse-muc-views', {
 
             closeRoom (ev) {
                 ev.preventDefault();
+               _converse.emit('aChatRoomClose')
                 this.hide();
                 return this;
             },

@@ -71975,6 +71975,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
 
       openRoom(ev) {
         ev.preventDefault();
+
+        _converse.emit('aChatRoomOpen');
+
         const name = ev.target.textContent;
         const jid = ev.target.getAttribute('data-room-jid');
         const data = {
@@ -72296,6 +72299,23 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         this.model.on("destroy", this.removeChat, this);
         this.el.classList.add(`converse-${_converse.view_mode}`);
         this.render();
+        let backgroundEl = this.el.querySelector('.row');
+
+        _converse.on('justShowbackground', () => {
+          backgroundEl.style.backgroundPositionX = 'calc(var(--fullpage-chat-width)/1.45)';
+        });
+
+        _converse.on('aChatRoomClose', () => {
+          backgroundEl.style.backgroundImage = "url('./assets/background.png')";
+        });
+
+        _converse.on('aChatRoomOpen', () => {
+          if (backgroundEl.style.backgroundImage === 'none') {
+            return;
+          } else {
+            backgroundEl.style.backgroundImage = 'none';
+          }
+        });
       },
 
       render() {
@@ -72812,7 +72832,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       },
 
       render() {
-        // XXX: Is this still needed?
+        // // XXX: Is this still needed?
+        // _converse.emit('aChatRoomOpen');
         this.el.setAttribute('id', this.model.get('box_id'));
         this.el.innerHTML = templates_chatbox_html__WEBPACK_IMPORTED_MODULE_7___default()(_.extend(this.model.toJSON(), {
           'unread_msgs': __('You have unread messages')
@@ -73752,6 +73773,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         this.remove();
 
         _converse.emit('chatBoxClosed', this);
+
+        _converse.emit('aChatRoomClose');
 
         return this;
       },
@@ -77031,6 +77054,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
 
       openRoom(ev) {
         ev.preventDefault();
+
+        _converse.emit('aChatRoomOpen');
+
         const jid = ev.target.getAttribute('data-room-jid');
         const name = ev.target.getAttribute('data-room-name');
         this.modal.hide();
@@ -77244,7 +77270,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       },
 
       initialize() {
-        this.model.set('hidden_occupants', true);
+        // this.model.set('hidden_occupants', false);
         this.initDebounced();
         this.model.messages.on('add', this.onMessageAdded, this);
         this.model.messages.on('rendered', this.scrollDown, this);
@@ -77269,6 +77295,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         this.render().insertIntoDOM();
         this.registerHandlers();
         this.enterRoom();
+        this.hideOccupants();
       },
 
       enterRoom(ev) {
@@ -77369,6 +77396,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
 
       closeRoom(ev) {
         ev.preventDefault();
+
+        _converse.emit('aChatRoomClose');
+
         this.hide();
         return this;
       },
@@ -82263,6 +82293,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       openRoom(ev) {
         ev.preventDefault();
 
+        _converse.emit('aChatRoomOpen');
+
         _converse.clearMsgCounter();
 
         const name = ev.target.textContent;
@@ -82931,6 +82963,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           ev.preventDefault();
         }
 
+        _converse.emit('aChatRoomOpen');
+
         const attrs = this.model.attributes;
 
         _converse.api.chats.open(attrs.jid, attrs);
@@ -83493,6 +83527,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       }); // _converse.rosterGroup = new _converse.RosterGroupView({
       //     'model': _converse.rostergroups
       // })
+
+      _converse.emit('justShowbackground');
 
       _converse.rosterview.render();
 
@@ -117239,6 +117275,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
       openChatbox(ev) {
         ev.preventDefault();
+
+        _converse.emit('aChatRoomOpen');
+
         const name = ev.target.textContent;
         const jid = ev.delegateTarget.dataset.jid;
         const data = {
@@ -117793,7 +117832,7 @@ return __p
 var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./node_modules/lodash/escape.js")};
 module.exports = function(o) {
 var __t, __p = '';
-__p += '<!-- src/templates/chatboxes.html -->\n<div style="width: 100%; height: 100%; \nbackground-image: url(\'./assets/background.png\');\nbackground-repeat: no-repeat;\nbackground-position: center;\nbackground-position-x: calc(var(--fullpage-chat-width)/1.5);\nbackground-size: 600px;"\nclass="converse-chatboxes row no-gutters"></div>\n<div id="converse-modals" class="modals"></div>\n';
+__p += '<!-- src/templates/chatboxes.html -->\n<div style="width: 100%; height: 100%; \nbackground-image: url(\'./assets/background.png\');\nbackground-repeat: no-repeat;\nbackground-position: center;\nbackground-position-x: center;\nbackground-size: 600px;"\nclass="converse-chatboxes row no-gutters "></div>\n<!-- <img src="./assets/background.png" > -->\n<div id="converse-modals" class="modals"></div>\n';
 return __p
 };
 
@@ -119668,21 +119707,21 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/recent_messages_item.html -->\n<style>\n  .unread-msgs {\n    font-weight: bold !important;\n    color: #ffffff !important;\n  }\n.badge-info {\n  background-color: #ec5057 !important;\n  border-radius: 10px !important;\n  margin-left: 30% !important;\n  min-width: 25px !important;\n}\n</style>\n<a class="list-item-link cbox-list-item open-chat w-100 ';
+__p += '<!-- src/templates/recent_messages_item.html -->\n<style>\n  .unread-msgs {\n    font-weight: bold !important;\n    color: #ffffff !important;\n  }\n.badge-info {\n  background-color: #ec5057 !important;\n  border-radius: 10px !important;\n  min-width: 25px !important;\n}\n</style>\n<a style="display:flex !important; justify-content: space-between !important" class="row list-item-link cbox-list-item open-chat w-100 ';
  if (o.num_unread) { ;
 __p += ' unread-msgs ';
  } ;
 __p += '" data-jid="' +
 __e(o.jid) +
-'" href="#">\n  <span class="chat-status ' +
+'" href="#">\n  <div style="margin-left: 6%;" class="">\n    <span class="chat-status ' +
 __e(o.status_icon) +
-'"></span>\n  <span class="contact-name">' +
+'"></span>\n    <span class="contact-name">' +
 __e(o.name || 'Loading...') +
-'</span>\n  ';
+'</span>\n  </div>\n  ';
  if (o.num_unread_general || o.num_unread) { ;
-__p += '\n  <span class="msgs-indicator badge badge-info">' +
+__p += '\n  <div class="msg">\n    <span class="msgs-indicator badge badge-info">' +
 __e( o.type === 'chatbox' ? o.num_unread : o.num_unread_general ) +
-'</span>\n  ';
+'</span>  \n  </div>\n  ';
  } ;
 __p += '\n</a>\n';
 return __p
