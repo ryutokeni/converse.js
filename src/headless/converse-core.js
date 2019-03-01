@@ -1783,22 +1783,51 @@ const converse = {
          if (!chatbox) {
              return;
          }
-        let arrayParticipants = participants.map(e => (e.split('@')[0]))
-        let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => (arrayParticipants.includes(e.userName)))
-        let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => (arrayParticipants.includes(e.userName)))
-        let arrayUser = arrayAddressBook.concat(arrayOrganization);
-        arrayUser = _.uniq(arrayUser);
-        arrayUser = arrayUser.map(e => {
-          e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
-          return e;
-        })
+         const that = this;
+         var ping = {};
+         ping.id = `${chatbox.get('jid')}`;
+         var json = JSON.stringify(ping);
+
+         var xhr = new XMLHttpRequest();
+         var url = `${_converse.user_settings.baseUrl}/group/userList`
+         xhr.open("POST", url, false);
+         xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+         xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+         xhr.onload = function () { // Call a function when the state changes.
+           if (xhr.status >= 200 && xhr.status < 400) {
+             // Request finished. Do processing here.
+             const res = JSON.parse(xhr.responseText);
+             if (res.response) {
+               chatbox.save({
+                 'users': res.response
+               })
+
+
+             } else {
+               console.log('nothing here');
+             }
+           } else {
+             xhr.onerror();
+           }
+         }
+         xhr.send(json);
+
+        // let arrayParticipants = participants.map(e => (e.split('@')[0]))
+        // let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => (arrayParticipants.includes(e.userName)))
+        // let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => (arrayParticipants.includes(e.userName)))
+        // let arrayUser = arrayAddressBook.concat(arrayOrganization);
+        // arrayUser = _.uniq(arrayUser);
+        // arrayUser = arrayUser.map(e => {
+        //   e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
+        //   return e;
+        // })
 
         // console.log(chatbox);
-        chatbox.save({
-            users: arrayUser,
-            latestMessageTime: null
-        })
-      // const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
+        // chatbox.save({
+        //     users: arrayUser,
+        //     latestMessageTime: null
+        // })
+    //    const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
     },
     'inviteToGroup' (jid, participants) {
         const chatbox = _converse.chatboxes.findWhere({'jid': jid});
@@ -1808,19 +1837,22 @@ const converse = {
         participants.forEach(user => {
             chatbox.directInvite(user, 'pageme invite');
         });
-        let arrayParticipants = participants.map(e => (e.split('@')[0]))
-        let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => (arrayParticipants.includes(e.userName)))
-        let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => (arrayParticipants.includes(e.userName)))
-        let arrayUser = arrayAddressBook.concat(arrayOrganization);
-        arrayUser = _.uniq(arrayUser);
-        arrayUser = arrayUser.map(e => {
-          e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
-          return e;
+        _converse.on('roomInviteSent', () => {
+            let arrayParticipants = participants.map(e => (e.split('@')[0]))
+            let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => (arrayParticipants.includes(e.userName)))
+            let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => (arrayParticipants.includes(e.userName)))
+            let arrayUser = arrayAddressBook.concat(arrayOrganization);
+            arrayUser = _.uniq(arrayUser);
+            arrayUser = arrayUser.map(e => {
+              e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
+              return e;
+            })
+            chatbox.save({
+                users: arrayUser,
+                latestMessageTime: null
+            })
         })
-        chatbox.save({
-            users: arrayUser,
-            latestMessageTime: null
-        })
+        
     },
     'onShowPageMeMediaViewer' (callback) {
       _converse.on('showPageMeMediaViewer', callback);

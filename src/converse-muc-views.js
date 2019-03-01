@@ -502,6 +502,7 @@ converse.plugins.add('converse-muc-views', {
             },
 
             initialize () {
+                this.model.set('hidden_occupants', true);
                 this.initDebounced();
 
                 this.model.messages.on('add', this.onMessageAdded, this);
@@ -529,7 +530,6 @@ converse.plugins.add('converse-muc-views', {
                 this.render().insertIntoDOM();
                 this.registerHandlers();
                 this.enterRoom();
-                this.model.set('hidden_occupants', true);
             },
            
             enterRoom (ev) {
@@ -579,7 +579,7 @@ converse.plugins.add('converse-muc-views', {
                     }));
                     container_el.insertAdjacentElement('beforeend', this.occupantsview.el);
                     this.content = this.el.querySelector('.chat-content');
-                    this.toggleOccupants(null, true);
+                    // this.toggleOccupants(null, true);
                 }
                 return this;
             },
@@ -815,6 +815,37 @@ converse.plugins.add('converse-muc-views', {
                 /* Show or hide the right sidebar containing the chat
                  * occupants (and the invite widget).
                  */
+                if (this.model.get('hidden_occupants')) {
+                    const that = this;
+                      var ping = {};
+                      ping.id = `${this.model.get('jid')}`;
+                      var json = JSON.stringify(ping);
+
+                      var xhr = new XMLHttpRequest();
+                      var url = `${_converse.user_settings.baseUrl}/group/userList`
+                      xhr.open("POST", url, false);
+                      xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+                      xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+                      xhr.onload = function () { // Call a function when the state changes.
+                        if (xhr.status >= 200 && xhr.status < 400) {
+                          // Request finished. Do processing here.
+                          const res = JSON.parse(xhr.responseText);
+                          if (res.response) {
+                            that.model.save({
+                                'users': res.response
+                            })
+
+
+                          } else {
+                            console.log('nothing here');
+                          }
+                        } else {
+                          xhr.onerror();
+                        }
+                      }
+                      xhr.send(json);
+                }
+
                 if (ev) {
                     ev.preventDefault();
                     ev.stopPropagation();

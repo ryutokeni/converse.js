@@ -77244,6 +77244,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       },
 
       initialize() {
+        this.model.set('hidden_occupants', true);
         this.initDebounced();
         this.model.messages.on('add', this.onMessageAdded, this);
         this.model.messages.on('rendered', this.scrollDown, this);
@@ -77268,7 +77269,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         this.render().insertIntoDOM();
         this.registerHandlers();
         this.enterRoom();
-        this.model.set('hidden_occupants', true);
       },
 
       enterRoom(ev) {
@@ -77326,8 +77326,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
             'show_send_button': _converse.show_send_button
           }));
           container_el.insertAdjacentElement('beforeend', this.occupantsview.el);
-          this.content = this.el.querySelector('.chat-content');
-          this.toggleOccupants(null, true);
+          this.content = this.el.querySelector('.chat-content'); // this.toggleOccupants(null, true);
         }
 
         return this;
@@ -77591,6 +77590,38 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         /* Show or hide the right sidebar containing the chat
          * occupants (and the invite widget).
          */
+        if (this.model.get('hidden_occupants')) {
+          const that = this;
+          var ping = {};
+          ping.id = `${this.model.get('jid')}`;
+          var json = JSON.stringify(ping);
+          var xhr = new XMLHttpRequest();
+          var url = `${_converse.user_settings.baseUrl}/group/userList`;
+          xhr.open("POST", url, false);
+          xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+          xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+
+          xhr.onload = function () {
+            // Call a function when the state changes.
+            if (xhr.status >= 200 && xhr.status < 400) {
+              // Request finished. Do processing here.
+              const res = JSON.parse(xhr.responseText);
+
+              if (res.response) {
+                that.model.save({
+                  'users': res.response
+                });
+              } else {
+                console.log('nothing here');
+              }
+            } else {
+              xhr.onerror();
+            }
+          };
+
+          xhr.send(json);
+        }
+
         if (ev) {
           ev.preventDefault();
           ev.stopPropagation();
@@ -88169,20 +88200,49 @@ const converse = {
       return;
     }
 
-    let arrayParticipants = participants.map(e => e.split('@')[0]);
-    let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => arrayParticipants.includes(e.userName));
-    let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => arrayParticipants.includes(e.userName));
-    let arrayUser = arrayAddressBook.concat(arrayOrganization);
-    arrayUser = _lodash_noconflict__WEBPACK_IMPORTED_MODULE_4___default.a.uniq(arrayUser);
-    arrayUser = arrayUser.map(e => {
-      e['joinedDate'] = moment__WEBPACK_IMPORTED_MODULE_7___default()(e['joinedDate'], 'YYYYMMDDHHmmssZ');
-      return e;
-    }); // console.log(chatbox);
+    const that = this;
+    var ping = {};
+    ping.id = `${chatbox.get('jid')}`;
+    var json = JSON.stringify(ping);
+    var xhr = new XMLHttpRequest();
+    var url = `${_converse.user_settings.baseUrl}/group/userList`;
+    xhr.open("POST", url, false);
+    xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+    xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
 
-    chatbox.save({
-      users: arrayUser,
-      latestMessageTime: null
-    }); // const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
+    xhr.onload = function () {
+      // Call a function when the state changes.
+      if (xhr.status >= 200 && xhr.status < 400) {
+        // Request finished. Do processing here.
+        const res = JSON.parse(xhr.responseText);
+
+        if (res.response) {
+          chatbox.save({
+            'users': res.response
+          });
+        } else {
+          console.log('nothing here');
+        }
+      } else {
+        xhr.onerror();
+      }
+    };
+
+    xhr.send(json); // let arrayParticipants = participants.map(e => (e.split('@')[0]))
+    // let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => (arrayParticipants.includes(e.userName)))
+    // let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => (arrayParticipants.includes(e.userName)))
+    // let arrayUser = arrayAddressBook.concat(arrayOrganization);
+    // arrayUser = _.uniq(arrayUser);
+    // arrayUser = arrayUser.map(e => {
+    //   e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
+    //   return e;
+    // })
+    // console.log(chatbox);
+    // chatbox.save({
+    //     users: arrayUser,
+    //     latestMessageTime: null
+    // })
+    //    const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
   },
 
   'inviteToGroup'(jid, participants) {
@@ -88197,18 +88257,21 @@ const converse = {
     participants.forEach(user => {
       chatbox.directInvite(user, 'pageme invite');
     });
-    let arrayParticipants = participants.map(e => e.split('@')[0]);
-    let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => arrayParticipants.includes(e.userName));
-    let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => arrayParticipants.includes(e.userName));
-    let arrayUser = arrayAddressBook.concat(arrayOrganization);
-    arrayUser = _lodash_noconflict__WEBPACK_IMPORTED_MODULE_4___default.a.uniq(arrayUser);
-    arrayUser = arrayUser.map(e => {
-      e['joinedDate'] = moment__WEBPACK_IMPORTED_MODULE_7___default()(e['joinedDate'], 'YYYYMMDDHHmmssZ');
-      return e;
-    });
-    chatbox.save({
-      users: arrayUser,
-      latestMessageTime: null
+
+    _converse.on('roomInviteSent', () => {
+      let arrayParticipants = participants.map(e => e.split('@')[0]);
+      let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => arrayParticipants.includes(e.userName));
+      let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => arrayParticipants.includes(e.userName));
+      let arrayUser = arrayAddressBook.concat(arrayOrganization);
+      arrayUser = _lodash_noconflict__WEBPACK_IMPORTED_MODULE_4___default.a.uniq(arrayUser);
+      arrayUser = arrayUser.map(e => {
+        e['joinedDate'] = moment__WEBPACK_IMPORTED_MODULE_7___default()(e['joinedDate'], 'YYYYMMDDHHmmssZ');
+        return e;
+      });
+      chatbox.save({
+        users: arrayUser,
+        latestMessageTime: null
+      });
     });
   },
 
@@ -90079,28 +90142,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         this.occupants = new _converse.ChatRoomOccupants();
         this.occupants.browserStorage = new Backbone.BrowserStorage.session(b64_sha1(`converse.occupants-${_converse.bare_jid}${this.get('jid')}`));
         this.occupants.chatroom = this; // console.log(this);
-        // var ping = {};
-        // ping.id = `${this.get('id')}`;
-        // var json = JSON.stringify(ping);
-        // var xhr = new XMLHttpRequest();
-        // var url = `${_converse.user_settings.baseUrl}/group/userList`
-        // xhr.open("POST", url, false);
-        // xhr.setRequestHeader("securityToken", _converse.user_settings.password);
-        // xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-        // xhr.onload = function () { // Call a function when the state changes.
-        //   if (xhr.status >= 200 && xhr.status < 400) {
-        //     // Request finished. Do processing here.
-        //     const res = JSON.parse(xhr.responseText);
-        //     if (res.response) {
-        //         console.log(res.response);
-        //     } else {
-        //       console.log('nothing here');
-        //     }
-        //   } else {
-        //     xhr.onerror();
-        //   }
-        // }
-        // xhr.send(json);
 
         this.pagemeGroupMembers = new _converse.PagemeGroupMembers();
         this.pagemeGroupMembers.browserStorage = new Backbone.BrowserStorage.session(b64_sha1(`converse.pageme-group-members-${_converse.bare_jid}${this.get('jid')}`));

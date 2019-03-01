@@ -178,32 +178,11 @@ converse.plugins.add('converse-muc', {
                     b64_sha1(`converse.occupants-${_converse.bare_jid}${this.get('jid')}`)
                 );
                 this.occupants.chatroom  = this;
+               
                 
                 // console.log(this);
 
-                // var ping = {};
-                // ping.id = `${this.get('id')}`;
-                // var json = JSON.stringify(ping);
-
-                // var xhr = new XMLHttpRequest();
-                // var url = `${_converse.user_settings.baseUrl}/group/userList`
-                // xhr.open("POST", url, false);
-                // xhr.setRequestHeader("securityToken", _converse.user_settings.password);
-                // xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-                // xhr.onload = function () { // Call a function when the state changes.
-                //   if (xhr.status >= 200 && xhr.status < 400) {
-                //     // Request finished. Do processing here.
-                //     const res = JSON.parse(xhr.responseText);
-                //     if (res.response) {
-                //         console.log(res.response);
-                //     } else {
-                //       console.log('nothing here');
-                //     }
-                //   } else {
-                //     xhr.onerror();
-                //   }
-                // }
-                // xhr.send(json);
+               
 
                 this.pagemeGroupMembers = new _converse.PagemeGroupMembers();
                 this.pagemeGroupMembers.browserStorage = new Backbone.BrowserStorage.session(
