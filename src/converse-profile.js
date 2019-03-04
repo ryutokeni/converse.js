@@ -214,7 +214,7 @@ converse.plugins.add('converse-profile', {
         _converse.XMPPStatusView = _converse.VDOMViewWithAvatar.extend({
             tagName: "div",
             events: {
-                // "click a.show-profile": "showProfileModal",
+                 "click a.show-profile": "showProfileModal",
                 "click .change-status": "showStatusChangeModal",
                 "click .show-client-info": "showClientInfoModal",
                 "click .logout": "logOut"

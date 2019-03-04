@@ -80995,7 +80995,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
     _converse.XMPPStatusView = _converse.VDOMViewWithAvatar.extend({
       tagName: "div",
       events: {
-        // "click a.show-profile": "showProfileModal",
+        "click a.show-profile": "showProfileModal",
         "click .change-status": "showStatusChangeModal",
         "click .show-client-info": "showClientInfoModal",
         "click .logout": "logOut"
@@ -117832,7 +117832,7 @@ return __p
 var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./node_modules/lodash/escape.js")};
 module.exports = function(o) {
 var __t, __p = '';
-__p += '<!-- src/templates/chatboxes.html -->\n<div style="width: 100%; height: 100%; \nbackground-image: url(\'./assets/background.png\');\nbackground-repeat: no-repeat;\nbackground-position: center;\nbackground-position-x: center;\nbackground-size: 600px;"\nclass="converse-chatboxes row no-gutters "></div>\n<!-- <img src="./assets/background.png" > -->\n<div id="converse-modals" class="modals"></div>\n';
+__p += '<!-- src/templates/chatboxes.html -->\n<div style="width: 100%; height: 100%; \nbackground-image: url(\'\');\nbackground-repeat: no-repeat;\nbackground-position: center;\nbackground-position-x: center;\nbackground-size: 600px;"\nclass="converse-chatboxes row no-gutters "></div>\n<!-- <img src="./assets/background.png" > -->\n<div id="converse-modals" class="modals"></div>\n';
 return __p
 };
 
