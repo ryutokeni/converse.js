@@ -59,6 +59,7 @@ const {
   updateContacts,
   updateGroups,
   updateMessageStatus,
+  allMessageAreLoaded,
   onLogOut,
   onLoadMessages,
   onOpenModalOptionPicture,
@@ -94,7 +95,9 @@ converse.updateGroups = function (groups) {
 converse.updateMessageStatus = function (jid, messages) {
   return updateMessageStatus(jid, messages);
 }
-
+converse.allMessageAreLoaded = function (jid) {
+  return allMessageAreLoaded(jid);
+}
 converse.onLogOut = function (callback) {
   return onLogOut(callback);
 }

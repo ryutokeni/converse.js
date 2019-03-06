@@ -504,9 +504,8 @@ converse.plugins.add('converse-muc-views', {
 
             initialize () {
                 // this.model.set('hidden_occupants', false);
-               
+                
                 this.initDebounced();
-
                 this.model.messages.on('add', this.onMessageAdded, this);
                 this.model.messages.on('rendered', this.scrollDown, this);
 
@@ -530,11 +529,79 @@ converse.plugins.add('converse-muc-views', {
                 this.createEmojiPicker();
                 this.createOccupantsView();
                 this.render().insertIntoDOM();
+
                 this.registerHandlers();
                 this.enterRoom();
                 this.hideOccupants();
+                _converse.on('AllMessageAreLoaded', (jid) => {
+                    if (jid === this.model.get('jid')) {
+                        u.hideElement(this.el.querySelector('button.load-more-messages'));
+                        u.hideElement(this.el.querySelector('span.spinner.fa.fa-spinner'));
+                        this.model.save({
+                            isAllLoaded: true
+                        })
+                    }
+                   
+                })
+                _converse.on('UnDisabledButtonLoadmore', () => {
+                //    this.hideSpinner();
+                        u.hideElement(this.el.querySelector('span.spinner.fa.fa-spinner'));
+                })
+                $('.chat-content').on('scroll',  () => {
+                    var x = this.el.querySelector('.chat-content').scrollTop;
+                    if (x === 0 ) {
+                        // console.log('we scroll on top');
+                        if (this.model.get('isAllLoaded')) {
+                            u.hideElement(this.el.querySelector('button.load-more-messages'))
+                        }
+                        else {
+                            u.showElement(this.el.querySelector('button.load-more-messages'))
+                        }
+                    }
+                    else {
+                        u.hideElement(this.el.querySelector('button.load-more-messages'))
+                    }
+                })
             },
-           
+            // checkMessageLength() {
+                
+            //     // const that = this;
+            //     //     var ping = {
+            //     //         numberOfMinutes: 1440,
+            //     //         id: this.model.get('jid'),
+            //     //         pageSize: 20,
+            //     //         pageNumber: 1,
+            //     //         lastLoadedTime: ''
+            //     //     };
+            //     //     var json = JSON.stringify(ping);
+
+            //     //     var xhr = new XMLHttpRequest();
+            //     //     var url = `${_converse.user_settings.baseUrl}/group/messageList`
+            //     //     xhr.open("POST", url, false);
+            //     //     xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+            //     //     xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+            //     //     xhr.onload = function () { // Call a function when the state changes.
+            //     //         if (xhr.status >= 200 && xhr.status < 400) {
+            //     //         // Request finished. Do processing here.
+            //     //             const res = JSON.parse(xhr.responseText);
+            //     //             if (res.response && res.response.length >= 20) {
+            //     //                     that.model.save({
+            //     //                         isShowLoadMore: true
+            //     //                     })
+            //     //             } else {
+            //     //                     that.model.save({
+            //     //                       isShowLoadMore: false
+            //     //                     })
+            //     //                     //    u.hideElement(that.model.querySelector('.load-more-messages'));
+            //     //                     //    console.log('nothing here');
+            //     //             }
+            //     //             } else {
+            //     //              xhr.onerror();
+            //     //             }
+            //     //     }
+            //     //     xhr.send(json);
+                
+            // },
             enterRoom (ev) {
                 if (ev) { ev.preventDefault(); }
                 if (this.model.get('connection_status') !==  converse.ROOMSTATUS.ENTERED) {
@@ -1822,9 +1889,15 @@ converse.plugins.add('converse-muc-views', {
             },
 
             loadMoreMessages () {
-              _converse.emit('loadMoreMessages', {
-                jid: this.model.get('jid'),
-                messageType: this.model.get('message_type')
+                // this.model.save({
+                //   isShowLoadMore: false
+                // })
+                // this.showSpinner();
+                 u.showElement(this.el.querySelector('span.spinner.fa.fa-spinner'));
+                 u.hideElement(this.el.querySelector('button.load-more-messages'));
+                _converse.emit('loadMoreMessages', {
+                    jid: this.model.get('jid'),
+                    messageType: this.model.get('message_type')
               });
             }
         });
@@ -2109,6 +2182,7 @@ converse.plugins.add('converse-muc-views', {
                   _.extend(
                       { '_': _,
                         'image': `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`,
+                        'status': status
                       }, this.model.toJSON()
                   )
               );

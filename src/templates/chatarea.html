@@ -1,7 +1,11 @@
 <div class="chat-area col-md-9 col-8">
+    <span class="spinner hidden fa fa-spinner centered"></span>
     <div class="text-center">
-      <!-- <button class="load-more-messages">Load more...</button> -->
+        
+        <button  class="btn btn-primary hidden load-more-messages {{{o.user_id}}}">Load more...</button>
     </div>
-    <div class="chat-content {[ if (o.show_send_button) { ]}chat-content-sendbutton{[ } ]}"></div>
+    <div class="chat-content {[ if (o.show_send_button) { ]}chat-content-sendbutton{[ } ]}">
+      
+    </div>
     <div class="message-form-container message-form-container-wrap"/>
 </div>

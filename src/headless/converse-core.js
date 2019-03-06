@@ -1916,10 +1916,19 @@ const converse = {
       if (!chatbox) {
         return;
       }
+      _converse.emit('UnDisabledButtonLoadmore')
       messages.forEach(msg => {
         const message = chatbox.messages.findWhere({'msgid': msg.id});
         message.save({ 'received': msg.received });
       })
+    },
+    'allMessageAreLoaded'(jid) {
+        const chatbox = _converse.chatboxes.findWhere({'jid': jid});
+        if (!chatbox) {
+            console.log('some thing wrong');
+            return;
+        }
+        _converse.emit('AllMessageAreLoaded', jid)
     },
     'onUploadFiles' (callback) {
       return _converse.on('filesButtonClicked', callback);

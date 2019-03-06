@@ -72793,7 +72793,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         this.model.on('show', this.show, this);
         this.model.on('destroy', this.remove, this); // this.model.on('change:num_unread', this.render, this)
 
-        this.model.presence.on('change:show', this.onPresenceChanged, this);
+        this.model.presence.on('change:show', this.onPresenceChanged, this); // this.el.querySelector('.load-more-messages').on('change', this.render, this)
+
         this.model.on('showHelpMessages', this.showHelpMessages, this);
         this.render();
         this.fetchMessages(); // this.model.save({
@@ -77296,8 +77297,79 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         this.registerHandlers();
         this.enterRoom();
         this.hideOccupants();
+
+        _converse.on('AllMessageAreLoaded', jid => {
+          console.log('all message loaded?');
+
+          if (jid === this.model.get('jid')) {
+            console.log(this.model.get('jid'), jid);
+            u.hideElement(this.el.querySelector('button.load-more-messages'));
+            u.hideElement(this.el.querySelector('span.spinner.fa.fa-spinner'));
+            this.model.save({
+              isAllLoaded: true
+            });
+          }
+        });
+
+        _converse.on('UnDisabledButtonLoadmore', () => {
+          //    this.hideSpinner();
+          u.hideElement(this.el.querySelector('span.spinner.fa.fa-spinner'));
+        });
+
+        $('.chat-content').on('scroll', () => {
+          var x = this.el.querySelector('.chat-content').scrollTop;
+          console.log(x);
+
+          if (x === 0) {
+            // console.log('we scroll on top');
+            if (this.model.get('isAllLoaded')) {
+              u.hideElement(this.el.querySelector('button.load-more-messages'));
+            } else {
+              console.log('just show button');
+              u.showElement(this.el.querySelector('button.load-more-messages'));
+            }
+          } else {
+            u.hideElement(this.el.querySelector('button.load-more-messages'));
+          }
+        });
       },
 
+      // checkMessageLength() {
+      //     // const that = this;
+      //     //     var ping = {
+      //     //         numberOfMinutes: 1440,
+      //     //         id: this.model.get('jid'),
+      //     //         pageSize: 20,
+      //     //         pageNumber: 1,
+      //     //         lastLoadedTime: ''
+      //     //     };
+      //     //     var json = JSON.stringify(ping);
+      //     //     var xhr = new XMLHttpRequest();
+      //     //     var url = `${_converse.user_settings.baseUrl}/group/messageList`
+      //     //     xhr.open("POST", url, false);
+      //     //     xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+      //     //     xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+      //     //     xhr.onload = function () { // Call a function when the state changes.
+      //     //         if (xhr.status >= 200 && xhr.status < 400) {
+      //     //         // Request finished. Do processing here.
+      //     //             const res = JSON.parse(xhr.responseText);
+      //     //             if (res.response && res.response.length >= 20) {
+      //     //                     that.model.save({
+      //     //                         isShowLoadMore: true
+      //     //                     })
+      //     //             } else {
+      //     //                     that.model.save({
+      //     //                       isShowLoadMore: false
+      //     //                     })
+      //     //                     //    u.hideElement(that.model.querySelector('.load-more-messages'));
+      //     //                     //    console.log('nothing here');
+      //     //             }
+      //     //             } else {
+      //     //              xhr.onerror();
+      //     //             }
+      //     //     }
+      //     //     xhr.send(json);
+      // },
       enterRoom(ev) {
         if (ev) {
           ev.preventDefault();
@@ -78693,6 +78765,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       },
 
       loadMoreMessages() {
+        // this.model.save({
+        //   isShowLoadMore: false
+        // })
+        // this.showSpinner();
+        u.showElement(this.el.querySelector('span.spinner.fa.fa-spinner'));
+        u.hideElement(this.el.querySelector('button.load-more-messages'));
+
         _converse.emit('loadMoreMessages', {
           jid: this.model.get('jid'),
           messageType: this.model.get('message_type')
@@ -78981,7 +79060,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         this.model.set('status', status);
         return templates_pageme_group_member_html__WEBPACK_IMPORTED_MODULE_21___default()(_.extend({
           '_': _,
-          'image': `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`
+          'image': `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`,
+          'status': status
         }, this.model.toJSON()));
       },
 
@@ -83774,6 +83854,7 @@ const initialize = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21_
       updateContacts = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].updateContacts,
       updateGroups = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].updateGroups,
       updateMessageStatus = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].updateMessageStatus,
+      allMessageAreLoaded = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].allMessageAreLoaded,
       onLogOut = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onLogOut,
       onLoadMessages = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onLoadMessages,
       onOpenModalOptionPicture = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpenModalOptionPicture,
@@ -83810,6 +83891,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].update
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].updateMessageStatus = function (jid, messages) {
   return updateMessageStatus(jid, messages);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].allMessageAreLoaded = function (jid) {
+  return allMessageAreLoaded(jid);
 };
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onLogOut = function (callback) {
@@ -88399,6 +88484,8 @@ const converse = {
       return;
     }
 
+    _converse.emit('UnDisabledButtonLoadmore');
+
     messages.forEach(msg => {
       const message = chatbox.messages.findWhere({
         'msgid': msg.id
@@ -88407,6 +88494,19 @@ const converse = {
         'received': msg.received
       });
     });
+  },
+
+  'allMessageAreLoaded'(jid) {
+    const chatbox = _converse.chatboxes.findWhere({
+      'jid': jid
+    });
+
+    if (!chatbox) {
+      console.log('some thing wrong');
+      return;
+    }
+
+    _converse.emit('AllMessageAreLoaded', jid);
   },
 
   'onUploadFiles'(callback) {
@@ -117679,13 +117779,15 @@ return __p
 
 var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./node_modules/lodash/escape.js")};
 module.exports = function(o) {
-var __t, __p = '', __j = Array.prototype.join;
+var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/chatarea.html -->\n<div class="chat-area col-md-9 col-8">\n    <div class="text-center">\n      <!-- <button class="load-more-messages">Load more...</button> -->\n    </div>\n    <div class="chat-content ';
+__p += '<!-- src/templates/chatarea.html -->\n<div class="chat-area col-md-9 col-8">\n    <span class="spinner hidden fa fa-spinner centered"></span>\n    <div class="text-center">\n        \n        <button  class="btn btn-primary hidden load-more-messages ' +
+__e(o.user_id) +
+'">Load more...</button>\n    </div>\n    <div class="chat-content ';
  if (o.show_send_button) { ;
 __p += 'chat-content-sendbutton';
  } ;
-__p += '"></div>\n    <div class="message-form-container message-form-container-wrap"/>\n</div>\n';
+__p += '">\n      \n    </div>\n    <div class="message-form-container message-form-container-wrap"/>\n</div>\n';
 return __p
 };
 
@@ -117700,9 +117802,11 @@ return __p
 
 var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./node_modules/lodash/escape.js")};
 module.exports = function(o) {
-var __t, __p = '', __j = Array.prototype.join;
+var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/chatbox.html -->\n<div style="width: calc(var(--fullpage-chat-width)/1.03);margin-left: 40px;" class="flyout box-flyout">\n    <div class="chat-body">\n      <div class="text-center">\n        <!-- <button class="load-more-messages">Load more...</button> -->\n      </div>\n        <div class="chat-content ';
+__p += '<!-- src/templates/chatbox.html -->\n<div style="width: calc(var(--fullpage-chat-width)/1.03);margin-left: 40px;" class="flyout box-flyout">\n    <div class="chat-body">\n        <span class="spinner fa fa-spinner hidden centered"></span>\n      <div class="text-center">\n            \n            <button class="btn btn-primary hidden load-more-messages ' +
+__e(o.user_id) +
+'">Load more...</button>\n      </div>\n        <div  class="chat-content ';
  if (o.show_send_button) { ;
 __p += 'chat-content-sendbutton';
  } ;
@@ -119439,9 +119543,9 @@ __p += '<!-- src/templates/pageme_group_member.html -->\n<style>\n@media only sc
 __e( o.id ) +
 '">\n    <div class="row no-gutters">\n        <div class="col occupant-nick-badge" style="display: flex; justify-content: flex-start; align-items: center;\n         border-bottom: 1px solid #B3B3B5; padding-bottom: 5px;">\n            <span class="avatar" style=" width: 30px !important; height: 30px !important">\n                <img src="' +
 __e(o.image) +
-'" onerror="this.src=\'./assets/appIcon.png\'" alt="">\n            </span>\n            <!-- <span style="display: flex !important;justify-content: center !important;align-items: center !important"\n            class="fa fa-circle chat-status change-status chat-status--' +
+'" onerror="this.src=\'./assets/appIcon.png\'" alt="">\n            </span>\n            <span style="display: flex !important;justify-content: center !important;align-items: center !important"\n            class="fa fa-circle chat-status change-status chat-status--' +
 __e(o.status) +
-'"></span> -->\n            <span class="info-member" style="display: flex; flex-direction: column; padding-left: 10px;">\n                <span style=" font-weight: bold; font-size: 18px;" class="occupant-nick">' +
+'"></span>\n            <span class="info-member" style="display: flex; flex-direction: column; padding-left: 10px;">\n                <span style=" font-weight: bold; font-size: 18px;" class="occupant-nick">' +
 __e(o.fullName|| o.nick) +
 '</span>\n                <i  class="">' +
 __e(o.title) +

@@ -1,9 +1,11 @@
 <div style="width: calc(var(--fullpage-chat-width)/1.03);margin-left: 40px;" class="flyout box-flyout">
     <div class="chat-body">
+        <span class="spinner fa fa-spinner hidden centered"></span>
       <div class="text-center">
-        <!-- <button class="load-more-messages">Load more...</button> -->
+            
+            <button class="btn btn-primary hidden load-more-messages {{{o.user_id}}}">Load more...</button>
       </div>
-        <div class="chat-content {[ if (o.show_send_button) { ]}chat-content-sendbutton{[ } ]}">
+        <div  class="chat-content {[ if (o.show_send_button) { ]}chat-content-sendbutton{[ } ]}">
             <div class="chat-loading">
             <h3>Loading...</h3>
             </div>

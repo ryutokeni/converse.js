@@ -349,8 +349,8 @@ converse.plugins.add('converse-chatview', {
                 this.model.on('destroy', this.remove, this);
                 // this.model.on('change:num_unread', this.render, this)
                 this.model.presence.on('change:show', this.onPresenceChanged, this);
+                // this.el.querySelector('.load-more-messages').on('change', this.render, this)
                 this.model.on('showHelpMessages', this.showHelpMessages, this);
-
                 this.render();
                 this.fetchMessages();
                 // this.model.save({
@@ -366,6 +366,34 @@ converse.plugins.add('converse-chatview', {
                 })
                 //  this.model.set('num_unread', 0)
                 //  this.model.set('num_unread_general', 0)
+
+                 _converse.on('AllMessageAreLoaded', (jid) => {
+                   if (jid === this.model.get('jid')) {
+                     u.hideElement(this.el.querySelector('button.load-more-messages'));
+                     u.hideElement(this.el.querySelector('span.spinner.fa.fa-spinner'));
+                     this.model.save({
+                       isAllLoaded: true
+                     })
+                   }
+
+                 })
+                 _converse.on('UnDisabledButtonLoadmore', () => {
+                   //    this.hideSpinner();
+                   u.hideElement(this.el.querySelector('span.spinner.fa.fa-spinner'));
+                 })
+                 $('.chat-content').on('scroll', () => {
+                   var x = this.el.querySelector('.chat-content').scrollTop;
+                   if (x === 0) {
+                     // console.log('we scroll on top');
+                     if (this.model.get('isAllLoaded')) {
+                       u.hideElement(this.el.querySelector('button.load-more-messages'))
+                     } else {
+                       u.showElement(this.el.querySelector('button.load-more-messages'))
+                     }
+                   } else {
+                     u.hideElement(this.el.querySelector('button.load-more-messages'))
+                   }
+                 })
             },
 
             initDebounced () {
@@ -1410,6 +1438,8 @@ converse.plugins.add('converse-chatview', {
             },
 
             loadMoreMessages () {
+                u.showElement(this.el.querySelector('span.spinner.fa.fa-spinner'));
+                u.hideElement(this.el.querySelector('button.load-more-messages'));
               _converse.emit('loadMoreMessages', {
                 jid: this.model.get('jid'),
                 messageType: this.model.get('message_type')
