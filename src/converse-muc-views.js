@@ -536,7 +536,7 @@ converse.plugins.add('converse-muc-views', {
                 _converse.on('AllMessageAreLoaded', (jid) => {
                     if (jid === this.model.get('jid')) {
                         u.hideElement(this.el.querySelector('button.load-more-messages'));
-                        u.hideElement(this.el.querySelector('span.spinner.fa.fa-spinner'));
+                        u.hideElement(this.el.querySelector('.fa-spinner'));
                         this.model.save({
                             isAllLoaded: true
                         })
@@ -545,17 +545,27 @@ converse.plugins.add('converse-muc-views', {
                 })
                 _converse.on('UnDisabledButtonLoadmore', () => {
                 //    this.hideSpinner();
-                        u.hideElement(this.el.querySelector('span.spinner.fa.fa-spinner'));
+                        u.hideElement(this.el.querySelector('.fa-spinner'));
+                        this.model.save({
+                            loadingMore: false
+                        })
                 })
                 $('.chat-content').on('scroll',  () => {
                     var x = this.el.querySelector('.chat-content').scrollTop;
                     if (x === 0 ) {
                         // console.log('we scroll on top');
                         if (this.model.get('isAllLoaded')) {
+                             this.model.save({
+                               loadingMore: false
+                             })
                             u.hideElement(this.el.querySelector('button.load-more-messages'))
                         }
                         else {
-                            u.showElement(this.el.querySelector('button.load-more-messages'))
+                            u.showElement(this.el.querySelector('.fa-spinner'));
+                            if (!this.model.get('loadingMore')) {
+                                this.loadMoreMessages();
+                            }
+                            // u.showElement(this.el.querySelector('button.load-more-messages'))
                         }
                     }
                     else {
@@ -772,6 +782,7 @@ converse.plugins.add('converse-muc-views', {
             generateHeadingHTML () {
                 /* Returns the heading HTML to be rendered.
                  */
+                console.log('model extend when a message',this.model);
                 return tpl_chatroom_head(
                     _.extend(this.model.toJSON(), {
                         'members_length': this.model.pagemeGroupMembers.length,
@@ -1888,13 +1899,18 @@ converse.plugins.add('converse-muc-views', {
                 this.scrollDown();
             },
 
-            loadMoreMessages () {
+            loadMoreMessages (ev) {
                 // this.model.save({
                 //   isShowLoadMore: false
                 // })
                 // this.showSpinner();
-                 u.showElement(this.el.querySelector('span.spinner.fa.fa-spinner'));
-                 u.hideElement(this.el.querySelector('button.load-more-messages'));
+                // ev.preventDefault();
+                // ev.stopPropagation();
+                this.model.save({
+                    loadingMore: true
+                })
+                //  u.showElement(this.el.querySelector('.fa-spinner'));
+                //  u.hideElement(this.el.querySelector('button.load-more-messages'));
                 _converse.emit('loadMoreMessages', {
                     jid: this.model.get('jid'),
                     messageType: this.model.get('message_type')

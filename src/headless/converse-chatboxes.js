@@ -121,7 +121,7 @@ converse.plugins.add('converse-chatboxes', {
 
             getDisplayName () {
                 if (this.get('type') === 'groupchat') {
-                    return this.vcard.get('fullname') || this.get('nick');
+                    return this.vcard.get('fullname') || this.get('nick') || this.get('senderName');
                 } else {
                     return this.vcard.get('fullname') || 'Loading...';
                 }

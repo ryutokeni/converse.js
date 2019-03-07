@@ -72804,14 +72804,54 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
         _converse.emit('chatBoxOpened', this);
 
-        _converse.emit('chatBoxInitialized', this);
-
-        _converse.on('message-rendered-!', () => {
-          const loading = this.el.querySelector('.chat-loading');
-          uk.hideElement(loading);
-        }); //  this.model.set('num_unread', 0)
+        _converse.emit('chatBoxInitialized', this); // _converse.on('message-rendered-!', () => {
+        //     const loading = this.el.querySelector('.chat-loading');
+        //     uk.hideElement(loading);
+        // })
+        //  this.model.set('num_unread', 0)
         //  this.model.set('num_unread_general', 0)
 
+
+        _converse.on('AllMessageAreLoaded', jid => {
+          if (jid === this.model.get('jid')) {
+            _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_21__["default"].hideElement(this.el.querySelector('button.load-more-messages'));
+            _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_21__["default"].hideElement(this.el.querySelector('.fa-spinner'));
+            this.model.save({
+              isAllLoaded: true
+            });
+          }
+        });
+
+        _converse.on('UnDisabledButtonLoadmore', () => {
+          //    this.hideSpinner();
+          _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_21__["default"].hideElement(this.el.querySelector('.fa-spinner'));
+          this.model.save({
+            loadingMore: false
+          });
+        });
+
+        $('.chat-content').on('scroll', () => {
+          var x = this.el.querySelector('.chat-content').scrollTop;
+
+          if (x === 0) {
+            // console.log('we scroll on top');
+            if (this.model.get('isAllLoaded')) {
+              this.model.save({
+                loadingMore: false
+              });
+              _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_21__["default"].hideElement(this.el.querySelector('button.load-more-messages'));
+            } else {
+              _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_21__["default"].showElement(this.el.querySelector('.fa-spinner'));
+
+              if (!this.model.get('loadingMore')) {
+                this.loadMoreMessages();
+              } // u.showElement(this.el.querySelector('button.load-more-messages'))
+
+            }
+          } else {
+            _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_21__["default"].hideElement(this.el.querySelector('button.load-more-messages'));
+          }
+        });
       },
 
       initDebounced() {
@@ -73920,7 +73960,18 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         }
       },
 
-      loadMoreMessages() {
+      loadMoreMessages(ev) {
+        // this.model.save({
+        //   isShowLoadMore: false
+        // })
+        // this.showSpinner();
+        // ev.preventDefault();
+        // ev.stopPropagation();
+        this.model.save({
+          loadingMore: true
+        }); //  u.showElement(this.el.querySelector('.fa-spinner'));
+        //  u.hideElement(this.el.querySelector('button.load-more-messages'));
+
         _converse.emit('loadMoreMessages', {
           jid: this.model.get('jid'),
           messageType: this.model.get('message_type')
@@ -77299,12 +77350,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         this.hideOccupants();
 
         _converse.on('AllMessageAreLoaded', jid => {
-          console.log('all message loaded?');
-
           if (jid === this.model.get('jid')) {
-            console.log(this.model.get('jid'), jid);
             u.hideElement(this.el.querySelector('button.load-more-messages'));
-            u.hideElement(this.el.querySelector('span.spinner.fa.fa-spinner'));
+            u.hideElement(this.el.querySelector('.fa-spinner'));
             this.model.save({
               isAllLoaded: true
             });
@@ -77313,20 +77361,29 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
 
         _converse.on('UnDisabledButtonLoadmore', () => {
           //    this.hideSpinner();
-          u.hideElement(this.el.querySelector('span.spinner.fa.fa-spinner'));
+          u.hideElement(this.el.querySelector('.fa-spinner'));
+          this.model.save({
+            loadingMore: false
+          });
         });
 
         $('.chat-content').on('scroll', () => {
           var x = this.el.querySelector('.chat-content').scrollTop;
-          console.log(x);
 
           if (x === 0) {
             // console.log('we scroll on top');
             if (this.model.get('isAllLoaded')) {
+              this.model.save({
+                loadingMore: false
+              });
               u.hideElement(this.el.querySelector('button.load-more-messages'));
             } else {
-              console.log('just show button');
-              u.showElement(this.el.querySelector('button.load-more-messages'));
+              u.showElement(this.el.querySelector('.fa-spinner'));
+
+              if (!this.model.get('loadingMore')) {
+                this.loadMoreMessages();
+              } // u.showElement(this.el.querySelector('button.load-more-messages'))
+
             }
           } else {
             u.hideElement(this.el.querySelector('button.load-more-messages'));
@@ -77569,6 +77626,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       generateHeadingHTML() {
         /* Returns the heading HTML to be rendered.
          */
+        console.log('model extend when a message', this.model);
         return templates_chatroom_head_html__WEBPACK_IMPORTED_MODULE_13___default()(_.extend(this.model.toJSON(), {
           'members_length': this.model.pagemeGroupMembers.length,
           'list_members': __('List members'),
@@ -78764,13 +78822,17 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         this.scrollDown();
       },
 
-      loadMoreMessages() {
+      loadMoreMessages(ev) {
         // this.model.save({
         //   isShowLoadMore: false
         // })
         // this.showSpinner();
-        u.showElement(this.el.querySelector('span.spinner.fa.fa-spinner'));
-        u.hideElement(this.el.querySelector('button.load-more-messages'));
+        // ev.preventDefault();
+        // ev.stopPropagation();
+        this.model.save({
+          loadingMore: true
+        }); //  u.showElement(this.el.querySelector('.fa-spinner'));
+        //  u.hideElement(this.el.querySelector('button.load-more-messages'));
 
         _converse.emit('loadMoreMessages', {
           jid: this.model.get('jid'),
@@ -85219,7 +85281,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
 
       getDisplayName() {
         if (this.get('type') === 'groupchat') {
-          return this.vcard.get('fullname') || this.get('nick');
+          return this.vcard.get('fullname') || this.get('nick') || this.get('senderName');
         } else {
           return this.vcard.get('fullname') || 'Loading...';
         }
@@ -88378,21 +88440,19 @@ const converse = {
     participants.forEach(user => {
       chatbox.directInvite(user, 'pageme invite');
     });
-
-    _converse.on('roomInviteSent', () => {
-      let arrayParticipants = participants.map(e => e.split('@')[0]);
-      let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => arrayParticipants.includes(e.userName));
-      let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => arrayParticipants.includes(e.userName));
-      let arrayUser = arrayAddressBook.concat(arrayOrganization);
-      arrayUser = _lodash_noconflict__WEBPACK_IMPORTED_MODULE_4___default.a.uniq(arrayUser);
-      arrayUser = arrayUser.map(e => {
-        e['joinedDate'] = moment__WEBPACK_IMPORTED_MODULE_7___default()(e['joinedDate'], 'YYYYMMDDHHmmssZ');
-        return e;
-      });
-      chatbox.save({
-        users: arrayUser,
-        latestMessageTime: null
-      });
+    let arrayParticipants = participants.map(e => e.split('@')[0]);
+    let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => arrayParticipants.includes(e.userName));
+    let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => arrayParticipants.includes(e.userName));
+    let arrayUser = arrayAddressBook.concat(arrayOrganization);
+    arrayUser = _lodash_noconflict__WEBPACK_IMPORTED_MODULE_4___default.a.uniq(arrayUser);
+    arrayUser = arrayUser.map(e => {
+      e['joinedDate'] = moment__WEBPACK_IMPORTED_MODULE_7___default()(e['joinedDate'], 'YYYYMMDDHHmmssZ');
+      return e;
+    });
+    console.log(arrayUser);
+    chatbox.save({
+      users: arrayUser,
+      latestMessageTime: null
     });
   },
 
@@ -91241,14 +91301,9 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
           const subject_el = stanza.querySelector('subject');
 
-          if (subject_el) {
-            const subject = _.propertyOf(subject_el)('textContent') || '';
-            _utils_form__WEBPACK_IMPORTED_MODULE_7__["default"].safeSave(this, {
-              'subject': {
-                'author': sender,
-                'text': subject
-              }
-            });
+          if (subject_el) {// const subject = _.propertyOf(subject_el)('textContent') || '';
+            // console.log(subject, sender);
+            // u.safeSave(this, {'subject': {'author': sender, 'text': subject}});
           }
 
           const msg = await this.createMessage(stanza, original_stanza);
@@ -117781,7 +117836,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/chatarea.html -->\n<div class="chat-area col-md-9 col-8">\n    <span class="spinner hidden fa fa-spinner centered"></span>\n    <div class="text-center">\n        \n        <button  class="btn btn-primary hidden load-more-messages ' +
+__p += '<!-- src/templates/chatarea.html -->\n<div class="chat-area col-md-9 col-8">\n    <div class="text-center">\n        <i class="fas hidden fa-spinner"></i>\n        <button  class="btn btn-primary hidden load-more-messages ' +
 __e(o.user_id) +
 '">Load more...</button>\n    </div>\n    <div class="chat-content ';
  if (o.show_send_button) { ;
@@ -117804,13 +117859,13 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/chatbox.html -->\n<div style="width: calc(var(--fullpage-chat-width)/1.03);margin-left: 40px;" class="flyout box-flyout">\n    <div class="chat-body">\n        <span class="spinner fa fa-spinner hidden centered"></span>\n      <div class="text-center">\n            \n            <button class="btn btn-primary hidden load-more-messages ' +
+__p += '<!-- src/templates/chatbox.html -->\n<div style="width: calc(var(--fullpage-chat-width)/1.03);margin-left: 40px;" class="flyout box-flyout">\n    <div class="chat-body">\n        \n      <div class="text-center">\n            <i class="fas hidden fa-spinner"></i>\n            <button class="btn btn-primary hidden load-more-messages ' +
 __e(o.user_id) +
 '">Load more...</button>\n      </div>\n        <div  class="chat-content ';
  if (o.show_send_button) { ;
 __p += 'chat-content-sendbutton';
  } ;
-__p += '">\n            <div class="chat-loading">\n            <h3>Loading...</h3>\n            </div>\n        </div>\n        <div class="message-form-container message-form-container-wrap"></div>\n    </div>\n</div>\n';
+__p += '">\n            <!-- <div class="chat-loading">\n            <h3>Loading...</h3>\n            </div> -->\n            <!-- <div class="text-center">\n                <i class="fas hidden fa-spinner"></i>\n            </div> -->\n        </div>\n        <div class="message-form-container message-form-container-wrap"></div>\n    </div>\n</div>\n';
 return __p
 };
 

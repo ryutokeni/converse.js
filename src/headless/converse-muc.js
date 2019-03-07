@@ -990,7 +990,6 @@ converse.plugins.add('converse-muc', {
                  * Parameters:
                  *  (XMLElement) stanza: The message stanza.
                  */
-               
                 this.fetchFeaturesIfConfigurationChanged(stanza);
 
                 const original_stanza = stanza,
@@ -1005,15 +1004,15 @@ converse.plugins.add('converse-muc', {
                 const jid = stanza.getAttribute('from'),
                       resource = Strophe.getResourceFromJid(jid),
                       sender = resource && Strophe.unescapeNode(resource) || '';
-
                 if (!this.handleMessageCorrection(stanza)) {
                     if (sender === '') {
                         return;
                     }
                     const subject_el = stanza.querySelector('subject');
                     if (subject_el) {
-                        const subject = _.propertyOf(subject_el)('textContent') || '';
-                        u.safeSave(this, {'subject': {'author': sender, 'text': subject}});
+                        // const subject = _.propertyOf(subject_el)('textContent') || '';
+                        // console.log(subject, sender);
+                        // u.safeSave(this, {'subject': {'author': sender, 'text': subject}});
                     }
                     const msg = await this.createMessage(stanza, original_stanza);
                     if (forwarded && msg && msg.get('sender')  === 'me') {
