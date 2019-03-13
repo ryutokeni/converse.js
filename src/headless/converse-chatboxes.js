@@ -121,7 +121,7 @@ converse.plugins.add('converse-chatboxes', {
 
             getDisplayName () {
                 if (this.get('type') === 'groupchat') {
-                    return this.vcard.get('fullname') || this.get('nick') || this.get('senderName');
+                    return this.vcard.get('fullname') ||  this.get('senderName') || this.get('nick');
                 } else {
                     return this.vcard.get('fullname') || 'Loading...';
                 }
@@ -349,13 +349,15 @@ converse.plugins.add('converse-chatboxes', {
                         'from': _converse.connection.jid,
                         'to': this.get('jid'),
                         'type': this.get('message_type'),
-                        'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid')
+                        'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid'),
                     }).c('body').t(body).up()
                       .c(_converse.ACTIVE, {'xmlns': Strophe.NS.CHATSTATES}).up();
                 if (message.get('type') === 'chat' || message.get('type') === 'groupchat') {
                     stanza.c('data', {'xmlns': 'pageMe.message.data'})
                     .c('sentDate').t(sentDate).up()
+                    .c('senderName').t(_converse.user_settings.fullname).up()
                     .c('timeToRead').t(timeToRead).up();
+                    
 
                     if (type === 'file') {
                       stanza.c('itemType').t(message.get('itemType')).up()
@@ -685,7 +687,9 @@ converse.plugins.add('converse-chatboxes', {
                           ) {
                             try {
                               newPagemeMessage.decrypted = RNCryptor.pagemeDecrypt(_converse.user_settings.pagemeEncryptKey, newPagemeMessage.body)
-                            } catch(err) { }
+                            } catch(err) {
+                              newPagemeMessage.decrypted = 'Howdy! This character is unsupported by end-to-end encryption';
+                            }
                           } else {
                             newPagemeMessage.decrypted = newPagemeMessage.body;
                           }

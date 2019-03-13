@@ -269,7 +269,7 @@ converse.plugins.add('converse-muc', {
             },
 
             getDisplayName () {
-                return this.get('name') || this.get('jid');
+                return this.get('name') || this.get('subject').text || 'Loading...';
             },
 
             join (nick, password) {
@@ -524,7 +524,7 @@ converse.plugins.add('converse-muc', {
                           'features_fetched': moment().format(),
                           'name': identity && identity.get('name')
                       };
-
+                      
                 features.each(feature => {
                     const fieldname = feature.get('var');
                     if (!fieldname.startsWith('muc_')) {
@@ -1004,17 +1004,39 @@ converse.plugins.add('converse-muc', {
                 const jid = stanza.getAttribute('from'),
                       resource = Strophe.getResourceFromJid(jid),
                       sender = resource && Strophe.unescapeNode(resource) || '';
+               
                 if (!this.handleMessageCorrection(stanza)) {
                     if (sender === '') {
                         return;
                     }
                     const subject_el = stanza.querySelector('subject');
                     if (subject_el) {
-                        // const subject = _.propertyOf(subject_el)('textContent') || '';
-                        // console.log(subject, sender);
-                        // u.safeSave(this, {'subject': {'author': sender, 'text': subject}});
+                        const subject = _.propertyOf(subject_el)('textContent') || '';
+                        if (!this.get('subject').text){
+                            u.safeSave(this, {'subject': {'author': sender, 'text': subject}});
+                        }
                     }
+                    // console.dir(stanza);
+                    // console.log(this);
                     const msg = await this.createMessage(stanza, original_stanza);
+                    if (msg && stanza.querySelector('data')) {
+                        msg.save({
+                            senderName: stanza.querySelector('data').querySelector('senderName').textContent ? stanza.querySelector('data').querySelector('senderName').textContent : ''
+                        })
+                    }
+                     
+                    //  this.save({
+                    //     'subject' : {
+                    //         'text' : stanza.children[0].tagName === 'subject' ? stanza.children[0].textContent : 'Loading...'
+                    //     }
+                    //  })
+                    //  if (stanza.children[2]  && stanza.children[2].tagName === 'data' 
+                    //  && stanza.children[2].children[1] && stanza.children[2].children[1].tagName === 'senderName') {
+                      
+                    //    console.log('this model chatroom: ', this);
+                    //  }
+                   
+                     
                     if (forwarded && msg && msg.get('sender')  === 'me') {
                         msg.save({'received': moment().format()});
                     }
@@ -1202,7 +1224,7 @@ converse.plugins.add('converse-muc', {
                 if (this.vcard) {
                   return this.vcard.get('fullname');
                 }
-                return this.get('nick') || this.get('jid');
+                return this.get('nick') ;
             },
 
             isMember () {
