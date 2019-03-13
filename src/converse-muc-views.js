@@ -782,7 +782,10 @@ converse.plugins.add('converse-muc-views', {
             generateHeadingHTML () {
                 /* Returns the heading HTML to be rendered.
                  */
+<<<<<<< HEAD
                 // console.log('model extend when a message',this.model);
+=======
+>>>>>>> e6c9c1ec6c006a36495059db643a4413cfe65143
                 return tpl_chatroom_head(
                     _.extend(this.model.toJSON(), {
                         'members_length': this.model.pagemeGroupMembers.length,
@@ -2173,14 +2176,31 @@ converse.plugins.add('converse-muc-views', {
         });
 
         _converse.PagemeGroupMemberView = Backbone.VDOMView.extend({
+            events: {
+                'click .avatar': 'showProfileMember'
+            },
+            
             tagName: 'li',
+
+            showProfileMember(ev) {
+                this.model.set('avatarUrl', `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`)
+                this.model.set('isMemberProfile', true)
+                this.profile_modal = new _converse.ProfileModal({model: this.model});
+                this.profile_modal.show(ev);
+            },
+
             initialize () {
                 this.model.on('change', this.render, this);
                 this.model.on('change:status', this.render, this)
+                this.model.set('avatarUrl', `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`);
+                _converse.api.listen.on('editUserProfileCompleted', (avatarUrl) => {
+                    if (avatarUrl.includes(this.model.get('userName'))){
+                        this.model.set('avatarUrl', avatarUrl);
+                    }
+                });
             },
-
             toHTML () {
-                // console.log(this.model);
+                // console.log('PagemeGroupMemberView model',this.model);
                 let status;
                 if (this.model.get('onCall')) {
                     status = 'ON_CALL'
@@ -2197,7 +2217,6 @@ converse.plugins.add('converse-muc-views', {
               return tpl_pageme_group_member(
                   _.extend(
                       { '_': _,
-                        'image': `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`,
                         'status': status
                       }, this.model.toJSON()
                   )
@@ -2220,6 +2239,7 @@ converse.plugins.add('converse-muc-views', {
             initialize () {
                 Backbone.OrderedListView.prototype.initialize.apply(this, arguments);
                 this.chatroomview = this.model.chatroomview;
+                // console.log('model PagemeGroupMembersView', this.model, this.chatroomview);
                 this.render();
             },
 
