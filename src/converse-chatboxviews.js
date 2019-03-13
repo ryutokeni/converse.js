@@ -15,21 +15,26 @@ const { Backbone, _, utils } = converse.env;
 const u = utils;
 
 const AvatarMixin = {
-
+    
     renderAvatar (el, me, Url) {
         el = el || this.el;
         const canvas_el = el.querySelector('canvas');
         if (_.isNull(canvas_el)) {
-            return;
+            // second times
+            const img = el.querySelector('img');
+            if (img){
+                img.src = this.image;
+            }
+        } else {
+            // const image_type = this.model.vcard.get('image_type'),
+            //       image = this.model.vcard.get('image');
+            canvas_el.outerHTML = tpl_avatar({
+                'classes': canvas_el.getAttribute('class'),
+                'width': this.width || canvas_el.width,
+                'height': this.height || canvas_el.height,
+                'image': this.image,
+            });
         }
-        const image_type = this.model.vcard.get('image_type'),
-                image = this.model.vcard.get('image');
-        canvas_el.outerHTML = tpl_avatar({
-            'classes': canvas_el.getAttribute('class'),
-            'width': this.width || canvas_el.width,
-            'height': this.height || canvas_el.height,
-            'image': this.image,
-        });
     },
 };
 

@@ -1748,6 +1748,9 @@ const converse = {
     'onOpenModalOptionPicture' (callback) {
         return _converse.on('openModalOptionPicture', callback);
     },
+    'onEditUserProfile' (body, avatar, callback) {
+        return _converse.on('editUserProfile', body, avatar, callback);
+    },
     'onOpenCreateGroupModal' (callback) {
       return _converse.on('openCreateGroupModal', callback);
     },
@@ -1957,9 +1960,10 @@ const converse = {
         callback(data);
       })
     },
-    'updateProfile' (data) {
+    'updateProfile' (data, status) {
       _converse.api.waitUntil('statusInitialized').then(() => {
-        _converse.xmppstatus.save(data)
+          _converse.xmppstatus.save(status);
+          _converse.xmppstatus.save(data)
       })
     },
     /**

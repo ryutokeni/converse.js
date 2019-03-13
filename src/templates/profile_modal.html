@@ -20,34 +20,41 @@
                     <div class="tab-pane fade show active" id="profile-tabpanel" role="tabpanel" aria-labelledby="profile-tab">
                         <form class="converse-form converse-form--modal profile-form" action="#">
                             <div class="row">
-                                <div class="col-auto">
+                                <div class="col-auto" style="margin: 5px auto">
                                     <a class="change-avatar" href="#">
-                                        {[ if (o.image) { ]}
                                             <!-- <img alt="{{{o.alt_avatar}}}" class="img-thumbnail avatar align-self-center" height="100px" width="100px" src="data:{{{o.image_type}}};base64,{{{o.image}}}"/> -->
-                                            <img alt="{{{o.alt_avatar}}}" class="img-thumbnail avatar align-self-center" height="100px" width="100px" src="{{{o.image}}}"/>
-                                            {[ } ]}
-                                        {[ if (!o.image) { ]}
-                                            <canvas class="avatar" height="100px" width="100px"></canvas>
-                                        {[ } ]}
+                                        <img alt="{{{o.alt_avatar}}}" class="img-thumbnail avatar align-self-center" height="100px" width="100px" src="{{{o.avatarUrl}}}" onerror="this.src='./assets/appIcon.png'"/>
                                     </a>
                                     <input class="hidden" name="image" type="file"/>
                                 </div>
-                                <div class="col">
+                                <!-- <div class="col">
                                     <div class="form-group">
                                         <label class="col-form-label">{{{o.label_jid}}}:</label>
                                         <div>{{{o.jid}}}</div>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
+
+                            {[ if (!o.isMemberProfile) { ]}
+                            <div class="form-group">
+                                <label for="vcard-email" class="col-form-label">{{{o.label_email}}}:</label>
+                                <input id="vcard-email" type="text" class="form-control" name="email" value="{{{o.emailAddress}}}" disabled="true"/>
+                            </div>
+                            {[ } ]}
+                            
                             <div class="form-group">
                                 <label for="vcard-fullname" class="col-form-label">{{{o.label_fullname}}}:</label>
-                                <input id="vcard-fullname" type="text" class="form-control" name="fn" value="{{{o.fullname}}}"/>
+                                <input id="vcard-fullname" type="text" class="form-control" name="fullName" value="{{{o.fullName}}}" disabled="{{{ o.isMemberProfile }}}"/>
                             </div>
                             <div class="form-group">
-                                <label for="vcard-nickname" class="col-form-label">{{{o.label_nickname}}}:</label>
-                                <input id="vcard-nickname" type="text" class="form-control" name="nickname" value="{{{o.nickname}}}"/>
+                                <label for="vcard-nickname" class="col-form-label">{{{o.label_speciality}}}:</label>
+                                <!-- <input id="vcard-nickname" type="text" class="form-control" name="nickname" value="{{{o.title}}}"/> -->
+                                <div style="display: flex; justify-content: space-around; padding: 0 20px;">
+                                    <select id="main-speciality" name="main-speciality" class="main-speciality" style="margin: 0 10px" disabled="{{{ o.isMemberProfile }}}"></select>
+                                    <select class="sub-speciality" name="sub-speciality" style="margin: 0 10px" disabled="{{{ o.isMemberProfile }}}"></select>
+                                </div>
                             </div>
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label for="vcard-url" class="col-form-label">{{{o.label_url}}}:</label>
                                 <input id="vcard-url" type="url" class="form-control" name="url" value="{{{o.url}}}"/>
                             </div>
@@ -59,11 +66,21 @@
                                 <label for="vcard-role" class="col-form-label">{{{o.label_role}}}:</label>
                                 <input id="vcard-role" type="text" class="form-control" name="role" value="{{{o.role}}}" aria-describedby="vcard-role-help"/>
                                 <small id="vcard-role-help" class="form-text text-muted">{{{o.label_role_help}}}</small>
-                            </div>
+                            </div> -->
                             <hr/>
-                            <div class="form-group">
-                                <button type="submit" class="save-form btn btn-primary">{{{o.__('Save and close')}}}</button>
-                            </div>
+
+                            {[ if (!o.isMemberProfile) { ]}
+                                <div class="form-group" style="margin: 5px 0px; text-align: center">
+                                    {[ if ( !o.submitted ) { ]} 
+                                        <button type="submit" class="save-form btn btn-primary save-profile">{{{o.__('Save and close')}}}</button>
+                                    {[ } ]}
+
+                                    {[ if (o.submitted) { ]}
+                                        {{{ o.label_saving }}}
+                                        <span class="spinner fa fa-spinner centered"/>
+                                    {[ } ]}    
+                                </div>
+                            {[ } ]}
                         </form>
                     </div>
                     {[ if (o._converse.pluggable.plugins['converse-omemo'].enabled(o._converse)) { ]}

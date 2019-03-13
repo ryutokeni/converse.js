@@ -202,8 +202,9 @@ converse.plugins.add('pageme-recent-messages-view', {
                 })
                 if (chatbox) {
                     if (!data.chatbox.get('name')) {
-                      var ping = {};
-                      ping.userName = `${chatbox.get('jid').split('@')[0]}`;
+                      var ping = {
+                        userName: `${chatbox.get('jid').split('@')[0]}`
+                      };
                       var json = JSON.stringify(ping);
                       var url = `${_converse.user_settings.baseUrl}/userProfile`
                       var xhr = new XMLHttpRequest();

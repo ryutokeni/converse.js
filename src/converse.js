@@ -65,6 +65,7 @@ const {
   onOpenModalOptionPicture,
   onOpenCreateGroupModal,
   onOpenInviteMemberModal,
+  onEditUserProfile,
   createNewGroup,
   onLeaveGroup,
   onShowPageMeMediaViewer,
@@ -116,6 +117,10 @@ converse.onOpenInviteMemberModal = function (callback) {
   return onOpenInviteMemberModal(callback);
 }
 
+converse.onEditUserProfile = function (body, avatar, callback) {
+  return onEditUserProfile(body, avatar, callback);
+}
+
 converse.onShowPageMeMediaViewer = function (callback) {
   return onShowPageMeMediaViewer(callback);
 }
@@ -152,8 +157,8 @@ converse.onStatusFormSubmitted = function(callback) {
   return onStatusFormSubmitted(callback);
 }
 
-converse.updateProfile = function(data) {
-  return updateProfile(data);
+converse.updateProfile = function(data, status) {
+  return updateProfile(data, status);
 }
 
 export default converse;
