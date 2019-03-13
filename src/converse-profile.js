@@ -36,27 +36,47 @@ converse.plugins.add('converse-profile', {
         _converse.ProfileModal = _converse.BootstrapModal.extend({
             events: {
                 'change input[type="file"': "updateFilePreview",
+                'change select.main-speciality': "updateSubSpeciality",
                 'click .change-avatar': "openFileSelection",
                 'submit .profile-form': 'onFormSubmitted'
             },
 
             initialize () {
                 this.model.on('change', this.render, this);
+                this.model.set({'specialities': [
+                    {   main: 'Physician',
+                        subs: ["Allergy & Immunology", "Anesthesiology", "Cardiac Surgery", "Cardiology", "Critical Care", "Dermatology", "Emergency Medicine", "Endocrinology", "Family Medicine", "Gastroenterology", "General Surgery", "Genetics", "Geriatrics", "Hematology", "Infectious Diseases", "Internal Medicine and Subspecialties", "Lab Medicine", "Medical Oncology", "Nephrology", "Neurology", "Neurosurgery", "Obstetrics and Gynaecology", "Ophthalmology", "Orthopaedic Surgery", "Otolaryngology - Head and Neck Surgery", "Palliative Medicine", "Pathology", "Pediatrics", "Pediatrics Subspecialits", "Physical Medicine and Rehabilitation", "Plastic Surgery", "Psychiatry", "Radiology and Nuclear Medicine", "Respirology", "Rheumatology", "Urology", "Vascular Surgery", "Other"],
+                    },
+                    {   main: 'Trainees',
+                        subs: ["Medical Student", "Resident", "Fellow", "Other"]
+                    },
+                    {   main: 'Nursing Professional',
+                        subs: ["Advanced Practice Registered Nurse", "Certified Nurse Midwife", "Certified Registered Nurse Anesthetist", "Clinical Nurse Specialist", "Nurse Practitioner", "Registered Nurse", "Registered Practical Nurse", "Other"]
+
+                    },
+                    {   main: 'Dentistry',
+                        subs: ["General Practice Dentist", "Oral and Maxillofacial Surgery", "Orthodontist", "Pedodontist", "Periodontist", "Prosthodontist", "Other"]
+                    },
+                    {   main: 'Other Healthcare Professional',
+                        subs: ["Acupuncturist", "Anatomist", "Audiologist", "Chiropractor", "Clinical Associate", "Dentistry and Subspecialties", "Dietitian", "Medical Educator", "Medical Librarian", "Medical Photographer", "Midwife", "Occupational Therapist", "Optometrist", "Orderly", "Paramedic", "Pathology Assistant", "Perfusionist", "Pharmacist", "Physician Assistant", "Physiotherapist", "Podiatrist", "Psychologist", "Respiratory Therapist", "Social Worker", "Speech-Language Pathologist", "Technician", "Technologist", "Veterinarian"]
+                    }
+                ]});
+                this.model.set({'submitted': false});
                 _converse.BootstrapModal.prototype.initialize.apply(this, arguments);
                 _converse.emit('profileModalInitialized', this.model);
             },
 
             toHTML () {
                 //this.model.vcard.image = _converse.user_settings.userProfile.avatarUrl;
-                this.model.vcard.attributes.image = _converse.user_settings.userProfile.avatarUrl;
+                if (this.model.vcard) this.model.vcard.attributes.image = _converse.user_settings.userProfile.avatarUrl;
                 return tpl_profile_modal(_.extend(
                     this.model.toJSON(),
-                    this.model.vcard.toJSON(), {
+                    this.model.vcard ? this.model.vcard.toJSON : {}, {
                     '_': _,
                     '__': __,
                     '_converse': _converse,
                     'alt_avatar': __('Your avatar image'),
-                    'heading_profile': __('Your Profile'),
+                    'heading_profile': __('Profile'),
                     'label_close': __('Close'),
                     'label_email': __('Email'),
                     'label_fullname': __('Full Name'),
@@ -65,6 +85,8 @@ converse.plugins.add('converse-profile', {
                     'label_role': __('Role'),
                     'label_role_help': __('Use commas to separate multiple roles. Your roles are shown next to your name on your chat messages.'),
                     'label_url': __('URL'),
+                    'label_speciality': "Speciality",
+                    'label_saving': "Saving ...",
                     'utils': u,
                     'view': this
                 }));
@@ -72,9 +94,47 @@ converse.plugins.add('converse-profile', {
 
             afterRender () {
                 this.tabs = _.map(this.el.querySelectorAll('.nav-item'), (tab) => new bootstrap.Tab(tab));
+                var mainSpecialityDOM = this.el.querySelectorAll('.main-speciality')[0];
+                if (mainSpecialityDOM) {
+                    mainSpecialityDOM.options.length = 0; // clear data
+                    var currentMainSpecIndex = this.model.get('specialities').findIndex(speciality => this.model.get('title') && this.model.get('title').includes(speciality.main + '+'));
+
+                    this.model.get('specialities').forEach((speciality, i) => {
+                        var opt = document.createElement('option');
+                        opt.textContent = speciality.main;
+                        opt.value = i;
+                        opt.selected = currentMainSpecIndex === i
+                        mainSpecialityDOM.appendChild(opt);
+                    })
+
+                    this.updateSubSpeciality();
+                }
+            },
+
+            updateSubSpeciality(){
+                var mainSpecialityDOM = this.el.querySelectorAll('.main-speciality')[0];
+                var subSpecialityDOM = this.el.querySelectorAll('.sub-speciality')[0];
+                if (subSpecialityDOM) {
+                    subSpecialityDOM.options.length = 0;// clear data
+
+                    var findMain = this.model.get('specialities')[mainSpecialityDOM.options[mainSpecialityDOM.selectedIndex].value];
+                    if (findMain) {
+                        findMain.subs.forEach((subSpeciality, i) => {
+                            var findSubSpecIndex = findMain.subs.findIndex(subSpeciality => this.model.get('title') && this.model.get('title').includes(findMain.main + '+' + subSpeciality));
+                            
+                            var opt = document.createElement('option');
+                            opt.textContent = subSpeciality;
+                            opt.value = i;
+                            opt.selected = findSubSpecIndex === i;
+                            subSpecialityDOM.appendChild(opt);
+                        })
+                    }
+                }
             },
 
             openFileSelection (ev) {
+                if (this.model.get('isMemberProfile')) return;
+                
                 ev.preventDefault();
                 this.el.querySelector('input[type="file"]').click();
             },
@@ -105,35 +165,48 @@ converse.plugins.add('converse-profile', {
 
             onFormSubmitted (ev) {
                 ev.preventDefault();
+                this.model.set({'submitted': true});
                 const reader = new FileReader(),
                       form_data = new FormData(ev.target),
                       image_file = form_data.get('image');
-                const data = {
-                    'fn': form_data.get('fn'),
-                    'nickname': form_data.get('nickname'),
-                    'role': form_data.get('role'),
-                    'email': form_data.get('email'),
-                    'url': form_data.get('url'),
-                };
-                if (!image_file.size) {
-                    _.extend(data, {
-                        'image': this.model.vcard.get('image'),
-                        'image_type': this.model.vcard.get('image_type')
-                    });
-                    this.setVCard(data);
-                } else {
-                    reader.onloadend = () => {
-                        _.extend(data, {
-                            'image': btoa(reader.result),
-                            'image_type': image_file.type
-                        });
-                        this.setVCard(data);
-                    };
-                    reader.readAsBinaryString(image_file);
+                // const data = {
+                //     'fn': form_data.get('fn'),
+                //     'nickname': form_data.get('nickname'),
+                //     'role': form_data.get('role'),
+                //     'email': form_data.get('email'),
+                //     'url': form_data.get('url'),
+                // };
+                var data = {
+                    fullName: form_data.get('fullName'),
+                    title: this.model.get('specialities')[form_data.get('main-speciality')].main + '+' + this.model.get('specialities')[form_data.get('main-speciality')].subs[form_data.get('sub-speciality')],
+                    avatarUrl: this.model.get('avatarUrl').replace(/\?t=.*/, '') + '?t=' + new Date().getTime()
                 }
+
+                _converse.emit('editUserProfile', data, image_file,  () => {
+                    _converse.emit('editUserProfileCompleted', data.avatarUrl)
+                    
+                    this.model.set(data);
+                    _converse.user_settings.userProfile.avatarUrl = this.model.get('avatarUrl');
+                    // _converse.xmppstatusview.image = this.model.get('avatarUrl');
+                    if (!image_file.size) {
+                        _.extend(data, {
+                            'image': this.model.vcard.get('image'),
+                            'image_type': this.model.vcard.get('image_type')
+                        });
+                        if (this.model.vcard) this.setVCard(data);
+                    } else {
+                        reader.onloadend = () => {
+                            _.extend(data, {
+                                'image': btoa(reader.result),
+                                'image_type': image_file.type
+                            });
+                            if (this.model.vcard) this.setVCard(data);
+                        };
+                        reader.readAsBinaryString(image_file);
+                    }
+                });
             }
         });
-
 
         _converse.ChatStatusModal = _converse.BootstrapModal.extend({
             events: {
@@ -231,7 +304,7 @@ converse.plugins.add('converse-profile', {
                     this.model.toJSON(),
                     this.model.vcard.toJSON(), {
                     '__': __,
-                    'fullname': this.model.vcard.get('fullname') || 'Loading...',
+                    'fullName': this.model.get('fullName') || 'Loading...',
                     'organizations': _converse.user_settings.organizations,
                     'status_message': this.model.get('status_message') ||
                                         __("I am %1$s", this.getPrettyStatus(chat_status)),
@@ -247,14 +320,13 @@ converse.plugins.add('converse-profile', {
 
             afterRender () {
                 const jid = Strophe.getNodeFromJid(_converse.bare_jid);
-                this.image = `${_converse.user_settings.avatarUrl}${jid}`;
-                this.renderAvatar(null, true, _converse.user_settings.userProfile.avatarUrl);
+                // this.image = `${_converse.user_settings.avatarUrl}${jid}`;
+                this.image = this.model.get('avatarUrl');
+                this.renderAvatar();
             },
 
             showProfileModal (ev) {
-                if (_.isUndefined(this.profile_modal)) {
-                    this.profile_modal = new _converse.ProfileModal({model: this.model});
-                }
+                this.profile_modal = new _converse.ProfileModal({model: this.model});
                 this.profile_modal.show(ev);
             },
 

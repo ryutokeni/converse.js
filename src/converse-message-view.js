@@ -278,8 +278,17 @@ converse.plugins.add('converse-message-view', {
                 const promise = u.renderImageURLs(_converse, msg_content);
                 if (this.model.get('type') !== 'headline') {
                     const jid = Strophe.getNodeFromJid(this.model.vcard.get('jid'));
-                    this.image = `${_converse.user_settings.avatarUrl}${jid}`;
+                    if (!this.image || this.image.includes('/null')){
+                        this.image = `${_converse.user_settings.avatarUrl}${jid}`;
+                    }
                     this.width = this.height = 60;
+                    
+                    _converse.api.listen.on('editUserProfileCompleted', (avatarUrl) => {
+                        if (avatarUrl.includes(jid)){
+                            this.image = avatarUrl;
+                            this.renderAvatar(msg);
+                        }
+                    });
                     this.renderAvatar(msg);
                 }
                 await promise;
