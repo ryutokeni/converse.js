@@ -782,7 +782,10 @@ converse.plugins.add('converse-muc-views', {
             generateHeadingHTML () {
                 /* Returns the heading HTML to be rendered.
                  */
+<<<<<<< HEAD
                 // console.log('model extend when a message',this.model);
+=======
+>>>>>>> e6c9c1ec6c006a36495059db643a4413cfe65143
                 return tpl_chatroom_head(
                     _.extend(this.model.toJSON(), {
                         'members_length': this.model.pagemeGroupMembers.length,
