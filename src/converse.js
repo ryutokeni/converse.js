@@ -64,6 +64,7 @@ const {
   onLoadMessages,
   onOpenModalOptionPicture,
   onOpenCreateGroupModal,
+  onOpenSettingModal,
   onOpenInviteMemberModal,
   onEditUserProfile,
   createNewGroup,
@@ -109,8 +110,13 @@ converse.onLoadMessages = function (callback) {
 converse.onOpenModalOptionPicture = function (callback) {
   return onOpenModalOptionPicture(callback);
 }
+
 converse.onOpenCreateGroupModal = function (callback) {
   return onOpenCreateGroupModal(callback);
+}
+
+converse.onOpenSettingModal = function (callback) {
+  return onOpenSettingModal(callback);
 }
 
 converse.onOpenInviteMemberModal = function (callback) {
