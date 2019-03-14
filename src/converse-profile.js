@@ -326,6 +326,9 @@ converse.plugins.add('converse-profile', {
             },
 
             showProfileModal (ev) {
+                if (!_.isUndefined(this.profile_modal)) {
+                    this.profile_modal.remove();
+                }
                 this.profile_modal = new _converse.ProfileModal({model: this.model});
                 this.profile_modal.show(ev);
             },
