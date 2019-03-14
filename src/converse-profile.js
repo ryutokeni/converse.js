@@ -179,7 +179,7 @@ converse.plugins.add('converse-profile', {
                 var data = {
                     fullName: form_data.get('fullName'),
                     title: this.model.get('specialities')[form_data.get('main-speciality')].main + '+' + this.model.get('specialities')[form_data.get('main-speciality')].subs[form_data.get('sub-speciality')],
-                    avatarUrl: this.model.get('avatarUrl').replace(/\?t=.*/, '') + '?t=' + new Date().getTime()
+                    avatarUrl: `${_converse.user_settings.avatarUrl}${this.model.get('userName')}` + '?t=' + new Date().getTime()
                 }
 
                 _converse.emit('editUserProfile', data, image_file,  () => {

@@ -782,10 +782,7 @@ converse.plugins.add('converse-muc-views', {
             generateHeadingHTML () {
                 /* Returns the heading HTML to be rendered.
                  */
-<<<<<<< HEAD
                 // console.log('model extend when a message',this.model);
-=======
->>>>>>> e6c9c1ec6c006a36495059db643a4413cfe65143
                 return tpl_chatroom_head(
                     _.extend(this.model.toJSON(), {
                         'members_length': this.model.pagemeGroupMembers.length,
@@ -2183,7 +2180,8 @@ converse.plugins.add('converse-muc-views', {
             tagName: 'li',
 
             showProfileMember(ev) {
-                this.model.set('avatarUrl', `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`)
+                if (!this.model.get('avatarUrl')) this.model.set('avatarUrl', `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`);
+                
                 this.model.set('isMemberProfile', true)
                 this.profile_modal = new _converse.ProfileModal({model: this.model});
                 this.profile_modal.show(ev);
