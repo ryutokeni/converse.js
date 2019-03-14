@@ -75649,6 +75649,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
 
         this.model.on('change', this.onChanged, this);
         this.model.on('destroy', this.remove, this);
+        this.model.on('change:senderName', this.render, this);
 
         _converse.on('rerenderMessage', this.render, this);
       },
@@ -77626,7 +77627,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       generateHeadingHTML() {
         /* Returns the heading HTML to be rendered.
          */
-        console.log('model extend when a message', this.model);
+        // console.log('model extend when a message',this.model);
         return templates_chatroom_head_html__WEBPACK_IMPORTED_MODULE_13___default()(_.extend(this.model.toJSON(), {
           'members_length': this.model.pagemeGroupMembers.length,
           'list_members': __('List members'),
@@ -85281,7 +85282,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
 
       getDisplayName() {
         if (this.get('type') === 'groupchat') {
-          return this.vcard.get('fullname') || this.get('nick') || this.get('senderName');
+          return this.vcard.get('fullname') || this.get('senderName') || this.get('nick');
         } else {
           return this.vcard.get('fullname') || 'Loading...';
         }
@@ -85548,7 +85549,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         if (message.get('type') === 'chat' || message.get('type') === 'groupchat') {
           stanza.c('data', {
             'xmlns': 'pageMe.message.data'
-          }).c('sentDate').t(sentDate).up().c('timeToRead').t(timeToRead).up();
+          }).c('sentDate').t(sentDate).up().c('senderName').t(_converse.user_settings.fullname).up().c('timeToRead').t(timeToRead).up();
 
           if (type === 'file') {
             stanza.c('itemType').t(message.get('itemType')).up().c('mediaId').t(message.get('mediaId')).up().c('fileSize').t(message.get('fileSize')).up();
@@ -85904,7 +85905,9 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
               if (message.getElementsByTagName('encrypted') && message.getElementsByTagName('encrypted')[0] && message.getElementsByTagName('encrypted')[0].firstChild && message.getElementsByTagName('encrypted')[0].firstChild.nodeValue === '1') {
                 try {
                   newPagemeMessage.decrypted = RNCryptor.pagemeDecrypt(_converse.user_settings.pagemeEncryptKey, newPagemeMessage.body);
-                } catch (err) {}
+                } catch (err) {
+                  newPagemeMessage.decrypted = 'Howdy! This character is unsupported by end-to-end encryption';
+                }
               } else {
                 newPagemeMessage.decrypted = newPagemeMessage.body;
               }
@@ -88306,7 +88309,11 @@ const converse = {
       });
       chatbox.save({
         users: group.users,
-        latestMessageTime: group.latestMessageTime
+        latestMessageTime: group.latestMessageTime,
+        subject: {
+          text: group.groupName
+        },
+        name: group.groupName
       });
     });
   },
@@ -88488,18 +88495,36 @@ const converse = {
 
     pagemeMessages.forEach(msg => {
       if (msg.type !== 'text') {
-        if (msg.type === 'medical_request') {
-          _converse.chatboxes.onMessage(msg.stanza, {
-            medReqStt: msg.medReqStt,
-            isMedReqSender: msg.isMedReqSender,
-            senderSignedMedReq: msg.senderSignedMedReq,
-            rcvrSignedMedReq: msg.rcvrSignedMedReq,
-            silent: true
-          });
+        if (msg.stanza.getAttribute('type') === 'groupchat' && msg.stanza.querySelector('data') && msg.stanza.querySelector('data').querySelector('senderName')) {
+          if (msg.type === 'medical_request') {
+            _converse.chatboxes.onMessage(msg.stanza, {
+              medReqStt: msg.medReqStt,
+              isMedReqSender: msg.isMedReqSender,
+              senderSignedMedReq: msg.senderSignedMedReq,
+              rcvrSignedMedReq: msg.rcvrSignedMedReq,
+              silent: true,
+              senderName: msg.stanza.querySelector('data').querySelector('senderName').textContent ? msg.stanza.querySelector('data').querySelector('senderName').textContent : ''
+            });
+          } else {
+            _converse.chatboxes.onMessage(msg.stanza, {
+              silent: true,
+              senderName: msg.stanza.querySelector('data').querySelector('senderName').textContent ? msg.stanza.querySelector('data').querySelector('senderName').textContent : ''
+            });
+          }
         } else {
-          _converse.chatboxes.onMessage(msg.stanza, {
-            silent: true
-          });
+          if (msg.type === 'medical_request') {
+            _converse.chatboxes.onMessage(msg.stanza, {
+              medReqStt: msg.medReqStt,
+              isMedReqSender: msg.isMedReqSender,
+              senderSignedMedReq: msg.senderSignedMedReq,
+              rcvrSignedMedReq: msg.rcvrSignedMedReq,
+              silent: true
+            });
+          } else {
+            _converse.chatboxes.onMessage(msg.stanza, {
+              silent: true
+            });
+          }
         }
 
         return;
@@ -88519,9 +88544,18 @@ const converse = {
         }
       }
 
-      _converse.chatboxes.onMessage(msg.stanza, {
-        silent: true
-      });
+      if (msg.stanza.getAttribute('type') === 'groupchat' && msg.stanza.querySelector('data') && msg.stanza.querySelector('data').querySelector('senderName')) {
+        // console.log(msg.stanza);
+        // console.log(msg.stanza.querySelector('data').querySelector('senderName').textContent);
+        _converse.chatboxes.onMessage(msg.stanza, {
+          silent: true,
+          senderName: msg.stanza.querySelector('data').querySelector('senderName').textContent ? msg.stanza.querySelector('data').querySelector('senderName').textContent : ''
+        });
+      } else {
+        _converse.chatboxes.onMessage(msg.stanza, {
+          silent: true
+        });
+      }
     });
 
     _converse.api.emit('rerenderMessage');
@@ -90429,7 +90463,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
       },
 
       getDisplayName() {
-        return this.get('name') || this.get('jid');
+        return this.get('name') || this.get('subject').text || 'Loading...';
       },
 
       join(nick, password) {
@@ -91301,12 +91335,37 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
           const subject_el = stanza.querySelector('subject');
 
-          if (subject_el) {// const subject = _.propertyOf(subject_el)('textContent') || '';
-            // console.log(subject, sender);
-            // u.safeSave(this, {'subject': {'author': sender, 'text': subject}});
-          }
+          if (subject_el) {
+            const subject = _.propertyOf(subject_el)('textContent') || '';
+
+            if (!this.get('subject').text) {
+              _utils_form__WEBPACK_IMPORTED_MODULE_7__["default"].safeSave(this, {
+                'subject': {
+                  'author': sender,
+                  'text': subject
+                }
+              });
+            }
+          } // console.dir(stanza);
+          // console.log(this);
+
 
           const msg = await this.createMessage(stanza, original_stanza);
+
+          if (msg && stanza.querySelector('data')) {
+            msg.save({
+              senderName: stanza.querySelector('data').querySelector('senderName').textContent ? stanza.querySelector('data').querySelector('senderName').textContent : ''
+            });
+          } //  this.save({
+          //     'subject' : {
+          //         'text' : stanza.children[0].tagName === 'subject' ? stanza.children[0].textContent : 'Loading...'
+          //     }
+          //  })
+          //  if (stanza.children[2]  && stanza.children[2].tagName === 'data' 
+          //  && stanza.children[2].children[1] && stanza.children[2].children[1].tagName === 'senderName') {
+          //    console.log('this model chatroom: ', this);
+          //  }
+
 
           if (forwarded && msg && msg.get('sender') === 'me') {
             msg.save({
@@ -91530,7 +91589,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           return this.vcard.get('fullname');
         }
 
-        return this.get('nick') || this.get('jid');
+        return this.get('nick');
       },
 
       isMember() {

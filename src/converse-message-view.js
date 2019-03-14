@@ -114,10 +114,11 @@ converse.plugins.add('converse-message-view', {
                 }
                 this.model.on('change', this.onChanged, this);
                 this.model.on('destroy', this.remove, this);
+                this.model.on('change:senderName', this.render, this);
                 _converse.on('rerenderMessage', this.render, this);
             },
 
-            async render (force) {
+            async render (force) {                
                 if (this.rendered && !force) {
                   return;
                 }
