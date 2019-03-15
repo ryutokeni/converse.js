@@ -1758,8 +1758,8 @@ const converse = {
     'onOpenCreateGroupModal' (callback) {
       return _converse.on('openCreateGroupModal', callback);
     },
-    'onOpenSettingModal' (callback) {
-      return _converse.on('openSettingModal', callback);
+    'onOpenPreferencesModal' (callback) {
+      return _converse.on('openPreferencesModal', callback);
     },
     'onOpenInviteMemberModal' (callback) {
       return _converse.on('openInviteMemberModal', callback);

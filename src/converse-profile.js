@@ -336,7 +336,7 @@ converse.plugins.add('converse-profile', {
 
             showSettingModal (ev) {
                 ev.preventDefault();
-                _converse.emit('openSettingModal');
+                _converse.emit('openPreferencesModal');
             },
 
             showStatusChangeModal (ev) {
