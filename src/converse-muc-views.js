@@ -2191,9 +2191,10 @@ converse.plugins.add('converse-muc-views', {
                 this.model.on('change', this.render, this);
                 this.model.on('change:status', this.render, this)
                 this.model.set('avatarUrl', `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`);
-                _converse.api.listen.on('editUserProfileCompleted', (avatarUrl) => {
-                    if (avatarUrl.includes(this.model.get('userName'))){
-                        this.model.set('avatarUrl', avatarUrl);
+                _converse.api.listen.on('updateProfile', (data) => {
+                    if (data.avatarUrl.includes(this.model.get('userName'))){
+                        this.model.set('avatarUrl', data.avatarUrl);
+                        this.model.set('fullName', data.fullName);
                     }
                 });
             },

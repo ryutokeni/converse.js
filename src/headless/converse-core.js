@@ -2004,9 +2004,9 @@ const converse = {
         callback(data);
       })
     },
-    'updateProfile' (data, status) {
+    'updateProfile' (data) {
       _converse.api.waitUntil('statusInitialized').then(() => {
-          _converse.xmppstatus.save(status);
+          _converse.emit('updateProfile', data);
           _converse.xmppstatus.save(data)
       })
     },

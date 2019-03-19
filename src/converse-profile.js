@@ -287,8 +287,8 @@ converse.plugins.add('converse-profile', {
         _converse.XMPPStatusView = _converse.VDOMViewWithAvatar.extend({
             tagName: "div",
             events: {
-                "click span.currentName": "showSettingModal",
-                "click a.show-profile": "showProfileModal",
+                // "click span.currentName": "showSettingModal",
+                "click a.show-preferences": "showPreferencesModal",
                 "click .change-status": "showStatusChangeModal",
                 "click .show-client-info": "showClientInfoModal",
                 "click .logout": "logOut"
@@ -334,7 +334,7 @@ converse.plugins.add('converse-profile', {
                 this.profile_modal.show(ev);
             },
 
-            showSettingModal (ev) {
+            showPreferencesModal (ev) {
                 ev.preventDefault();
                 _converse.emit('openPreferencesModal');
             },

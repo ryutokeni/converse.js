@@ -283,9 +283,10 @@ converse.plugins.add('converse-message-view', {
                     }
                     this.width = this.height = 60;
                     
-                    _converse.api.listen.on('editUserProfileCompleted', (avatarUrl) => {
-                        if (avatarUrl.includes(jid)){
-                            this.image = avatarUrl;
+                    _converse.api.listen.on('updateProfile', (data) => {
+                        if (data.avatarUrl.includes(jid)){
+                            this.image = data.avatarUrl;
+                            this.model.set('senderName', data.fullName);
                             this.renderAvatar(msg);
                         }
                     });
