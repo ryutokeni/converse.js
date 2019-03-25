@@ -297,6 +297,12 @@ converse.plugins.add('converse-profile', {
             initialize () {
                 this.model.on("change", this.render, this);
                 this.model.vcard.on("change", this.render, this);
+                _converse.on('numRequestChange', (num) => {
+                    this.model.save({
+                        'numRequest': num
+                    })
+                })
+                
             },
 
             toHTML () {

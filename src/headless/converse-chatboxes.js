@@ -332,6 +332,9 @@ converse.plugins.add('converse-chatboxes', {
                  *  Parameters:
                  *    (Object) message - The Backbone.Model representing the message
                  */
+                // if (type === 'medical_request') {
+                //     console.log('this is an medicalRequest message!', message);
+                // }
                 const sentDate = message.get('sent');
                 let rawText = '';
                 switch (type) {
@@ -733,8 +736,11 @@ converse.plugins.add('converse-chatboxes', {
                 /* Given a newly received message, update the unread counter if
                  * necessary.
                  */
-               
+                
                 if (!message) { return; }
+                if (message.get('itemType') === "medical_request") {
+                    _converse.emit('MedicalRequestReceived', message.get('medialRequestKey'));
+                }
                 // if (_.isNil(message.get('message'))) { return; }
                 if (utils.isNewMessage(message) && this.isHidden()) {
                     this.save({'num_unread': this.get('num_unread') + 1});

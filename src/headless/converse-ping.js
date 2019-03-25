@@ -48,9 +48,9 @@ converse.plugins.add('converse-ping', {
         };
 
         _converse.pong = function (ping) {
-            
             if (ping.getAttribute('CustomType') === 'VerificationRequest') {
               const verification = ping.querySelector('VerificationRequest');
+              _converse.emit('StatusMedicalRequestChanged', verification.getAttribute('key'));
               let chatboxId = verification.getAttribute('sender');
               if (chatboxId === Strophe.getNodeFromJid(_converse.bare_jid)) {
                 chatboxId = verification.getAttribute('recipient');

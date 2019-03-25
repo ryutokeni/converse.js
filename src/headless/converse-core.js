@@ -1749,6 +1749,15 @@ const converse = {
         callback(jid, messageType, null, 20);
       });
     },
+    'onStatusMedicalRequestChanged' (key, callback) {
+        return _converse.on('StatusMedicalRequestChanged',key,  callback);
+    },
+    'onMedicalRequestReceived' (key, callback) {
+        return _converse.on('MedicalRequestReceived', key, callback);
+    },
+    'playSound' () {
+        return _converse.playSoundNotification('blastwave');
+    },
     'onOpenModalOptionPicture' (callback) {
         return _converse.on('openModalOptionPicture', callback);
     },
@@ -1957,6 +1966,9 @@ const converse = {
         }
       })
       return notReceivedMessages;
+    },
+    'numberRequestChange' (num) {
+        _converse.emit('numRequestChange', num);
     },
     'updateMessageStatus' (jid, messages) {
       const chatbox = _converse.chatboxes.findWhere({'jid': jid});

@@ -72215,17 +72215,22 @@ const AvatarMixin = {
     const canvas_el = el.querySelector('canvas');
 
     if (_.isNull(canvas_el)) {
-      return;
-    }
+      // second times
+      const img = el.querySelector('img');
 
-    const image_type = this.model.vcard.get('image_type'),
-          image = this.model.vcard.get('image');
-    canvas_el.outerHTML = templates_avatar_html__WEBPACK_IMPORTED_MODULE_4___default()({
-      'classes': canvas_el.getAttribute('class'),
-      'width': this.width || canvas_el.width,
-      'height': this.height || canvas_el.height,
-      'image': this.image
-    });
+      if (img) {
+        img.src = this.image;
+      }
+    } else {
+      // const image_type = this.model.vcard.get('image_type'),
+      //       image = this.model.vcard.get('image');
+      canvas_el.outerHTML = templates_avatar_html__WEBPACK_IMPORTED_MODULE_4___default()({
+        'classes': canvas_el.getAttribute('class'),
+        'width': this.width || canvas_el.width,
+        'height': this.height || canvas_el.height,
+        'image': this.image
+      });
+    }
   }
 
 };
@@ -75826,8 +75831,21 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
 
         if (this.model.get('type') !== 'headline') {
           const jid = Strophe.getNodeFromJid(this.model.vcard.get('jid'));
-          this.image = `${_converse.user_settings.avatarUrl}${jid}`;
+
+          if (!this.image || this.image.includes('/null')) {
+            this.image = `${_converse.user_settings.avatarUrl}${jid}`;
+          }
+
           this.width = this.height = 60;
+
+          _converse.api.listen.on('updateProfile', data => {
+            if (data.avatarUrl.includes(jid)) {
+              this.image = data.avatarUrl;
+              this.model.set('senderName', data.fullName);
+              this.renderAvatar(msg);
+            }
+          });
+
           this.renderAvatar(msg);
         }
 
@@ -79099,15 +79117,35 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
 
     });
     _converse.PagemeGroupMemberView = Backbone.VDOMView.extend({
+      events: {
+        'click .avatar': 'showProfileMember'
+      },
       tagName: 'li',
+
+      showProfileMember(ev) {
+        if (!this.model.get('avatarUrl')) this.model.set('avatarUrl', `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`);
+        this.model.set('isMemberProfile', true);
+        this.profile_modal = new _converse.ProfileModal({
+          model: this.model
+        });
+        this.profile_modal.show(ev);
+      },
 
       initialize() {
         this.model.on('change', this.render, this);
         this.model.on('change:status', this.render, this);
+        this.model.set('avatarUrl', `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`);
+
+        _converse.api.listen.on('updateProfile', data => {
+          if (data.avatarUrl.includes(this.model.get('userName'))) {
+            this.model.set('avatarUrl', data.avatarUrl);
+            this.model.set('fullName', data.fullName);
+          }
+        });
       },
 
       toHTML() {
-        // console.log(this.model);
+        // console.log('PagemeGroupMemberView model',this.model);
         let status;
 
         if (this.model.get('onCall')) {
@@ -79123,7 +79161,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         this.model.set('status', status);
         return templates_pageme_group_member_html__WEBPACK_IMPORTED_MODULE_21___default()(_.extend({
           '_': _,
-          'image': `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`,
           'status': status
         }, this.model.toJSON()));
       },
@@ -79142,7 +79179,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
 
       initialize() {
         Backbone.OrderedListView.prototype.initialize.apply(this, arguments);
-        this.chatroomview = this.model.chatroomview;
+        this.chatroomview = this.model.chatroomview; // console.log('model PagemeGroupMembersView', this.model, this.chatroomview);
+
         this.render();
       },
 
@@ -80977,12 +81015,34 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
     _converse.ProfileModal = _converse.BootstrapModal.extend({
       events: {
         'change input[type="file"': "updateFilePreview",
+        'change select.main-speciality': "updateSubSpeciality",
         'click .change-avatar': "openFileSelection",
         'submit .profile-form': 'onFormSubmitted'
       },
 
       initialize() {
         this.model.on('change', this.render, this);
+        this.model.set({
+          'specialities': [{
+            main: 'Physician',
+            subs: ["Allergy & Immunology", "Anesthesiology", "Cardiac Surgery", "Cardiology", "Critical Care", "Dermatology", "Emergency Medicine", "Endocrinology", "Family Medicine", "Gastroenterology", "General Surgery", "Genetics", "Geriatrics", "Hematology", "Infectious Diseases", "Internal Medicine and Subspecialties", "Lab Medicine", "Medical Oncology", "Nephrology", "Neurology", "Neurosurgery", "Obstetrics and Gynaecology", "Ophthalmology", "Orthopaedic Surgery", "Otolaryngology - Head and Neck Surgery", "Palliative Medicine", "Pathology", "Pediatrics", "Pediatrics Subspecialits", "Physical Medicine and Rehabilitation", "Plastic Surgery", "Psychiatry", "Radiology and Nuclear Medicine", "Respirology", "Rheumatology", "Urology", "Vascular Surgery", "Other"]
+          }, {
+            main: 'Trainees',
+            subs: ["Medical Student", "Resident", "Fellow", "Other"]
+          }, {
+            main: 'Nursing Professional',
+            subs: ["Advanced Practice Registered Nurse", "Certified Nurse Midwife", "Certified Registered Nurse Anesthetist", "Clinical Nurse Specialist", "Nurse Practitioner", "Registered Nurse", "Registered Practical Nurse", "Other"]
+          }, {
+            main: 'Dentistry',
+            subs: ["General Practice Dentist", "Oral and Maxillofacial Surgery", "Orthodontist", "Pedodontist", "Periodontist", "Prosthodontist", "Other"]
+          }, {
+            main: 'Other Healthcare Professional',
+            subs: ["Acupuncturist", "Anatomist", "Audiologist", "Chiropractor", "Clinical Associate", "Dentistry and Subspecialties", "Dietitian", "Medical Educator", "Medical Librarian", "Medical Photographer", "Midwife", "Occupational Therapist", "Optometrist", "Orderly", "Paramedic", "Pathology Assistant", "Perfusionist", "Pharmacist", "Physician Assistant", "Physiotherapist", "Podiatrist", "Psychologist", "Respiratory Therapist", "Social Worker", "Speech-Language Pathologist", "Technician", "Technologist", "Veterinarian"]
+          }]
+        });
+        this.model.set({
+          'submitted': false
+        });
 
         _converse.BootstrapModal.prototype.initialize.apply(this, arguments);
 
@@ -80991,13 +81051,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
 
       toHTML() {
         //this.model.vcard.image = _converse.user_settings.userProfile.avatarUrl;
-        this.model.vcard.attributes.image = _converse.user_settings.userProfile.avatarUrl;
-        return templates_profile_modal_html__WEBPACK_IMPORTED_MODULE_7___default()(_.extend(this.model.toJSON(), this.model.vcard.toJSON(), {
+        if (this.model.vcard) this.model.vcard.attributes.image = _converse.user_settings.userProfile.avatarUrl;
+        return templates_profile_modal_html__WEBPACK_IMPORTED_MODULE_7___default()(_.extend(this.model.toJSON(), this.model.vcard ? this.model.vcard.toJSON : {}, {
           '_': _,
           '__': __,
           '_converse': _converse,
           'alt_avatar': __('Your avatar image'),
-          'heading_profile': __('Your Profile'),
+          'heading_profile': __('Profile'),
           'label_close': __('Close'),
           'label_email': __('Email'),
           'label_fullname': __('Full Name'),
@@ -81006,6 +81066,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
           'label_role': __('Role'),
           'label_role_help': __('Use commas to separate multiple roles. Your roles are shown next to your name on your chat messages.'),
           'label_url': __('URL'),
+          'label_speciality': "Speciality",
+          'label_saving': "Saving ...",
           'utils': u,
           'view': this
         }));
@@ -81013,9 +81075,47 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
 
       afterRender() {
         this.tabs = _.map(this.el.querySelectorAll('.nav-item'), tab => new bootstrap__WEBPACK_IMPORTED_MODULE_3___default.a.Tab(tab));
+        var mainSpecialityDOM = this.el.querySelectorAll('.main-speciality')[0];
+
+        if (mainSpecialityDOM) {
+          mainSpecialityDOM.options.length = 0; // clear data
+
+          var currentMainSpecIndex = this.model.get('specialities').findIndex(speciality => this.model.get('title') && this.model.get('title').includes(speciality.main + '+'));
+          this.model.get('specialities').forEach((speciality, i) => {
+            var opt = document.createElement('option');
+            opt.textContent = speciality.main;
+            opt.value = i;
+            opt.selected = currentMainSpecIndex === i;
+            mainSpecialityDOM.appendChild(opt);
+          });
+          this.updateSubSpeciality();
+        }
+      },
+
+      updateSubSpeciality() {
+        var mainSpecialityDOM = this.el.querySelectorAll('.main-speciality')[0];
+        var subSpecialityDOM = this.el.querySelectorAll('.sub-speciality')[0];
+
+        if (subSpecialityDOM) {
+          subSpecialityDOM.options.length = 0; // clear data
+
+          var findMain = this.model.get('specialities')[mainSpecialityDOM.options[mainSpecialityDOM.selectedIndex].value];
+
+          if (findMain) {
+            findMain.subs.forEach((subSpeciality, i) => {
+              var findSubSpecIndex = findMain.subs.findIndex(subSpeciality => this.model.get('title') && this.model.get('title').includes(findMain.main + '+' + subSpeciality));
+              var opt = document.createElement('option');
+              opt.textContent = subSpeciality;
+              opt.value = i;
+              opt.selected = findSubSpecIndex === i;
+              subSpecialityDOM.appendChild(opt);
+            });
+          }
+        }
       },
 
       openFileSelection(ev) {
+        if (this.model.get('isMemberProfile')) return;
         ev.preventDefault();
         this.el.querySelector('input[type="file"]').click();
       },
@@ -81043,36 +81143,51 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
 
       onFormSubmitted(ev) {
         ev.preventDefault();
+        this.model.set({
+          'submitted': true
+        });
         const reader = new FileReader(),
               form_data = new FormData(ev.target),
-              image_file = form_data.get('image');
-        const data = {
-          'fn': form_data.get('fn'),
-          'nickname': form_data.get('nickname'),
-          'role': form_data.get('role'),
-          'email': form_data.get('email'),
-          'url': form_data.get('url')
+              image_file = form_data.get('image'); // const data = {
+        //     'fn': form_data.get('fn'),
+        //     'nickname': form_data.get('nickname'),
+        //     'role': form_data.get('role'),
+        //     'email': form_data.get('email'),
+        //     'url': form_data.get('url'),
+        // };
+
+        var data = {
+          fullName: form_data.get('fullName'),
+          title: this.model.get('specialities')[form_data.get('main-speciality')].main + '+' + this.model.get('specialities')[form_data.get('main-speciality')].subs[form_data.get('sub-speciality')],
+          avatarUrl: `${_converse.user_settings.avatarUrl}${this.model.get('userName')}` + '?t=' + new Date().getTime()
         };
 
-        if (!image_file.size) {
-          _.extend(data, {
-            'image': this.model.vcard.get('image'),
-            'image_type': this.model.vcard.get('image_type')
-          });
+        _converse.emit('editUserProfile', data, image_file, () => {
+          _converse.emit('editUserProfileCompleted', data.avatarUrl);
 
-          this.setVCard(data);
-        } else {
-          reader.onloadend = () => {
+          this.model.set(data);
+          _converse.user_settings.userProfile.avatarUrl = this.model.get('avatarUrl'); // _converse.xmppstatusview.image = this.model.get('avatarUrl');
+
+          if (!image_file.size) {
             _.extend(data, {
-              'image': btoa(reader.result),
-              'image_type': image_file.type
+              'image': this.model.vcard.get('image'),
+              'image_type': this.model.vcard.get('image_type')
             });
 
-            this.setVCard(data);
-          };
+            if (this.model.vcard) this.setVCard(data);
+          } else {
+            reader.onloadend = () => {
+              _.extend(data, {
+                'image': btoa(reader.result),
+                'image_type': image_file.type
+              });
 
-          reader.readAsBinaryString(image_file);
-        }
+              if (this.model.vcard) this.setVCard(data);
+            };
+
+            reader.readAsBinaryString(image_file);
+          }
+        });
       }
 
     });
@@ -81138,7 +81253,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
     _converse.XMPPStatusView = _converse.VDOMViewWithAvatar.extend({
       tagName: "div",
       events: {
-        "click a.show-profile": "showProfileModal",
+        // "click span.currentName": "showSettingModal",
+        "click a.show-preferences": "showPreferencesModal",
         "click .change-status": "showStatusChangeModal",
         "click .show-client-info": "showClientInfoModal",
         "click .logout": "logOut"
@@ -81147,13 +81263,19 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
       initialize() {
         this.model.on("change", this.render, this);
         this.model.vcard.on("change", this.render, this);
+
+        _converse.on('numRequestChange', num => {
+          this.model.save({
+            'numRequest': num
+          });
+        });
       },
 
       toHTML() {
         const chat_status = this.model.get('status') || 'offline';
         return templates_profile_view_html__WEBPACK_IMPORTED_MODULE_8___default()(_.extend(this.model.toJSON(), this.model.vcard.toJSON(), {
           '__': __,
-          'fullname': this.model.vcard.get('fullname') || 'Loading...',
+          'fullName': this.model.get('fullName') || 'Loading...',
           'organizations': _converse.user_settings.organizations,
           'status_message': this.model.get('status_message') || __("I am %1$s", this.getPrettyStatus(chat_status)),
           'chat_status': chat_status,
@@ -81167,19 +81289,27 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
       },
 
       afterRender() {
-        const jid = Strophe.getNodeFromJid(_converse.bare_jid);
-        this.image = `${_converse.user_settings.avatarUrl}${jid}`;
-        this.renderAvatar(null, true, _converse.user_settings.userProfile.avatarUrl);
+        const jid = Strophe.getNodeFromJid(_converse.bare_jid); // this.image = `${_converse.user_settings.avatarUrl}${jid}`;
+
+        this.image = this.model.get('avatarUrl');
+        this.renderAvatar();
       },
 
       showProfileModal(ev) {
-        if (_.isUndefined(this.profile_modal)) {
-          this.profile_modal = new _converse.ProfileModal({
-            model: this.model
-          });
+        if (!_.isUndefined(this.profile_modal)) {
+          this.profile_modal.remove();
         }
 
+        this.profile_modal = new _converse.ProfileModal({
+          model: this.model
+        });
         this.profile_modal.show(ev);
+      },
+
+      showPreferencesModal(ev) {
+        ev.preventDefault();
+
+        _converse.emit('openPreferencesModal');
       },
 
       showStatusChangeModal(ev) {
@@ -83237,7 +83367,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
         _.each(this.model.contacts.models, contact => {
           const contact_view = this.get(contact.get('id'));
-          contact_view.el.setAttribute('data-group', this.model.get('name'));
+
+          if (contact_view) {
+            contact_view.el.setAttribute('data-group', this.model.get('name'));
+          }
 
           if (_.includes(contacts, contact)) {
             u.hideElement(contact_view.el);
@@ -83917,12 +84050,18 @@ const initialize = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21_
       updateContacts = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].updateContacts,
       updateGroups = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].updateGroups,
       updateMessageStatus = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].updateMessageStatus,
+      numberRequestChange = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].numberRequestChange,
       allMessageAreLoaded = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].allMessageAreLoaded,
       onLogOut = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onLogOut,
+      playSound = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].playSound,
       onLoadMessages = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onLoadMessages,
+      onStatusMedicalRequestChanged = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onStatusMedicalRequestChanged,
+      onMedicalRequestReceived = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onMedicalRequestReceived,
       onOpenModalOptionPicture = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpenModalOptionPicture,
       onOpenCreateGroupModal = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpenCreateGroupModal,
+      onOpenPreferencesModal = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpenPreferencesModal,
       onOpenInviteMemberModal = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpenInviteMemberModal,
+      onEditUserProfile = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onEditUserProfile,
       createNewGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].createNewGroup,
       onLeaveGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onLeaveGroup,
       onShowPageMeMediaViewer = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onShowPageMeMediaViewer,
@@ -83944,6 +84083,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].initia
   return initialize(settings, callback);
 };
 
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].playSound = function () {
+  return playSound();
+};
+
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].updateContacts = function (contacts, group) {
   return updateContacts(contacts, group);
 };
@@ -83956,12 +84099,24 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].update
   return updateMessageStatus(jid, messages);
 };
 
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].numberRequestChange = function (num) {
+  return numberRequestChange(num);
+};
+
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].allMessageAreLoaded = function (jid) {
   return allMessageAreLoaded(jid);
 };
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onLogOut = function (callback) {
   return onLogOut(callback);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onStatusMedicalRequestChanged = function (key, callback) {
+  return onStatusMedicalRequestChanged(key, callback);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onMedicalRequestReceived = function (key, callback) {
+  return onMedicalRequestReceived(key, callback);
 };
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onLoadMessages = function (callback) {
@@ -83976,8 +84131,16 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpen
   return onOpenCreateGroupModal(callback);
 };
 
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpenPreferencesModal = function (callback) {
+  return onOpenPreferencesModal(callback);
+};
+
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpenInviteMemberModal = function (callback) {
   return onOpenInviteMemberModal(callback);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onEditUserProfile = function (body, avatar, callback) {
+  return onEditUserProfile(body, avatar, callback);
 };
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onShowPageMeMediaViewer = function (callback) {
@@ -85516,6 +85679,9 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
          *  Parameters:
          *    (Object) message - The Backbone.Model representing the message
          */
+        // if (type === 'medical_request') {
+        //     console.log('this is an medicalRequest message!', message);
+        // }
         const sentDate = message.get('sent');
         let rawText = '';
 
@@ -85957,6 +86123,10 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
          */
         if (!message) {
           return;
+        }
+
+        if (message.get('itemType') === "medical_request") {
+          _converse.emit('MedicalRequestReceived', message.get('medialRequestKey'));
         } // if (_.isNil(message.get('message'))) { return; }
 
 
@@ -88340,12 +88510,32 @@ const converse = {
     });
   },
 
+  'onStatusMedicalRequestChanged'(key, callback) {
+    return _converse.on('StatusMedicalRequestChanged', key, callback);
+  },
+
+  'onMedicalRequestReceived'(key, callback) {
+    return _converse.on('MedicalRequestReceived', key, callback);
+  },
+
+  'playSound'() {
+    return _converse.playSoundNotification('blastwave');
+  },
+
   'onOpenModalOptionPicture'(callback) {
     return _converse.on('openModalOptionPicture', callback);
   },
 
+  'onEditUserProfile'(body, avatar, callback) {
+    return _converse.on('editUserProfile', body, avatar, callback);
+  },
+
   'onOpenCreateGroupModal'(callback) {
     return _converse.on('openCreateGroupModal', callback);
+  },
+
+  'onOpenPreferencesModal'(callback) {
+    return _converse.on('openPreferencesModal', callback);
   },
 
   'onOpenInviteMemberModal'(callback) {
@@ -88569,6 +88759,10 @@ const converse = {
     return notReceivedMessages;
   },
 
+  'numberRequestChange'(num) {
+    _converse.emit('numRequestChange', num);
+  },
+
   'updateMessageStatus'(jid, messages) {
     const chatbox = _converse.chatboxes.findWhere({
       'jid': jid
@@ -88637,6 +88831,8 @@ const converse = {
 
   'updateProfile'(data) {
     _converse.api.waitUntil('statusInitialized').then(() => {
+      _converse.emit('updateProfile', data);
+
       _converse.xmppstatus.save(data);
     });
   },
@@ -92151,6 +92347,9 @@ _converse_core__WEBPACK_IMPORTED_MODULE_1__["default"].plugins.add('converse-pin
     _converse.pong = function (ping) {
       if (ping.getAttribute('CustomType') === 'VerificationRequest') {
         const verification = ping.querySelector('VerificationRequest');
+
+        _converse.emit('StatusMedicalRequestChanged', verification.getAttribute('key'));
+
         let chatboxId = verification.getAttribute('sender');
 
         if (chatboxId === Strophe.getNodeFromJid(_converse.bare_jid)) {
@@ -117543,8 +117742,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
             if (chatbox) {
               if (!data.chatbox.get('name')) {
-                var ping = {};
-                ping.userName = `${chatbox.get('jid').split('@')[0]}`;
+                var ping = {
+                  userName: `${chatbox.get('jid').split('@')[0]}`
+                };
                 var json = JSON.stringify(ping);
                 var url = `${_converse.user_settings.baseUrl}/userProfile`;
                 var xhr = new XMLHttpRequest();
@@ -119656,11 +119856,11 @@ var __t, __p = '', __e = _.escape;
 __p += '<!-- src/templates/pageme_group_member.html -->\n<style>\n@media only screen and (max-width: 1540px) {\n    .info-member {\n        padding-left: 0px !important;\n    }\n}\n</style>\n<li class="occupant" id="' +
 __e( o.id ) +
 '">\n    <div class="row no-gutters">\n        <div class="col occupant-nick-badge" style="display: flex; justify-content: flex-start; align-items: center;\n         border-bottom: 1px solid #B3B3B5; padding-bottom: 5px;">\n            <span class="avatar" style=" width: 30px !important; height: 30px !important">\n                <img src="' +
-__e(o.image) +
+__e(o.avatarUrl) +
 '" onerror="this.src=\'./assets/appIcon.png\'" alt="">\n            </span>\n            <span style="display: flex !important;justify-content: center !important;align-items: center !important"\n            class="fa fa-circle chat-status change-status chat-status--' +
 __e(o.status) +
 '"></span>\n            <span class="info-member" style="display: flex; flex-direction: column; padding-left: 10px;">\n                <span style=" font-weight: bold; font-size: 18px;" class="occupant-nick">' +
-__e(o.fullName|| o.nick) +
+__e((o.fullName || o.nick) ) +
 '</span>\n                <i  class="">' +
 __e(o.title) +
 '</i>\n            </span>\n        </div>\n    </div>\n</li>\n';
@@ -119759,37 +119959,43 @@ __e(o.label_close) +
  if (o._converse.pluggable.plugins['converse-omemo'].enabled(o._converse)) { ;
 __p += '\n                <ul class="nav nav-pills justify-content-center">\n                    <li role="presentation" class="nav-item">\n                        <a class="nav-link active" id="profile-tab" href="#profile-tabpanel" aria-controls="profile-tabpanel" role="tab" data-toggle="tab">Profile</a>\n                    </li>\n                    <li role="presentation" class="nav-item">\n                        <a class="nav-link" id="omemo-tab" href="#omemo-tabpanel" aria-controls="omemo-tabpanel" role="tab" data-toggle="tab">OMEMO</a>\n                    </li>\n                </ul>\n                ';
  } ;
-__p += '\n                <div class="tab-content">\n                    <div class="tab-pane fade show active" id="profile-tabpanel" role="tabpanel" aria-labelledby="profile-tab">\n                        <form class="converse-form converse-form--modal profile-form" action="#">\n                            <div class="row">\n                                <div class="col-auto">\n                                    <a class="change-avatar" href="#">\n                                        ';
- if (o.image) { ;
-__p += '\n                                            <!-- <img alt="' +
+__p += '\n                <div class="tab-content">\n                    <div class="tab-pane fade show active" id="profile-tabpanel" role="tabpanel" aria-labelledby="profile-tab">\n                        <form class="converse-form converse-form--modal profile-form" action="#">\n                            <div class="row">\n                                <div class="col-auto" style="margin: 5px auto">\n                                    <a class="change-avatar" href="#">\n                                            <!-- <img alt="' +
 __e(o.alt_avatar) +
 '" class="img-thumbnail avatar align-self-center" height="100px" width="100px" src="data:' +
 __e(o.image_type) +
 ';base64,' +
 __e(o.image) +
-'"/> -->\n                                            <img alt="' +
+'"/> -->\n                                        <img alt="' +
 __e(o.alt_avatar) +
 '" class="img-thumbnail avatar align-self-center" height="100px" width="100px" src="' +
-__e(o.image) +
-'"/>\n                                            ';
- } ;
-__p += '\n                                        ';
- if (!o.image) { ;
-__p += '\n                                            <canvas class="avatar" height="100px" width="100px"></canvas>\n                                        ';
- } ;
-__p += '\n                                    </a>\n                                    <input class="hidden" name="image" type="file"/>\n                                </div>\n                                <div class="col">\n                                    <div class="form-group">\n                                        <label class="col-form-label">' +
+__e(o.avatarUrl) +
+'" onerror="this.src=\'./assets/appIcon.png\'"/>\n                                    </a>\n                                    <input class="hidden" name="image" type="file"/>\n                                </div>\n                                <!-- <div class="col">\n                                    <div class="form-group">\n                                        <label class="col-form-label">' +
 __e(o.label_jid) +
 ':</label>\n                                        <div>' +
 __e(o.jid) +
-'</div>\n                                    </div>\n                                </div>\n                            </div>\n                            <div class="form-group">\n                                <label for="vcard-fullname" class="col-form-label">' +
+'</div>\n                                    </div>\n                                </div> -->\n                            </div>\n\n                            ';
+ if (!o.isMemberProfile) { ;
+__p += '\n                            <div class="form-group">\n                                <label for="vcard-email" class="col-form-label">' +
+__e(o.label_email) +
+':</label>\n                                <input id="vcard-email" type="text" class="form-control" name="email" value="' +
+__e(o.emailAddress) +
+'" disabled="true"/>\n                            </div>\n                            ';
+ } ;
+__p += '\n                            \n                            <div class="form-group">\n                                <label for="vcard-fullname" class="col-form-label">' +
 __e(o.label_fullname) +
-':</label>\n                                <input id="vcard-fullname" type="text" class="form-control" name="fn" value="' +
-__e(o.fullname) +
+':</label>\n                                <input id="vcard-fullname" type="text" class="form-control" name="fullName" value="' +
+__e(o.fullName) +
+'" disabled="' +
+__e( o.isMemberProfile ) +
 '"/>\n                            </div>\n                            <div class="form-group">\n                                <label for="vcard-nickname" class="col-form-label">' +
-__e(o.label_nickname) +
-':</label>\n                                <input id="vcard-nickname" type="text" class="form-control" name="nickname" value="' +
-__e(o.nickname) +
-'"/>\n                            </div>\n                            <div class="form-group">\n                                <label for="vcard-url" class="col-form-label">' +
+__e(o.label_speciality) +
+':</label>\n                                <!-- <input id="vcard-nickname" type="text" class="form-control" name="nickname" value="' +
+__e(o.title) +
+'"/> -->\n                                <div style="display: flex; justify-content: space-around; padding: 0 20px;">\n                                    <select id="main-speciality" name="main-speciality" class="main-speciality" style="margin: 0 10px" disabled="' +
+__e( o.isMemberProfile ) +
+'"></select>\n                                    <select class="sub-speciality" name="sub-speciality" style="margin: 0 10px" disabled="' +
+__e( o.isMemberProfile ) +
+'"></select>\n                                </div>\n                            </div>\n                            <!-- <div class="form-group">\n                                <label for="vcard-url" class="col-form-label">' +
 __e(o.label_url) +
 ':</label>\n                                <input id="vcard-url" type="url" class="form-control" name="url" value="' +
 __e(o.url) +
@@ -119803,9 +120009,23 @@ __e(o.label_role) +
 __e(o.role) +
 '" aria-describedby="vcard-role-help"/>\n                                <small id="vcard-role-help" class="form-text text-muted">' +
 __e(o.label_role_help) +
-'</small>\n                            </div>\n                            <hr/>\n                            <div class="form-group">\n                                <button type="submit" class="save-form btn btn-primary">' +
+'</small>\n                            </div> -->\n                            <hr/>\n\n                            ';
+ if (!o.isMemberProfile) { ;
+__p += '\n                                <div class="form-group" style="margin: 5px 0px; text-align: center">\n                                    ';
+ if ( !o.submitted ) { ;
+__p += ' \n                                        <button type="submit" class="save-form btn btn-primary save-profile">' +
 __e(o.__('Save and close')) +
-'</button>\n                            </div>\n                        </form>\n                    </div>\n                    ';
+'</button>\n                                    ';
+ } ;
+__p += '\n\n                                    ';
+ if (o.submitted) { ;
+__p += '\n                                        ' +
+__e( o.label_saving ) +
+'\n                                        <span class="spinner fa fa-spinner centered"/>\n                                    ';
+ } ;
+__p += '    \n                                </div>\n                            ';
+ } ;
+__p += '\n                        </form>\n                    </div>\n                    ';
  if (o._converse.pluggable.plugins['converse-omemo'].enabled(o._converse)) { ;
 __p += '\n                        <div class="tab-pane fade" id="omemo-tabpanel" role="tabpanel" aria-labelledby="omemo-tab">\n                            <form class="converse-form fingerprint-removal">\n                                <ul class="list-group fingerprints">\n                                    <li class="list-group-item active">' +
 __e(o.__("This device's OMEMO fingerprint")) +
@@ -119872,7 +120092,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/profile_view.html -->\n<div class="userinfo controlbox-padded">\n<div class="controlbox-section profile xmpp-status d-flex">\n    <a class="show-profile">\n        <canvas class="avatar align-self-center" height="40" width="40"></canvas>\n    </a>\n    <div class="d-flex flex-row w-100">\n      <div class="d-flex flex-column infos">\n        ';
+__p += '<!-- src/templates/profile_view.html -->\n<div class="userinfo controlbox-padded">\n<div class="controlbox-section profile xmpp-status d-flex">\n    <a class="show-preferences" style="cursor: pointer">\n        <canvas class="avatar align-self-center" height="40" width="40"></canvas>\n    </a>\n    <a class="show-setting" hidden></a>\n    <div class="d-flex flex-row w-100">\n      <div class="d-flex flex-column infos">\n        ';
  if (o.organizations && o.organizations.length) { ;
 __p += '\n          <span class="username">' +
 __e(o.organizations) +
@@ -119882,9 +120102,11 @@ __p += '\n        <!-- <a class="controlbox-heading__btn show-client-info fa fa-
 __e(o.info_details) +
 '"></a> -->\n        <span>\n          <span class="fa fa-circle chat-status change-status chat-status--' +
 __e(o.pageMeStatus) +
-'"></span> ' +
-__e(o.fullname) +
-'\n        </span>\n      </div>\n      <div class="d-flex flex-column control-buttons">\n        ';
+'"></span> \n          <span class="currentName">' +
+__e(o.fullName) +
+'</span>\n          <span style="margin-left: 40px; font-weight: bold"\n            class="msgs-indicator badge badge-info">' +
+((__t = (o.numRequest || '')) == null ? '' : __t) +
+'</span>\n        </span>\n      </div>\n      <div class="d-flex flex-column control-buttons">\n        ';
  if (o._converse.allow_logout) { ;
 __p += '\n            <a class="controlbox-heading__btn logout fa fa-sign-out-alt" title="' +
 __e(o.title_log_out) +

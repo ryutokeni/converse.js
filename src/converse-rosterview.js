@@ -594,7 +594,9 @@ converse.plugins.add('converse-rosterview', {
                 const all_contact_views = this.getAll();
                 _.each(this.model.contacts.models, (contact) => {
                     const contact_view = this.get(contact.get('id'));
-                    contact_view.el.setAttribute('data-group', this.model.get('name'));
+                    if (contact_view) {
+                        contact_view.el.setAttribute('data-group', this.model.get('name'));
+                    }
                     if (_.includes(contacts, contact)) {
                         u.hideElement(contact_view.el);
                     } else if (contact_view.mayBeShown()) {

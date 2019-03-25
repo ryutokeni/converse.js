@@ -59,9 +59,13 @@ const {
   updateContacts,
   updateGroups,
   updateMessageStatus,
+  numberRequestChange,
   allMessageAreLoaded,
   onLogOut,
+  playSound,
   onLoadMessages,
+  onStatusMedicalRequestChanged,
+  onMedicalRequestReceived,
   onOpenModalOptionPicture,
   onOpenCreateGroupModal,
   onOpenPreferencesModal,
@@ -87,7 +91,9 @@ converse.initialize = function (settings, callback) {
   }
   return initialize(settings, callback);
 }
-
+converse.playSound = function () {
+  return playSound();
+}
 converse.updateContacts = function (contacts, group) {
   return updateContacts(contacts, group);
 }
@@ -97,13 +103,21 @@ converse.updateGroups = function (groups) {
 converse.updateMessageStatus = function (jid, messages) {
   return updateMessageStatus(jid, messages);
 }
+converse.numberRequestChange = function (num) {
+  return numberRequestChange(num);
+}
 converse.allMessageAreLoaded = function (jid) {
   return allMessageAreLoaded(jid);
 }
 converse.onLogOut = function (callback) {
   return onLogOut(callback);
 }
-
+converse.onStatusMedicalRequestChanged = function (key, callback) {
+  return onStatusMedicalRequestChanged(key, callback);
+}
+converse.onMedicalRequestReceived = function (key, callback) {
+  return onMedicalRequestReceived(key, callback);
+}
 converse.onLoadMessages = function (callback) {
   return onLoadMessages(callback);
 }
