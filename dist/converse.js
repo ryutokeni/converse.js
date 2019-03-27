@@ -79125,6 +79125,44 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       showProfileMember(ev) {
         if (!this.model.get('avatarUrl')) this.model.set('avatarUrl', `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`);
         this.model.set('isMemberProfile', true);
+
+        if (this.model.get('userName') === _converse.user_settings.jid.split('@')[0]) {
+          this.model.set('isMe', true);
+        } else {
+          let jid = _converse.user_settings.jid.split('@')[0] + _converse.user_settings.domain;
+
+          const iq = $iq({
+            to: jid,
+            type: "get"
+          }).c("query", {
+            "xmlns": "jabber:iq:privacy"
+          });
+          const iqBlockList = $iq({
+            to: jid,
+            type: "get"
+          }).c("query", {
+            "xmlns": "jabber:iq:privacy"
+          }).c("list", {
+            "name": "Block"
+          });
+
+          _converse.api.sendIQ(iq).then(res => {
+            if (res.querySelector('query') && res.querySelector('query').querySelector('list').getAttribute('name') === "Block") {
+              _converse.api.sendIQ(iqBlockList).then(next => {
+                // console.log();
+                next.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
+                  if (item.getAttribute('value') === this.model.get('userName') + _converse.user_settings.domain) {
+                    this.model.set('isBlocked', true);
+                    return;
+                  }
+                });
+              }, err => console.log(err));
+            } else {
+              this.model.set('isBlocked', false);
+            }
+          }, err => console.log(err));
+        }
+
         this.profile_modal = new _converse.ProfileModal({
           model: this.model
         });
@@ -80997,6 +81035,7 @@ __webpack_require__.r(__webpack_exports__);
 
 const _converse$env = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].env,
       Strophe = _converse$env.Strophe,
+      $iq = _converse$env.$iq,
       Backbone = _converse$env.Backbone,
       Promise = _converse$env.Promise,
       utils = _converse$env.utils,
@@ -81017,6 +81056,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
         'change input[type="file"': "updateFilePreview",
         'change select.main-speciality': "updateSubSpeciality",
         'click .change-avatar': "openFileSelection",
+        'click .btn-block-contact': "BlockOrUnBlockContact",
         'submit .profile-form': 'onFormSubmitted'
       },
 
@@ -81071,6 +81111,123 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
           'utils': u,
           'view': this
         }));
+      },
+
+      BlockOrUnBlockContact() {
+        this.el.querySelector('.btn-block-contact').disabled = true;
+
+        let jid = _converse.user_settings.jid.split('@')[0] + _converse.user_settings.domain;
+
+        let iqBlockUser;
+        const iq = $iq({
+          to: jid,
+          type: "get"
+        }).c("query", {
+          "xmlns": "jabber:iq:privacy"
+        });
+        const iqBlockList = $iq({
+          to: jid,
+          type: "get"
+        }).c("query", {
+          "xmlns": "jabber:iq:privacy"
+        }).c("list", {
+          "name": "Block"
+        });
+
+        _converse.api.sendIQ(iq).then(result => {
+          if (result.querySelector('query') && result.querySelector('query').querySelector('list').getAttribute('name') === "Block") {
+            _converse.api.sendIQ(iqBlockList).then(blockList => {
+              //done later
+              let arrayJID = [];
+
+              if (!this.model.get('isBlocked')) {
+                blockList.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
+                  arrayJID.push(item.getAttribute('value'));
+                });
+                arrayJID.push(this.model.get('userName') + _converse.user_settings.domain);
+              } else {
+                blockList.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
+                  if (item.getAttribute('value').split('@')[0] !== this.model.get('userName')) {
+                    arrayJID.push(item.getAttribute('value'));
+                  }
+                });
+              }
+
+              iqBlockUser = $iq({
+                type: "set"
+              }).c("query", {
+                "xmlns": "jabber:iq:privacy"
+              }).c("list", {
+                "name": "Block"
+              });
+              arrayJID.forEach(jid => {
+                iqBlockUser.c("item", {
+                  "xmlns": "jabber:iq:privacy",
+                  "type": "jid",
+                  "value": jid,
+                  "action": "deny",
+                  "order": arrayJID.indexOf(jid)
+                }).c("message");
+
+                if (arrayJID.indexOf(jid) !== arrayJID.length - 1) {
+                  iqBlockUser.up().up();
+                }
+              });
+
+              _converse.api.sendIQ(iqBlockUser).then(res => {
+                const activeBlockList = $iq({
+                  to: jid,
+                  type: "set"
+                }).c("query", {
+                  "xmlns": "jabber:iq:privacy"
+                }).c("active", {
+                  "name": "Block"
+                });
+
+                _converse.api.sendIQ(activeBlockList).then(next => {
+                  _converse.api.sendIQ(iqBlockList).then(fina => {
+                    this.model.set('isBlocked', !this.model.get('isBlocked'));
+                    this.el.querySelector('.btn-block-contact').disabled = false;
+                  }, err => console.log(err));
+                }, err => console.log(err));
+              }, err => console.log(err));
+            }, err => {
+              console.log(err);
+            });
+          } else {
+            iqBlockUser = $iq({
+              type: "set"
+            }).c("query", {
+              "xmlns": "jabber:iq:privacy"
+            }).c("list", {
+              "name": "Block"
+            }).c("item", {
+              "xmlns": "jabber:iq:privacy",
+              "type": "jid",
+              "value": this.model.get('userName') + _converse.user_settings.domain,
+              "action": "deny",
+              "order": "0"
+            }).c("message");
+
+            _converse.api.sendIQ(iqBlockUser).then(res => {
+              const activeBlockList = $iq({
+                to: jid,
+                type: "set"
+              }).c("query", {
+                "xmlns": "jabber:iq:privacy"
+              }).c("active", {
+                "name": "Block"
+              });
+
+              _converse.api.sendIQ(activeBlockList).then(next => {
+                _converse.api.sendIQ(iqBlockList).then(fina => {
+                  this.model.set('isBlocked', !this.model.get('isBlocked'));
+                  this.el.querySelector('.btn-block-contact').disabled = true;
+                }, err => console.log(err));
+              }, err => console.log(err));
+            }, err => console.log(err));
+          }
+        }, err => console.log(err));
       },
 
       afterRender() {
@@ -83370,13 +83527,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
           if (contact_view) {
             contact_view.el.setAttribute('data-group', this.model.get('name'));
-          }
 
-          if (_.includes(contacts, contact)) {
-            u.hideElement(contact_view.el);
-          } else if (contact_view.mayBeShown()) {
-            u.showElement(contact_view.el);
-            shown += 1;
+            if (_.includes(contacts, contact)) {
+              u.hideElement(contact_view.el);
+            } else if (contact_view.mayBeShown()) {
+              u.showElement(contact_view.el);
+              shown += 1;
+            }
           }
         });
 
@@ -84061,7 +84218,9 @@ const initialize = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21_
       onOpenCreateGroupModal = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpenCreateGroupModal,
       onOpenPreferencesModal = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpenPreferencesModal,
       onOpenInviteMemberModal = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpenInviteMemberModal,
+      onReceivedListBlockedUsers = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onReceivedListBlockedUsers,
       onEditUserProfile = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onEditUserProfile,
+      onReceivedUnblockState = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onReceivedUnblockState,
       createNewGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].createNewGroup,
       onLeaveGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onLeaveGroup,
       onShowPageMeMediaViewer = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onShowPageMeMediaViewer,
@@ -84071,7 +84230,9 @@ const initialize = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21_
       sendFileXMPP = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].sendFileXMPP,
       inviteToGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].inviteToGroup,
       onStatusFormSubmitted = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onStatusFormSubmitted,
-      updateProfile = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].updateProfile;
+      updateProfile = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].updateProfile,
+      loadListBlock = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].loadListBlock,
+      UnBlockContact = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].UnBlockContact;
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].initialize = function (settings, callback) {
   if (_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].env._.isArray(settings.whitelisted_plugins)) {
@@ -84081,6 +84242,14 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].initia
   }
 
   return initialize(settings, callback);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].UnBlockContact = function (userId) {
+  return UnBlockContact(userId);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].loadListBlock = function (jid) {
+  return loadListBlock(jid);
 };
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].playSound = function () {
@@ -84137,6 +84306,14 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpen
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onOpenInviteMemberModal = function (callback) {
   return onOpenInviteMemberModal(callback);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onReceivedListBlockedUsers = function (listBlockedUsers, callback) {
+  return onReceivedListBlockedUsers(listBlockedUsers, callback);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onReceivedUnblockState = function (state, callback) {
+  return onReceivedUnblockState(state, callback);
 };
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onEditUserProfile = function (body, avatar, callback) {
@@ -85682,7 +85859,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         // if (type === 'medical_request') {
         //     console.log('this is an medicalRequest message!', message);
         // }
-        const sentDate = message.get('sent');
+        let sentDate = message.get('sent');
+        sentDate = Math.round(sentDate);
         let rawText = '';
 
         switch (type) {
@@ -88556,12 +88734,7 @@ const converse = {
 
       let currentUser = _converse.user_settings.jid.split('@')[0];
 
-      let arrayUser = arrayParticipants.filter(e => e.userName !== currentUser); // console.log(chatbox);
-      // chatbox.save({
-      //     users: arrayUser,
-      //     latestMessageTime: null
-      // })
-
+      let arrayUser = arrayParticipants.filter(e => e.userName !== currentUser);
       return callback(jid);
     });
   },
@@ -88608,21 +88781,112 @@ const converse = {
       }
     };
 
-    xhr.send(json); // let arrayParticipants = participants.map(e => (e.split('@')[0]))
-    // let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => (arrayParticipants.includes(e.userName)))
-    // let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => (arrayParticipants.includes(e.userName)))
-    // let arrayUser = arrayAddressBook.concat(arrayOrganization);
-    // arrayUser = _.uniq(arrayUser);
-    // arrayUser = arrayUser.map(e => {
-    //   e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
-    //   return e;
-    // })
-    // console.log(chatbox);
-    // chatbox.save({
-    //     users: arrayUser,
-    //     latestMessageTime: null
-    // })
-    //    const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
+    xhr.send(json);
+  },
+
+  'onReceivedListBlockedUsers'(listBlockedUsers, callback) {
+    return _converse.on('ListBlockedUsers', listBlockedUsers, callback);
+  },
+
+  'onReceivedUnblockState'(state, callback) {
+    return _converse.on('UnBlockState', state, callback);
+  },
+
+  'UnBlockContact'(userId) {
+    let jId = _converse.user_settings.jid.split('@')[0] + _converse.user_settings.domain;
+
+    const iqBlockList = Object(strophe_js__WEBPACK_IMPORTED_MODULE_0__["$iq"])({
+      to: jId,
+      type: "get"
+    }).c("query", {
+      "xmlns": "jabber:iq:privacy"
+    }).c("list", {
+      "name": "Block"
+    });
+
+    _converse.api.sendIQ(iqBlockList).then(blockList => {
+      let arrayJID = [];
+      blockList.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
+        if (item.getAttribute('value').split('@')[0] !== userId) {
+          arrayJID.push(item.getAttribute('value'));
+        }
+      });
+      const iqBlockUser = Object(strophe_js__WEBPACK_IMPORTED_MODULE_0__["$iq"])({
+        type: "set"
+      }).c("query", {
+        "xmlns": "jabber:iq:privacy"
+      }).c("list", {
+        "name": "Block"
+      });
+      arrayJID.forEach(jid => {
+        iqBlockUser.c("item", {
+          "xmlns": "jabber:iq:privacy",
+          "type": "jid",
+          "value": jid,
+          "action": "deny",
+          "order": arrayJID.indexOf(jid)
+        }).c("message");
+
+        if (arrayJID.indexOf(jid) !== arrayJID.length - 1) {
+          iqBlockUser.up().up();
+        }
+      });
+
+      _converse.api.sendIQ(iqBlockUser).then(res => {
+        const activeBlockList = Object(strophe_js__WEBPACK_IMPORTED_MODULE_0__["$iq"])({
+          to: jId,
+          type: "set"
+        }).c("query", {
+          "xmlns": "jabber:iq:privacy"
+        }).c("active", {
+          "name": "Block"
+        });
+
+        _converse.api.sendIQ(activeBlockList).then(next => {
+          _converse.api.sendIQ(iqBlockList).then(fina => {
+            _converse.emit('UnBlockState', true);
+          }, err => {
+            _converse.emit('UnBlockState', false);
+          });
+        }, err => {
+          _converse.emit('UnBlockState', false);
+        });
+      }, err => {
+        _converse.emit('UnBlockState', false);
+      });
+    }, err => console.log(err));
+  },
+
+  'loadListBlock'(jid) {
+    const iq = Object(strophe_js__WEBPACK_IMPORTED_MODULE_0__["$iq"])({
+      to: jid,
+      type: "get"
+    }).c("query", {
+      "xmlns": "jabber:iq:privacy"
+    });
+    const iqBlockList = Object(strophe_js__WEBPACK_IMPORTED_MODULE_0__["$iq"])({
+      to: jid,
+      type: "get"
+    }).c("query", {
+      "xmlns": "jabber:iq:privacy"
+    }).c("list", {
+      "name": "Block"
+    });
+
+    _converse.api.sendIQ(iq).then(iq => {
+      if (iq.querySelector('query') && iq.querySelector('query').querySelector('list').getAttribute('name') === 'Block') {
+        _converse.api.sendIQ(iqBlockList).then(res => {
+          let arrayItem = [];
+          res.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
+            arrayItem.push(item.getAttribute('value').split('@')[0]);
+          });
+
+          _converse.emit('ListBlockedUsers', arrayItem);
+        }, err => console.log(err));
+      } else {
+        _converse.emit('ListBlockedUsers', []);
+      }
+    }, err => console.log(err));
   },
 
   'inviteToGroup'(jid, participants) {
@@ -119995,7 +120259,13 @@ __e(o.title) +
 __e( o.isMemberProfile ) +
 '"></select>\n                                    <select class="sub-speciality" name="sub-speciality" style="margin: 0 10px" disabled="' +
 __e( o.isMemberProfile ) +
-'"></select>\n                                </div>\n                            </div>\n                            <!-- <div class="form-group">\n                                <label for="vcard-url" class="col-form-label">' +
+'"></select>\n                                </div>\n                            </div>\n                            ';
+ if (!o.isMe) { ;
+__p += '\n                            <div class="form-group text-center">\n                                <button type="button" class="btn btn-primary btn-block-contact">' +
+__e(o.isBlocked? 'Unblock' : 'Block') +
+'</button>\n                            </div>\n                            ';
+ } ;
+__p += '\n                            <!-- <div class="form-group">\n                                <label for="vcard-url" class="col-form-label">' +
 __e(o.label_url) +
 ':</label>\n                                <input id="vcard-url" type="url" class="form-control" name="url" value="' +
 __e(o.url) +
@@ -120147,11 +120417,11 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/recent_messages_item.html -->\n<style>\n  .unread-msgs {\n    font-weight: bold !important;\n    color: #ffffff !important;\n  }\n.badge-info {\n  background-color: #ec5057 !important;\n  border-radius: 10px !important;\n  min-width: 25px !important;\n}\n</style>\n<a style="display:flex !important; justify-content: space-between !important" class="row list-item-link cbox-list-item open-chat w-100 ';
+__p += '<!-- src/templates/recent_messages_item.html -->\n\n<style>\n\n</style>\n<a style="display:flex !important; justify-content: space-between !important;  min-width: 110% !important;  "\n  class="row list-item-link cbox-list-item open-chat w-100 ';
  if (o.num_unread) { ;
 __p += ' unread-msgs ';
  } ;
-__p += '" data-jid="' +
+__p += '"\n  data-jid="' +
 __e(o.jid) +
 '" href="#">\n  <div style="margin-left: 6%;" class="">\n    <span class="chat-status ' +
 __e(o.status_icon) +
@@ -120159,9 +120429,9 @@ __e(o.status_icon) +
 __e(o.name || 'Loading...') +
 '</span>\n  </div>\n  ';
  if (o.num_unread_general || o.num_unread) { ;
-__p += '\n  <div class="msg">\n    <span class="msgs-indicator badge badge-info">' +
+__p += '\n  <div class="msg">\n    <span style=" background-color: #ec5057 !important;  border-radius: 10px !important; min-width: 25px !important;"\n      class="msgs-indicator badge badge-info">' +
 __e( o.type === 'chatbox' ? o.num_unread : o.num_unread_general ) +
-'</span>  \n  </div>\n  ';
+'</span>\n  </div>\n  ';
  } ;
 __p += '\n</a>\n';
 return __p
@@ -120475,7 +120745,7 @@ __p += '<!-- src/templates/room_panel.html -->\n<!-- <div id="chatrooms"> -->\n<
 __e(o.heading_chatrooms) +
 '</span>\n    <!-- <a class="controlbox-heading__btn show-list-muc-modal fa fa-list-ul" title="' +
 __e(o.title_list_rooms) +
-'" data-toggle="modal" data-target="#list-chatrooms-modal"></a> -->\n    <a style="margin-top: 16px !important" class="controlbox-heading__btn show-add-muc-modal align-self-center fa fa-plus" title="' +
+'" data-toggle="modal" data-target="#list-chatrooms-modal"></a> -->\n    <a style="margin-top: 33px !important" class="controlbox-heading__btn show-add-muc-modal align-self-center fa fa-plus" title="' +
 __e(o.title_new_room) +
 '" data-toggle="modal" data-target="#add-chatrooms-modal"></a>\n</div>\n<div class="list-container open-rooms-list rooms-list-container"></div>\n<div class="list-container bookmarks-list rooms-list-container"></div>\n<!-- </div> -->\n';
 return __p

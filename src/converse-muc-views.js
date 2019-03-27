@@ -2181,8 +2181,48 @@ converse.plugins.add('converse-muc-views', {
 
             showProfileMember(ev) {
                 if (!this.model.get('avatarUrl')) this.model.set('avatarUrl', `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`);
-                
-                this.model.set('isMemberProfile', true)
+                this.model.set('isMemberProfile', true);
+                if (this.model.get('userName') === _converse.user_settings.jid.split('@')[0]) {
+                    this.model.set('isMe', true);
+                }
+                else {
+                    let jid = _converse.user_settings.jid.split('@')[0] + _converse.user_settings.domain;
+                    const iq = $iq({
+                    to: jid,
+                    type: "get"
+                    }).c("query", {
+                    "xmlns": "jabber:iq:privacy"
+                    });
+                    const iqBlockList = $iq({
+                    to: jid,
+                    type: "get"
+                    }).c("query", {
+                    "xmlns": "jabber:iq:privacy"
+                    }).c("list", {
+                    "name": "Block"
+                    });
+                    _converse.api.sendIQ(iq).then(
+                    res => {
+                        if (res.querySelector('query') && res.querySelector('query').querySelector('list').getAttribute('name') === "Block") {
+                        _converse.api.sendIQ(iqBlockList).then(
+                                next => {
+                                // console.log();
+                                next.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
+                                    if (item.getAttribute('value') === this.model.get('userName') + _converse.user_settings.domain) {
+                                        this.model.set('isBlocked', true);
+                                        return;
+                                    }
+                                })
+                                },
+                                err => console.log(err)
+                            )
+                        } else {
+                        this.model.set('isBlocked', false)
+                        }
+                    },
+                    err => console.log(err)
+                    )
+                } 
                 this.profile_modal = new _converse.ProfileModal({model: this.model});
                 this.profile_modal.show(ev);
             },

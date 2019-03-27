@@ -596,12 +596,12 @@ converse.plugins.add('converse-rosterview', {
                     const contact_view = this.get(contact.get('id'));
                     if (contact_view) {
                         contact_view.el.setAttribute('data-group', this.model.get('name'));
-                    }
-                    if (_.includes(contacts, contact)) {
-                        u.hideElement(contact_view.el);
-                    } else if (contact_view.mayBeShown()) {
-                        u.showElement(contact_view.el);
-                        shown += 1;
+                        if (_.includes(contacts, contact)) {
+                          u.hideElement(contact_view.el);
+                        } else if (contact_view.mayBeShown()) {
+                          u.showElement(contact_view.el);
+                          shown += 1;
+                        }
                     }
                 });
                 if (shown) {

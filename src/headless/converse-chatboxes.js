@@ -335,7 +335,8 @@ converse.plugins.add('converse-chatboxes', {
                 // if (type === 'medical_request') {
                 //     console.log('this is an medicalRequest message!', message);
                 // }
-                const sentDate = message.get('sent');
+                let sentDate = message.get('sent');
+                sentDate = Math.round(sentDate);
                 let rawText = '';
                 switch (type) {
                   case 'text':
@@ -360,7 +361,6 @@ converse.plugins.add('converse-chatboxes', {
                     .c('sentDate').t(sentDate).up()
                     .c('senderName').t(_converse.user_settings.fullname).up()
                     .c('timeToRead').t(timeToRead).up();
-                    
 
                     if (type === 'file') {
                       stanza.c('itemType').t(message.get('itemType')).up()

@@ -1784,11 +1784,6 @@ const converse = {
         let arrayParticipants =  chatbox.get('users');
         let currentUser = _converse.user_settings.jid.split('@')[0];
         let arrayUser = arrayParticipants.filter(e => (e.userName !== currentUser))
-       // console.log(chatbox);
-        // chatbox.save({
-        //     users: arrayUser,
-        //     latestMessageTime: null
-        // })
           return callback(jid)
       });
     },
@@ -1830,23 +1825,120 @@ const converse = {
            }
          }
          xhr.send(json);
+    },
+    'onReceivedListBlockedUsers'(listBlockedUsers, callback) {
+    return _converse.on('ListBlockedUsers', listBlockedUsers, callback);
+    },
+    'onReceivedUnblockState'(state, callback) {
+      return _converse.on('UnBlockState', state, callback);
+    },
+    'UnBlockContact' (userId) {
+        let jId = _converse.user_settings.jid.split('@')[0] + _converse.user_settings.domain;
+        const iqBlockList = $iq({
+        to: jId,
+        type: "get"
+        }).c("query", {
+        "xmlns": "jabber:iq:privacy"
+        }).c("list", {
+        "name": "Block"
+        });
+        _converse.api.sendIQ(iqBlockList).then(
+            blockList => {
+                let arrayJID = [];
+                blockList.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
+                    if (item.getAttribute('value').split('@')[0] !== userId) {
+                        arrayJID.push(item.getAttribute('value'));
+                    }
+                });
+                const iqBlockUser = $iq({
+                  type: "set"
+                }).c("query", {
+                  "xmlns": "jabber:iq:privacy"
+                }).c("list", {
+                  "name": "Block"
+                })
+                arrayJID.forEach(jid => {
+                  iqBlockUser.c("item", {
+                    "xmlns": "jabber:iq:privacy",
+                    "type": "jid",
+                    "value": jid,
+                    "action": "deny",
+                    "order": arrayJID.indexOf(jid)
+                  }).c("message");
+                  if (arrayJID.indexOf(jid) !== arrayJID.length - 1) {
+                    iqBlockUser.up().up();
+                  }
+                });
 
-        // let arrayParticipants = participants.map(e => (e.split('@')[0]))
-        // let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => (arrayParticipants.includes(e.userName)))
-        // let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => (arrayParticipants.includes(e.userName)))
-        // let arrayUser = arrayAddressBook.concat(arrayOrganization);
-        // arrayUser = _.uniq(arrayUser);
-        // arrayUser = arrayUser.map(e => {
-        //   e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
-        //   return e;
-        // })
-
-        // console.log(chatbox);
-        // chatbox.save({
-        //     users: arrayUser,
-        //     latestMessageTime: null
-        // })
-    //    const newChatRoom =  _converse.api.rooms.open(jid, attrs, participants);
+                _converse.api.sendIQ(iqBlockUser).then(
+                  res => {
+                    const activeBlockList = $iq({
+                      to: jId,
+                      type: "set"
+                    }).c("query", {
+                      "xmlns": "jabber:iq:privacy"
+                    }).c("active", {
+                      "name": "Block"
+                    });
+                    _converse.api.sendIQ(activeBlockList).then(
+                      next => {
+                        _converse.api.sendIQ(iqBlockList).then(
+                            fina => {
+                                _converse.emit('UnBlockState', true);
+                            },
+                            err => {
+                                _converse.emit('UnBlockState', false)
+                            }
+                        )
+                      },
+                        err => {
+                            _converse.emit('UnBlockState', false)
+                        }
+                    )
+                  },
+                    err => {
+                    _converse.emit('UnBlockState', false)
+                    }
+                )
+            },
+            err => console.log(err)
+        )
+    },
+    'loadListBlock' (jid) {
+        const iq = $iq({
+          to: jid,
+          type: "get"
+        }).c("query", {
+          "xmlns": "jabber:iq:privacy"
+        })
+        const iqBlockList = $iq({
+          to: jid,
+          type: "get"
+        }).c("query", {
+          "xmlns": "jabber:iq:privacy"
+        }).c("list", {
+            "name": "Block"
+        })
+        _converse.api.sendIQ(iq).then(
+            iq => {
+                if (iq.querySelector('query') && iq.querySelector('query').querySelector('list').getAttribute('name') === 'Block') {
+                    _converse.api.sendIQ(iqBlockList).then(
+                        res => {
+                            let arrayItem = [];
+                            res.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
+                                arrayItem.push(item.getAttribute('value').split('@')[0]);
+                            });
+                            _converse.emit('ListBlockedUsers', arrayItem);
+                        },
+                        err => console.log(err)
+                    )
+                }
+                else {
+                    _converse.emit('ListBlockedUsers', []);
+                }
+            },
+            err => console.log(err)
+        )
     },
     'inviteToGroup' (jid, participants) {
         const chatbox = _converse.chatboxes.findWhere({'jid': jid});

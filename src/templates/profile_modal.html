@@ -54,6 +54,11 @@
                                     <select class="sub-speciality" name="sub-speciality" style="margin: 0 10px" disabled="{{{ o.isMemberProfile }}}"></select>
                                 </div>
                             </div>
+                            {[ if (!o.isMe) { ]}
+                            <div class="form-group text-center">
+                                <button type="button" class="btn btn-primary btn-block-contact">{{{o.isBlocked? 'Unblock' : 'Block'}}}</button>
+                            </div>
+                            {[ } ]}
                             <!-- <div class="form-group">
                                 <label for="vcard-url" class="col-form-label">{{{o.label_url}}}:</label>
                                 <input id="vcard-url" type="url" class="form-control" name="url" value="{{{o.url}}}"/>

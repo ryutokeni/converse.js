@@ -18,7 +18,7 @@ import tpl_profile_view from "templates/profile_view.html";
 import tpl_status_option from "templates/status_option.html";
 
 
-const { Strophe, Backbone, Promise, utils, _, moment } = converse.env;
+const { Strophe, $iq,  Backbone, Promise, utils, _, moment } = converse.env;
 const u = converse.env.utils;
 
 
@@ -38,6 +38,7 @@ converse.plugins.add('converse-profile', {
                 'change input[type="file"': "updateFilePreview",
                 'change select.main-speciality': "updateSubSpeciality",
                 'click .change-avatar': "openFileSelection",
+                'click .btn-block-contact': "BlockOrUnBlockContact",
                 'submit .profile-form': 'onFormSubmitted'
             },
 
@@ -91,7 +92,140 @@ converse.plugins.add('converse-profile', {
                     'view': this
                 }));
             },
+            BlockOrUnBlockContact() {
+                this.el.querySelector('.btn-block-contact').disabled = true;
+                let jid = _converse.user_settings.jid.split('@')[0] + _converse.user_settings.domain;
+                let iqBlockUser;
+                 const iq = $iq({
+                    to: jid,
+                    type: "get"
+                    }).c("query", {
+                    "xmlns": "jabber:iq:privacy"
+                });
+                const iqBlockList = $iq({
+                    to: jid,
+                    type: "get"
+                }).c("query", {
+                    "xmlns": "jabber:iq:privacy"
+                }).c("list", {
+                    "name": "Block"
+                });
+              
+                _converse.api.sendIQ(iq)
+                .then(
+                    result => {
+                    if (result.querySelector('query') && result.querySelector('query').querySelector('list').getAttribute('name') === "Block") {
+                        _converse.api.sendIQ(iqBlockList).then(
+                        blockList => {
+                            //done later
+                            let arrayJID = [];
+                            if (!this.model.get('isBlocked')) {
+                            blockList.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
+                                arrayJID.push(item.getAttribute('value'));
+                            })
+                            arrayJID.push(this.model.get('userName') + _converse.user_settings.domain);
+                            } else {
+                            blockList.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
+                                if (item.getAttribute('value').split('@')[0] !== this.model.get('userName') ) {
+                                arrayJID.push(item.getAttribute('value'));
+                                }
+                            })
+                            }
+                        
+                        iqBlockUser = $iq({
+                            type: "set"
+                        }).c("query" , {
+                            "xmlns" : "jabber:iq:privacy"
+                        }).c("list", {"name":"Block"})
+                        arrayJID.forEach(jid => {
+                            iqBlockUser.c("item", {
+                                "xmlns": "jabber:iq:privacy",
+                                "type": "jid",
+                                "value": jid,
+                                "action": "deny",
+                                "order": arrayJID.indexOf(jid)
+                                }).c("message");
+                                if (arrayJID.indexOf(jid) !== arrayJID.length - 1) {
+                                    iqBlockUser.up().up();
+                                }
+                        });
 
+                        _converse.api.sendIQ(iqBlockUser).then(
+                        res => {
+                            const activeBlockList = $iq({
+                            to: jid,
+                            type: "set"
+                            }).c("query", {
+                            "xmlns": "jabber:iq:privacy"
+                            }).c("active", {
+                            "name": "Block"
+                            });
+                            _converse.api.sendIQ(activeBlockList).then(
+                            next => {
+                                _converse.api.sendIQ(iqBlockList).then(
+                                fina => {
+                                    this.model.set('isBlocked', !this.model.get('isBlocked'));
+                                    this.el.querySelector('.btn-block-contact').disabled = false;
+
+                                },
+                                err => console.log(err)
+                                )
+                            },
+                            err => console.log(err)
+                            )
+                        },
+                        err => console.log(err)
+                        )
+                        },
+                        err => {
+                            console.log(err);
+                        }
+                    )
+                    } else {
+                        iqBlockUser = $iq({
+                        type: "set"
+                        }).c("query", {
+                        "xmlns": "jabber:iq:privacy"
+                        }).c("list", {
+                        "name": "Block"
+                        }).c("item", {
+                        "xmlns": "jabber:iq:privacy",
+                        "type": "jid",
+                        "value": this.model.get('userName') + _converse.user_settings.domain,
+                        "action": "deny",
+                        "order": "0"
+                        }).c("message");
+                        _converse.api.sendIQ(iqBlockUser).then(
+                        res => {
+                            const activeBlockList = $iq({
+                            to: jid,
+                            type: "set"
+                            }).c("query", {
+                            "xmlns": "jabber:iq:privacy"
+                            }).c("active", {
+                            "name": "Block"
+                            });
+                            _converse.api.sendIQ(activeBlockList).then(
+                            next => {
+                                _converse.api.sendIQ(iqBlockList).then(
+                                fina => {
+                                this.model.set('isBlocked', !this.model.get('isBlocked'));
+                                this.el.querySelector('.btn-block-contact').disabled = true;
+                                },
+                                err => console.log(err)
+                                )
+                            },
+                            err => console.log(err)
+                            )
+                        },
+                        err => console.log(err)
+                        )
+                    }
+                    },
+                    err => console.log(err)
+                )
+               
+            },
             afterRender () {
                 this.tabs = _.map(this.el.querySelectorAll('.nav-item'), (tab) => new bootstrap.Tab(tab));
                 var mainSpecialityDOM = this.el.querySelectorAll('.main-speciality')[0];

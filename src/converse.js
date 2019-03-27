@@ -70,7 +70,9 @@ const {
   onOpenCreateGroupModal,
   onOpenPreferencesModal,
   onOpenInviteMemberModal,
+  onReceivedListBlockedUsers,
   onEditUserProfile,
+  onReceivedUnblockState,
   createNewGroup,
   onLeaveGroup,
   onShowPageMeMediaViewer,
@@ -80,7 +82,9 @@ const {
   sendFileXMPP,
   inviteToGroup,
   onStatusFormSubmitted,
-  updateProfile
+  updateProfile,
+  loadListBlock,
+  UnBlockContact,
 } = converse;
 
 converse.initialize = function (settings, callback) {
@@ -90,6 +94,13 @@ converse.initialize = function (settings, callback) {
       settings.whitelisted_plugins = WHITELISTED_PLUGINS;
   }
   return initialize(settings, callback);
+}
+
+converse.UnBlockContact = function (userId) {
+  return UnBlockContact(userId);
+}
+converse.loadListBlock = function (jid) {
+  return loadListBlock(jid);
 }
 converse.playSound = function () {
   return playSound();
@@ -135,6 +146,12 @@ converse.onOpenPreferencesModal = function (callback) {
 
 converse.onOpenInviteMemberModal = function (callback) {
   return onOpenInviteMemberModal(callback);
+}
+converse.onReceivedListBlockedUsers = function (listBlockedUsers, callback) {
+  return onReceivedListBlockedUsers(listBlockedUsers, callback);
+}
+converse.onReceivedUnblockState = function (state, callback) {
+  return onReceivedUnblockState(state, callback);
 }
 
 converse.onEditUserProfile = function (body, avatar, callback) {

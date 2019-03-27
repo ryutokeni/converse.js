@@ -1,22 +1,18 @@
+
 <style>
-  .unread-msgs {
-    font-weight: bold !important;
-    color: #ffffff !important;
-  }
-.badge-info {
-  background-color: #ec5057 !important;
-  border-radius: 10px !important;
-  min-width: 25px !important;
-}
+
 </style>
-<a style="display:flex !important; justify-content: space-between !important" class="row list-item-link cbox-list-item open-chat w-100 {[ if (o.num_unread) { ]} unread-msgs {[ } ]}" data-jid="{{{o.jid}}}" href="#">
+<a style="display:flex !important; justify-content: space-between !important;  min-width: 110% !important;  "
+  class="row list-item-link cbox-list-item open-chat w-100 {[ if (o.num_unread) { ]} unread-msgs {[ } ]}"
+  data-jid="{{{o.jid}}}" href="#">
   <div style="margin-left: 6%;" class="">
     <span class="chat-status {{{o.status_icon}}}"></span>
     <span class="contact-name">{{{o.name || 'Loading...'}}}</span>
   </div>
   {[ if (o.num_unread_general || o.num_unread) { ]}
   <div class="msg">
-    <span class="msgs-indicator badge badge-info">{{{ o.type === 'chatbox' ? o.num_unread : o.num_unread_general }}}</span>  
+    <span style=" background-color: #ec5057 !important;  border-radius: 10px !important; min-width: 25px !important;"
+      class="msgs-indicator badge badge-info">{{{ o.type === 'chatbox' ? o.num_unread : o.num_unread_general }}}</span>
   </div>
   {[ } ]}
 </a>
