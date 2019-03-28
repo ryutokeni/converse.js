@@ -72476,6 +72476,7 @@ const uk = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["defaul
 const _converse$env = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].env,
       $msg = _converse$env.$msg,
       Backbone = _converse$env.Backbone,
+      $iq = _converse$env.$iq,
       Promise = _converse$env.Promise,
       Strophe = _converse$env.Strophe,
       _ = _converse$env._,
@@ -72609,6 +72610,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
     });
     _converse.ChatBoxHeading = _converse.ViewWithAvatar.extend({
+      events: {
+        'click .avatar': 'showProfileMember'
+      },
+
       initialize() {
         this.model.on('change:status', this.onStatusMessageChanged, this);
         this.model.on('change:pageMeStatus', this.render, this);
@@ -72618,6 +72623,86 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         _converse.on('StatusChatChanged', data => {
           this.model.set('pageMeStatus', data.status);
         });
+      },
+
+      showProfileMember(ev) {
+        this.model.set('avatarUrl', `${_converse.user_settings.avatarUrl}${this.model.get('user_id')}`);
+        this.model.set('fullName', this.model.get('name'));
+
+        if (!this.model.get('title')) {
+          const that = this;
+          var ping = {
+            userName: `${this.model.get('user_id')}`
+          };
+          var json = JSON.stringify(ping);
+          var url = `${_converse.user_settings.baseUrl}/userProfile`;
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", url, false);
+          xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+          xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+
+          xhr.onload = function () {
+            // Call a function when the state changes.
+            if (xhr.status >= 200 && xhr.status < 400) {
+              // Request finished. Do processing here.
+              const res = JSON.parse(xhr.responseText);
+
+              if (res.response) {
+                that.model.set('title', res.response.title);
+              } else {
+                console.log('nothing here');
+              }
+            } else {
+              xhr.onerror();
+            }
+          };
+
+          xhr.send(json);
+        }
+
+        this.model.set('isMemberProfile', true);
+
+        if (this.model.get('user_id') === _converse.user_settings.jid.split('@')[0]) {
+          this.model.set('isMe', true);
+        } else {
+          let jid = _converse.user_settings.jid.split('@')[0] + _converse.user_settings.domain;
+
+          const iq = $iq({
+            to: jid,
+            type: "get"
+          }).c("query", {
+            "xmlns": "jabber:iq:privacy"
+          });
+          const iqBlockList = $iq({
+            to: jid,
+            type: "get"
+          }).c("query", {
+            "xmlns": "jabber:iq:privacy"
+          }).c("list", {
+            "name": "Block"
+          });
+
+          _converse.api.sendIQ(iq).then(res => {
+            if (res.querySelector('query') && res.querySelector('query').querySelector('list') && res.querySelector('query').querySelector('list').getAttribute('name') === "Block") {
+              _converse.api.sendIQ(iqBlockList).then(next => {
+                const temp = _.filter(next.querySelector('query').querySelector('list').querySelectorAll('item'), item => item.getAttribute('value') === this.model.get('user_id') + _converse.user_settings.domain);
+
+                if (temp.length > 0) {
+                  this.model.set('isBlocked', true);
+                } else {
+                  this.model.set('isBlocked', false);
+                }
+              }, err => console.log(err));
+            } else {
+              this.model.set('isBlocked', false);
+            }
+          }, err => console.log(err));
+        }
+
+        this.profile_modal = new _converse.ProfileModal({
+          model: this.model
+        });
+        this.profile_modal.show(ev);
       },
 
       render() {
@@ -79123,6 +79208,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       tagName: 'li',
 
       showProfileMember(ev) {
+        // console.log(this.model);
         if (!this.model.get('avatarUrl')) this.model.set('avatarUrl', `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`);
         this.model.set('isMemberProfile', true);
 
@@ -79147,15 +79233,15 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
           });
 
           _converse.api.sendIQ(iq).then(res => {
-            if (res.querySelector('query') && res.querySelector('query').querySelector('list').getAttribute('name') === "Block") {
+            if (res.querySelector('query') && res.querySelector('query').querySelector('list') && res.querySelector('query').querySelector('list').getAttribute('name') === "Block") {
               _converse.api.sendIQ(iqBlockList).then(next => {
-                // console.log();
-                next.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
-                  if (item.getAttribute('value') === this.model.get('userName') + _converse.user_settings.domain) {
-                    this.model.set('isBlocked', true);
-                    return;
-                  }
-                });
+                const temp = _.filter(next.querySelector('query').querySelector('list').querySelectorAll('item'), item => item.getAttribute('value') === this.model.get('userName') + _converse.user_settings.domain);
+
+                if (temp.length > 0) {
+                  this.model.set('isBlocked', true);
+                } else {
+                  this.model.set('isBlocked', false);
+                }
               }, err => console.log(err));
             } else {
               this.model.set('isBlocked', false);
@@ -81135,7 +81221,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
         });
 
         _converse.api.sendIQ(iq).then(result => {
-          if (result.querySelector('query') && result.querySelector('query').querySelector('list').getAttribute('name') === "Block") {
+          if (result.querySelector('query') && result.querySelector('query').querySelector('list') && result.querySelector('query').querySelector('list').getAttribute('name') === "Block") {
             _converse.api.sendIQ(iqBlockList).then(blockList => {
               //done later
               let arrayJID = [];
@@ -81144,11 +81230,17 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
                 blockList.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
                   arrayJID.push(item.getAttribute('value'));
                 });
-                arrayJID.push(this.model.get('userName') + _converse.user_settings.domain);
+                arrayJID.push((this.model.get('userName') || this.model.get('user_id')) + _converse.user_settings.domain);
               } else {
                 blockList.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
-                  if (item.getAttribute('value').split('@')[0] !== this.model.get('userName')) {
-                    arrayJID.push(item.getAttribute('value'));
+                  if (this.model.get('userName')) {
+                    if (item.getAttribute('value').split('@')[0] !== this.model.get('userName')) {
+                      arrayJID.push(item.getAttribute('value'));
+                    }
+                  } else {
+                    if (item.getAttribute('value').split('@')[0] !== this.model.get('user_id')) {
+                      arrayJID.push(item.getAttribute('value'));
+                    }
                   }
                 });
               }
@@ -81188,11 +81280,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
                   _converse.api.sendIQ(iqBlockList).then(fina => {
                     this.model.set('isBlocked', !this.model.get('isBlocked'));
                     this.el.querySelector('.btn-block-contact').disabled = false;
-                  }, err => console.log(err));
-                }, err => console.log(err));
-              }, err => console.log(err));
+                  }, err => this.el.querySelector('.btn-block-contact').disabled = false);
+                }, err => {
+                  this.el.querySelector('.btn-block-contact').disabled = false;
+                });
+              }, err => this.el.querySelector('.btn-block-contact').disabled = false);
             }, err => {
-              console.log(err);
+              this.el.querySelector('.btn-block-contact').disabled = false;
             });
           } else {
             iqBlockUser = $iq({
@@ -81204,7 +81298,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
             }).c("item", {
               "xmlns": "jabber:iq:privacy",
               "type": "jid",
-              "value": this.model.get('userName') + _converse.user_settings.domain,
+              "value": (this.model.get('userName') || this.model.get('user_id')) + _converse.user_settings.domain,
               "action": "deny",
               "order": "0"
             }).c("message");
@@ -88874,7 +88968,7 @@ const converse = {
     });
 
     _converse.api.sendIQ(iq).then(iq => {
-      if (iq.querySelector('query') && iq.querySelector('query').querySelector('list').getAttribute('name') === 'Block') {
+      if (iq.querySelector('query') && iq.querySelector('query').querySelector('list') && iq.querySelector('query').querySelector('list').getAttribute('name') === 'Block') {
         _converse.api.sendIQ(iqBlockList).then(res => {
           let arrayItem = [];
           res.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
@@ -118033,7 +118127,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
                 };
 
                 xhr.send(json);
-              } else {}
+              }
             } else {
               // let name;
               // data.chatbox.get('jid').includes('conference') ? name = data.chatbox.get('subject').text : name = data.chatbox.get('name') || 'PARIS'

@@ -28,7 +28,7 @@ import tpl_user_details_modal from "templates/user_details_modal.html";
 import u from "@converse/headless/utils/emoji";
 import xss from "xss";
 const uk = converse.env.utils;
-const { $msg, Backbone, Promise, Strophe, _, b64_sha1, f, sizzle, moment } = converse.env;
+const { $msg, Backbone,$iq, Promise, Strophe, _, b64_sha1, f, sizzle, moment } = converse.env;
 
 
 converse.plugins.add('converse-chatview', {
@@ -160,6 +160,9 @@ converse.plugins.add('converse-chatview', {
 
 
         _converse.ChatBoxHeading = _converse.ViewWithAvatar.extend({
+            events: {
+              'click .avatar': 'showProfileMember'
+            },
             initialize () {
                 this.model.on('change:status', this.onStatusMessageChanged, this);
                 this.model.on('change:pageMeStatus', this.render, this);
@@ -169,7 +172,81 @@ converse.plugins.add('converse-chatview', {
                     this.model.set('pageMeStatus', data.status)
                 })
             },
+            showProfileMember(ev) {
+                this.model.set('avatarUrl', `${_converse.user_settings.avatarUrl}${this.model.get('user_id')}`);
+                this.model.set('fullName', this.model.get('name'));
+                if (!this.model.get('title')) {
+                    const that = this;
+                     var ping = {
+                       userName: `${this.model.get('user_id')}`
+                     };
+                     var json = JSON.stringify(ping);
+                     var url = `${_converse.user_settings.baseUrl}/userProfile`
+                     var xhr = new XMLHttpRequest();
+                     xhr.open("POST", url, false);
+                     xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+                     xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+                     xhr.onload = function () { // Call a function when the state changes.
+                       if (xhr.status >= 200 && xhr.status < 400) {
+                         // Request finished. Do processing here.
+                         const res = JSON.parse(xhr.responseText);
+                         if (res.response) {
+                            that.model.set('title', res.response.title)
+                         } else {
+                           console.log('nothing here');
+                         }
+                       } else {
+                         xhr.onerror();
+                       }
+                     }
+                     xhr.send(json);
+                }
 
+                this.model.set('isMemberProfile', true);
+                if (this.model.get('user_id') === _converse.user_settings.jid.split('@')[0]) {
+                  this.model.set('isMe', true);
+                } else {
+                  let jid = _converse.user_settings.jid.split('@')[0] + _converse.user_settings.domain;
+                  const iq = $iq({
+                    to: jid,
+                    type: "get"
+                  }).c("query", {
+                    "xmlns": "jabber:iq:privacy"
+                  });
+                  const iqBlockList = $iq({
+                    to: jid,
+                    type: "get"
+                  }).c("query", {
+                    "xmlns": "jabber:iq:privacy"
+                  }).c("list", {
+                    "name": "Block"
+                  });
+                  _converse.api.sendIQ(iq).then(
+                    res => {
+                      if (res.querySelector('query') && res.querySelector('query').querySelector('list') &&  res.querySelector('query').querySelector('list').getAttribute('name') === "Block") {
+                        _converse.api.sendIQ(iqBlockList).then(
+                          next => {
+                            const temp = _.filter(next.querySelector('query').querySelector('list').querySelectorAll('item'), item => (item.getAttribute('value') === this.model.get('user_id') + _converse.user_settings.domain));
+                            if (temp.length > 0) {
+                              this.model.set('isBlocked', true);
+                            } else {
+                              this.model.set('isBlocked', false);
+                            }
+                          },
+                          err => console.log(err)
+                        )
+                      } else {
+                        this.model.set('isBlocked', false)
+                      }
+                    },
+                    err => console.log(err)
+                  )
+                }
+                this.profile_modal = new _converse.ProfileModal({
+                  model: this.model
+                });
+                this.profile_modal.show(ev);
+            },
             render () {
                 this.el.innerHTML = tpl_chatbox_head(
                     _.extend(

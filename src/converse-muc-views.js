@@ -2180,6 +2180,7 @@ converse.plugins.add('converse-muc-views', {
             tagName: 'li',
 
             showProfileMember(ev) {
+                // console.log(this.model);
                 if (!this.model.get('avatarUrl')) this.model.set('avatarUrl', `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`);
                 this.model.set('isMemberProfile', true);
                 if (this.model.get('userName') === _converse.user_settings.jid.split('@')[0]) {
@@ -2203,16 +2204,16 @@ converse.plugins.add('converse-muc-views', {
                     });
                     _converse.api.sendIQ(iq).then(
                     res => {
-                        if (res.querySelector('query') && res.querySelector('query').querySelector('list').getAttribute('name') === "Block") {
+                        if (res.querySelector('query') && res.querySelector('query').querySelector('list') && res.querySelector('query').querySelector('list').getAttribute('name') === "Block") {
                         _converse.api.sendIQ(iqBlockList).then(
                                 next => {
-                                // console.log();
-                                next.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
-                                    if (item.getAttribute('value') === this.model.get('userName') + _converse.user_settings.domain) {
-                                        this.model.set('isBlocked', true);
-                                        return;
-                                    }
-                                })
+                                const temp = _.filter(next.querySelector('query').querySelector('list').querySelectorAll('item'), item => (item.getAttribute('value') === this.model.get('userName') + _converse.user_settings.domain));
+                                if (temp.length > 0) {
+                                    this.model.set('isBlocked', true);
+                                }
+                                else {
+                                    this.model.set('isBlocked', false);
+                                }
                                 },
                                 err => console.log(err)
                             )

@@ -1827,10 +1827,10 @@ const converse = {
          xhr.send(json);
     },
     'onReceivedListBlockedUsers'(listBlockedUsers, callback) {
-    return _converse.on('ListBlockedUsers', listBlockedUsers, callback);
+        return _converse.on('ListBlockedUsers', listBlockedUsers, callback);
     },
     'onReceivedUnblockState'(state, callback) {
-      return _converse.on('UnBlockState', state, callback);
+        return _converse.on('UnBlockState', state, callback);
     },
     'UnBlockContact' (userId) {
         let jId = _converse.user_settings.jid.split('@')[0] + _converse.user_settings.domain;
@@ -1921,7 +1921,7 @@ const converse = {
         })
         _converse.api.sendIQ(iq).then(
             iq => {
-                if (iq.querySelector('query') && iq.querySelector('query').querySelector('list').getAttribute('name') === 'Block') {
+                if (iq.querySelector('query') && iq.querySelector('query').querySelector('list') && iq.querySelector('query').querySelector('list').getAttribute('name') === 'Block') {
                     _converse.api.sendIQ(iqBlockList).then(
                         res => {
                             let arrayItem = [];

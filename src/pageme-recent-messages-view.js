@@ -226,8 +226,7 @@ converse.plugins.add('pageme-recent-messages-view', {
                         }
                       }
                       xhr.send(json);
-                    } else {
-                    }
+                    } 
                   } else {
                     // let name;
                     // data.chatbox.get('jid').includes('conference') ? name = data.chatbox.get('subject').text : name = data.chatbox.get('name') || 'PARIS'

@@ -114,51 +114,62 @@ converse.plugins.add('converse-profile', {
                 _converse.api.sendIQ(iq)
                 .then(
                     result => {
-                    if (result.querySelector('query') && result.querySelector('query').querySelector('list').getAttribute('name') === "Block") {
+                    if (result.querySelector('query') && result.querySelector('query').querySelector('list') && result.querySelector('query').querySelector('list').getAttribute('name') === "Block") {
                         _converse.api.sendIQ(iqBlockList).then(
                         blockList => {
                             //done later
                             let arrayJID = [];
                             if (!this.model.get('isBlocked')) {
-                            blockList.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
-                                arrayJID.push(item.getAttribute('value'));
-                            })
-                            arrayJID.push(this.model.get('userName') + _converse.user_settings.domain);
+                                blockList.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
+                                    arrayJID.push(item.getAttribute('value'));
+                                })
+                                arrayJID.push(  (this.model.get('userName') || this.model.get('user_id')) + _converse.user_settings.domain);
                             } else {
-                            blockList.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
-                                if (item.getAttribute('value').split('@')[0] !== this.model.get('userName') ) {
-                                arrayJID.push(item.getAttribute('value'));
-                                }
-                            })
+                                blockList.querySelector('query').querySelector('list').querySelectorAll('item').forEach(item => {
+                                    if (this.model.get('userName')) {
+                                        if (item.getAttribute('value').split('@')[0] !== this.model.get('userName')) {
+                                            arrayJID.push(item.getAttribute('value'));
+                                        }
+                                    }
+                                    else {
+                                        if (item.getAttribute('value').split('@')[0] !== this.model.get('user_id')) {
+                                            arrayJID.push(item.getAttribute('value'));
+                                        }
+                                    }
+                                   
+                                })
                             }
-                        
-                        iqBlockUser = $iq({
-                            type: "set"
-                        }).c("query" , {
-                            "xmlns" : "jabber:iq:privacy"
-                        }).c("list", {"name":"Block"})
-                        arrayJID.forEach(jid => {
-                            iqBlockUser.c("item", {
-                                "xmlns": "jabber:iq:privacy",
-                                "type": "jid",
-                                "value": jid,
-                                "action": "deny",
-                                "order": arrayJID.indexOf(jid)
+                      
+                                iqBlockUser = $iq({
+                                    type: "set"
+                                    }).c("query", {
+                                    "xmlns": "jabber:iq:privacy"
+                                    }).c("list", {
+                                    "name": "Block"
+                                })
+                                arrayJID.forEach(jid => {
+                                iqBlockUser.c("item", {
+                                    "xmlns": "jabber:iq:privacy",
+                                    "type": "jid",
+                                    "value": jid,
+                                    "action": "deny",
+                                    "order": arrayJID.indexOf(jid)
                                 }).c("message");
                                 if (arrayJID.indexOf(jid) !== arrayJID.length - 1) {
                                     iqBlockUser.up().up();
                                 }
-                        });
+                                });
+                        
 
                         _converse.api.sendIQ(iqBlockUser).then(
                         res => {
                             const activeBlockList = $iq({
-                            to: jid,
-                            type: "set"
-                            }).c("query", {
-                            "xmlns": "jabber:iq:privacy"
-                            }).c("active", {
-                            "name": "Block"
+                                to: jid,
+                                type: "set"
+                                }).c("query", {
+                                "xmlns": "jabber:iq:privacy"
+                                }).c("active", {
+                                "name": "Block"
                             });
                             _converse.api.sendIQ(activeBlockList).then(
                             next => {
@@ -166,19 +177,20 @@ converse.plugins.add('converse-profile', {
                                 fina => {
                                     this.model.set('isBlocked', !this.model.get('isBlocked'));
                                     this.el.querySelector('.btn-block-contact').disabled = false;
-
                                 },
-                                err => console.log(err)
+                                err => this.el.querySelector('.btn-block-contact').disabled = false
                                 )
                             },
-                            err => console.log(err)
+                            err => {
+                                this.el.querySelector('.btn-block-contact').disabled = false;
+                            }
                             )
                         },
-                        err => console.log(err)
+                        err => this.el.querySelector('.btn-block-contact').disabled = false
                         )
                         },
                         err => {
-                            console.log(err);
+                            this.el.querySelector('.btn-block-contact').disabled = false
                         }
                     )
                     } else {
@@ -191,7 +203,7 @@ converse.plugins.add('converse-profile', {
                         }).c("item", {
                         "xmlns": "jabber:iq:privacy",
                         "type": "jid",
-                        "value": this.model.get('userName') + _converse.user_settings.domain,
+                        "value": (this.model.get('userName') || this.model.get('user_id')) + _converse.user_settings.domain,
                         "action": "deny",
                         "order": "0"
                         }).c("message");
