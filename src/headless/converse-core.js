@@ -1850,6 +1850,24 @@ const converse = {
                         arrayJID.push(item.getAttribute('value'));
                     }
                 });
+                if (arrayJID.length === 0) {
+                     const removeBlockUser = $iq({
+                       type: "set"
+                     }).c("query", {
+                       "xmlns": "jabber:iq:privacy"
+                     }).c("list", {
+                       "name": "Block"
+                     })
+                     _converse.api.sendIQ(removeBlockUser).then(
+                       res => {
+                        _converse.emit('UnBlockState', true);
+                        // this.model.set('isBlocked', !this.model.get('isBlocked'));
+                    //  this.el.querySelector('.btn-block-contact').disabled = false;
+                       },
+                       err => _converse.emit('UnBlockState', false)
+                     )
+                     return;
+                }
                 const iqBlockUser = $iq({
                   type: "set"
                 }).c("query", {

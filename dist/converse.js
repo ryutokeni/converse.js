@@ -81245,26 +81245,43 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
                 });
               }
 
-              iqBlockUser = $iq({
-                type: "set"
-              }).c("query", {
-                "xmlns": "jabber:iq:privacy"
-              }).c("list", {
-                "name": "Block"
-              });
-              arrayJID.forEach(jid => {
-                iqBlockUser.c("item", {
-                  "xmlns": "jabber:iq:privacy",
-                  "type": "jid",
-                  "value": jid,
-                  "action": "deny",
-                  "order": arrayJID.indexOf(jid)
-                }).c("message");
+              if (arrayJID.length > 0) {
+                iqBlockUser = $iq({
+                  type: "set"
+                }).c("query", {
+                  "xmlns": "jabber:iq:privacy"
+                }).c("list", {
+                  "name": "Block"
+                });
+                arrayJID.forEach(jid => {
+                  iqBlockUser.c("item", {
+                    "xmlns": "jabber:iq:privacy",
+                    "type": "jid",
+                    "value": jid,
+                    "action": "deny",
+                    "order": arrayJID.indexOf(jid)
+                  }).c("message");
 
-                if (arrayJID.indexOf(jid) !== arrayJID.length - 1) {
-                  iqBlockUser.up().up();
-                }
-              });
+                  if (arrayJID.indexOf(jid) !== arrayJID.length - 1) {
+                    iqBlockUser.up().up();
+                  }
+                });
+              } else {
+                const removeBlockUser = $iq({
+                  type: "set"
+                }).c("query", {
+                  "xmlns": "jabber:iq:privacy"
+                }).c("list", {
+                  "name": "Block"
+                });
+
+                _converse.api.sendIQ(removeBlockUser).then(res => {
+                  this.model.set('isBlocked', !this.model.get('isBlocked'));
+                  this.el.querySelector('.btn-block-contact').disabled = false;
+                }, err => this.el.querySelector('.btn-block-contact').disabled = false);
+
+                return;
+              }
 
               _converse.api.sendIQ(iqBlockUser).then(res => {
                 const activeBlockList = $iq({
@@ -81316,7 +81333,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
               _converse.api.sendIQ(activeBlockList).then(next => {
                 _converse.api.sendIQ(iqBlockList).then(fina => {
                   this.model.set('isBlocked', !this.model.get('isBlocked'));
-                  this.el.querySelector('.btn-block-contact').disabled = true;
+                  this.el.querySelector('.btn-block-contact').disabled = false;
                 }, err => console.log(err));
               }, err => console.log(err));
             }, err => console.log(err));
@@ -88905,6 +88922,25 @@ const converse = {
           arrayJID.push(item.getAttribute('value'));
         }
       });
+
+      if (arrayJID.length === 0) {
+        const removeBlockUser = Object(strophe_js__WEBPACK_IMPORTED_MODULE_0__["$iq"])({
+          type: "set"
+        }).c("query", {
+          "xmlns": "jabber:iq:privacy"
+        }).c("list", {
+          "name": "Block"
+        });
+
+        _converse.api.sendIQ(removeBlockUser).then(res => {
+          _converse.emit('UnBlockState', true); // this.model.set('isBlocked', !this.model.get('isBlocked'));
+          //  this.el.querySelector('.btn-block-contact').disabled = false;
+
+        }, err => _converse.emit('UnBlockState', false));
+
+        return;
+      }
+
       const iqBlockUser = Object(strophe_js__WEBPACK_IMPORTED_MODULE_0__["$iq"])({
         type: "set"
       }).c("query", {

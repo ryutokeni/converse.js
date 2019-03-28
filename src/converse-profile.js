@@ -139,7 +139,7 @@ converse.plugins.add('converse-profile', {
                                    
                                 })
                             }
-                      
+                            if (arrayJID.length > 0) {
                                 iqBlockUser = $iq({
                                     type: "set"
                                     }).c("query", {
@@ -148,18 +148,35 @@ converse.plugins.add('converse-profile', {
                                     "name": "Block"
                                 })
                                 arrayJID.forEach(jid => {
-                                iqBlockUser.c("item", {
-                                    "xmlns": "jabber:iq:privacy",
-                                    "type": "jid",
-                                    "value": jid,
-                                    "action": "deny",
-                                    "order": arrayJID.indexOf(jid)
-                                }).c("message");
-                                if (arrayJID.indexOf(jid) !== arrayJID.length - 1) {
-                                    iqBlockUser.up().up();
-                                }
+                                    iqBlockUser.c("item", {
+                                        "xmlns": "jabber:iq:privacy",
+                                        "type": "jid",
+                                        "value": jid,
+                                        "action": "deny",
+                                        "order": arrayJID.indexOf(jid)
+                                    }).c("message");
+                                    if (arrayJID.indexOf(jid) !== arrayJID.length - 1) {
+                                        iqBlockUser.up().up();
+                                    }
                                 });
-                        
+                            }
+                            else {
+                                const removeBlockUser = $iq({
+                                    type: "set"
+                                }).c("query", {
+                                    "xmlns" : "jabber:iq:privacy"
+                                }).c("list", {
+                                    "name" : "Block"
+                                })
+                                _converse.api.sendIQ(removeBlockUser).then(
+                                    res => {
+                                        this.model.set('isBlocked', !this.model.get('isBlocked'));
+                                        this.el.querySelector('.btn-block-contact').disabled = false;
+                                    },
+                                    err => this.el.querySelector('.btn-block-contact').disabled = false
+                                )
+                                return;
+                            }
 
                         _converse.api.sendIQ(iqBlockUser).then(
                         res => {
@@ -221,8 +238,8 @@ converse.plugins.add('converse-profile', {
                             next => {
                                 _converse.api.sendIQ(iqBlockList).then(
                                 fina => {
-                                this.model.set('isBlocked', !this.model.get('isBlocked'));
-                                this.el.querySelector('.btn-block-contact').disabled = true;
+                                    this.model.set('isBlocked', !this.model.get('isBlocked'));
+                                    this.el.querySelector('.btn-block-contact').disabled = false;
                                 },
                                 err => console.log(err)
                                 )
