@@ -79505,6 +79505,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
     /* The initialize function gets called as soon as the plugin is
      * loaded by converse.js's plugin machinery.
      */
+    let state = false;
     const _converse = this._converse;
     const __ = _converse.__;
     _converse.supports_html5_notification = "Notification" in window;
@@ -79751,6 +79752,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       /* Event handler for the on('message') event. Will call methods
        * to play sounds and show HTML5 notifications.
        */
+      if (state) {
+        return;
+      }
+
       const message = data.stanza;
 
       if (data.silent) {
@@ -79806,6 +79811,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       // We only register event handlers after all plugins are
       // registered, because other plugins might override some of our
       // handlers.
+      _converse.on('disabledNotification', isDisabled => {
+        state = isDisabled;
+      });
+
       _converse.on('contactRequest', _converse.handleContactRequestNotification);
 
       _converse.on('contactPresenceChanged', _converse.handleChatStateNotification);
@@ -84343,7 +84352,8 @@ const initialize = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21_
       onStatusFormSubmitted = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onStatusFormSubmitted,
       updateProfile = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].updateProfile,
       loadListBlock = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].loadListBlock,
-      UnBlockContact = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].UnBlockContact;
+      UnBlockContact = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].UnBlockContact,
+      disabledNotification = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].disabledNotification;
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].initialize = function (settings, callback) {
   if (_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].env._.isArray(settings.whitelisted_plugins)) {
@@ -84369,6 +84379,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].playSo
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].updateContacts = function (contacts, group) {
   return updateContacts(contacts, group);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].disabledNotification = function (state) {
+  return disabledNotification(state);
 };
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].updateGroups = function (groups) {
@@ -88848,6 +88862,10 @@ const converse = {
       let arrayUser = arrayParticipants.filter(e => e.userName !== currentUser);
       return callback(jid);
     });
+  },
+
+  'disabledNotification'(state) {
+    _converse.emit('disabledNotification', state);
   },
 
   'createNewGroup'(jid, attrs, participants) {

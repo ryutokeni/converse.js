@@ -85,6 +85,7 @@ const {
   updateProfile,
   loadListBlock,
   UnBlockContact,
+  disabledNotification,
 } = converse;
 
 converse.initialize = function (settings, callback) {
@@ -107,6 +108,9 @@ converse.playSound = function () {
 }
 converse.updateContacts = function (contacts, group) {
   return updateContacts(contacts, group);
+}
+converse.disabledNotification = function (state) {
+  return disabledNotification(state);
 }
 converse.updateGroups = function (groups) {
   return updateGroups(groups);

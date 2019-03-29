@@ -1787,6 +1787,9 @@ const converse = {
           return callback(jid)
       });
     },
+    'disabledNotification' (state) {
+        _converse.emit('disabledNotification', state);
+    },
     'createNewGroup' (jid, attrs, participants) {
         _converse.api.rooms.open(jid, attrs, participants);
          jid = jid.toLowerCase();

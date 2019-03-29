@@ -19,9 +19,9 @@ converse.plugins.add('converse-notification', {
         /* The initialize function gets called as soon as the plugin is
          * loaded by converse.js's plugin machinery.
          */
+        let state = false;
         const { _converse } = this;
         const { __ } = _converse;
-
         _converse.supports_html5_notification = "Notification" in window;
 
         _converse.api.settings.update({
@@ -267,6 +267,10 @@ converse.plugins.add('converse-notification', {
             /* Event handler for the on('message') event. Will call methods
              * to play sounds and show HTML5 notifications.
              */
+            
+            if (state) {
+                return;
+            }
             const message = data.stanza;
             if (data.silent) {
               return;
@@ -319,9 +323,12 @@ converse.plugins.add('converse-notification', {
             // We only register event handlers after all plugins are
             // registered, because other plugins might override some of our
             // handlers.
+            _converse.on('disabledNotification', isDisabled => {
+                state = isDisabled;
+            })
             _converse.on('contactRequest',  _converse.handleContactRequestNotification);
             _converse.on('contactPresenceChanged',  _converse.handleChatStateNotification);
-            _converse.on('message',  _converse.handleMessageNotification);
+            _converse.on('message', _converse.handleMessageNotification);
             _converse.on('feedback', _converse.handleFeedback);
             _converse.on('connected', _converse.requestPermission);
         });
