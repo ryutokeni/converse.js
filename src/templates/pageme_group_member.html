@@ -9,11 +9,14 @@
     <div class="row no-gutters">
         <div class="col occupant-nick-badge" style="display: flex; justify-content: flex-start; align-items: center;
          border-bottom: 1px solid #B3B3B5; padding-bottom: 5px;">
-            <span class="avatar" style=" width: 30px !important; height: 30px !important">
-                <img src="{{{o.avatarUrl}}}" onerror="this.src='./assets/appIcon.png'" alt="">
+            <span class="avatar" style=" width: 40px !important; height: 40px !important; border-radius: 50% !important; text-align: center;
+            background-image: url('{{{o.avatarUrl}}}');
+            background-size: cover;
+            background-position: top center;">
+                <img src="{{{o.avatarUrl}}}" onerror="this.src='./assets/appIcon.png'" alt="" style="display: none">
             </span>
-            <span style="display: flex !important;justify-content: center !important;align-items: center !important"
-            class="fa fa-circle chat-status change-status chat-status--{{{o.status}}}"></span>
+            <!-- <span style="display: flex !important;justify-content: center !important;align-items: center !important"
+            class="fa fa-circle chat-status change-status chat-status--{{{o.status}}}"></span> -->
             <span class="info-member" style="display: flex; flex-direction: column; padding-left: 10px;">
                 <span style=" font-weight: bold; font-size: 18px;" class="occupant-nick">{{{(o.fullName || o.nick) }}}</span>
                 <i  class="">{{{o.title}}}</i>

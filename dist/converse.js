@@ -120249,11 +120249,13 @@ module.exports = function(o) {
 var __t, __p = '', __e = _.escape;
 __p += '<!-- src/templates/pageme_group_member.html -->\n<style>\n@media only screen and (max-width: 1540px) {\n    .info-member {\n        padding-left: 0px !important;\n    }\n}\n</style>\n<li class="occupant" id="' +
 __e( o.id ) +
-'">\n    <div class="row no-gutters">\n        <div class="col occupant-nick-badge" style="display: flex; justify-content: flex-start; align-items: center;\n         border-bottom: 1px solid #B3B3B5; padding-bottom: 5px;">\n            <span class="avatar" style=" width: 30px !important; height: 30px !important">\n                <img src="' +
+'">\n    <div class="row no-gutters">\n        <div class="col occupant-nick-badge" style="display: flex; justify-content: flex-start; align-items: center;\n         border-bottom: 1px solid #B3B3B5; padding-bottom: 5px;">\n            <span class="avatar" style=" width: 40px !important; height: 40px !important; border-radius: 50% !important; text-align: center;\n            background-image: url(\'' +
 __e(o.avatarUrl) +
-'" onerror="this.src=\'./assets/appIcon.png\'" alt="">\n            </span>\n            <span style="display: flex !important;justify-content: center !important;align-items: center !important"\n            class="fa fa-circle chat-status change-status chat-status--' +
+'\');\n            background-size: cover;\n            background-position: top center;">\n                <img src="' +
+__e(o.avatarUrl) +
+'" onerror="this.src=\'./assets/appIcon.png\'" alt="" style="display: none">\n            </span>\n            <!-- <span style="display: flex !important;justify-content: center !important;align-items: center !important"\n            class="fa fa-circle chat-status change-status chat-status--' +
 __e(o.status) +
-'"></span>\n            <span class="info-member" style="display: flex; flex-direction: column; padding-left: 10px;">\n                <span style=" font-weight: bold; font-size: 18px;" class="occupant-nick">' +
+'"></span> -->\n            <span class="info-member" style="display: flex; flex-direction: column; padding-left: 10px;">\n                <span style=" font-weight: bold; font-size: 18px;" class="occupant-nick">' +
 __e((o.fullName || o.nick) ) +
 '</span>\n                <i  class="">' +
 __e(o.title) +
@@ -120492,7 +120494,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/profile_view.html -->\n<div class="userinfo controlbox-padded">\n<div class="controlbox-section profile xmpp-status d-flex">\n    <a class="show-preferences" style="cursor: pointer">\n        <canvas class="avatar align-self-center" height="40" width="40"></canvas>\n    </a>\n    <a class="show-setting" hidden></a>\n    <div class="d-flex flex-row w-100">\n      <div class="d-flex flex-column infos">\n        ';
+__p += '<!-- src/templates/profile_view.html -->\n<div class="userinfo controlbox-padded">\n<div class="controlbox-section profile xmpp-status d-flex">\n    <a class="show-preferences" style="cursor: pointer; text-align: center">\n        <canvas class="avatar align-self-center" height="40" width="40"></canvas>\n    </a>\n    <a class="show-setting" hidden></a>\n    <div class="d-flex flex-row w-100">\n      <div class="d-flex flex-column infos">\n        ';
  if (o.organizations && o.organizations.length) { ;
 __p += '\n          <span class="username">' +
 __e(o.organizations) +
