@@ -118378,7 +118378,7 @@ __e(o.width) +
 __e(o.height) +
 'px">\n  <img src="' +
 __e(o.image) +
-'" onerror="this.src=\'./assets/appIcon.png\'" alt="">\n</div>\n';
+'" style="width:100%" onerror="this.src=\'./assets/appIcon.png\'" alt="">\n</div>\n';
 return __p
 };
 
