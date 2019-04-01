@@ -79811,7 +79811,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       // We only register event handlers after all plugins are
       // registered, because other plugins might override some of our
       // handlers.
-      _converse.on('disabledNotification', isDisabled => {
+      _converse.on('disabledNotificationFromCore', isDisabled => {
         state = isDisabled;
       });
 
@@ -81538,13 +81538,18 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
       },
 
       initialize() {
+        // _converse.emit('profileModalReadyToListen');
         this.model.on("change", this.render, this);
-        this.model.vcard.on("change", this.render, this);
+        this.model.vcard.on("change", this.render, this); // console.log('profile Modal initialized!!');
 
         _converse.on('numRequestChange', num => {
           this.model.save({
             'numRequest': num
           });
+        });
+
+        _converse.on("disabledNotificationFromCore", state => {
+          this.model.set("stateNotification", state);
         });
       },
 
@@ -88847,25 +88852,21 @@ const converse = {
 
   'onLeaveGroup'(callback) {
     return _converse.on('leavePageMeGroup', jid => {
-      jid = jid.toLowerCase();
+      jid = jid.toLowerCase(); // const chatbox = _converse.chatboxes.getChatBox(jid, {
+      //   type: _converse.CHATROOMS_TYPE,
+      //   id: jid,
+      //   box_id: b64_sha1(jid)
+      // }, true)
+      // let arrayParticipants =  chatbox.get('users');
+      // let currentUser = _converse.user_settings.jid.split('@')[0];
+      // let arrayUser = arrayParticipants.filter(e => (e.userName !== currentUser))
 
-      const chatbox = _converse.chatboxes.getChatBox(jid, {
-        type: _converse.CHATROOMS_TYPE,
-        id: jid,
-        box_id: b64_sha1(jid)
-      }, true);
-
-      let arrayParticipants = chatbox.get('users');
-
-      let currentUser = _converse.user_settings.jid.split('@')[0];
-
-      let arrayUser = arrayParticipants.filter(e => e.userName !== currentUser);
       return callback(jid);
     });
   },
 
   'disabledNotification'(state) {
-    _converse.emit('disabledNotification', state);
+    return _converse.emit('disabledNotificationFromCore', state);
   },
 
   'createNewGroup'(jid, attrs, participants) {
@@ -120524,9 +120525,13 @@ __e(o.info_details) +
 __e(o.pageMeStatus) +
 '"></span> \n          <span class="currentName">' +
 __e(o.fullName) +
-'</span>\n          <span style="margin-left: 40px; font-weight: bold"\n            class="msgs-indicator badge badge-info">' +
+'</span>\n          <span style="margin-left: 15px; font-weight: bold; color: red; background-color: #fff; border-radius: 50%; min-width: 22px" class="msgs-indicator badge badge-info">' +
 ((__t = (o.numRequest || '')) == null ? '' : __t) +
-'</span>\n        </span>\n      </div>\n      <div class="d-flex flex-column control-buttons">\n        ';
+'</span>\n          ';
+ if (o.stateNotification) { ;
+__p += '\n          <span style="margin-left: 10px;"><i style="color: red; font-weight: bold; font-size: 15px" class="fas fa-bell-slash"></i></span>\n          ';
+ } ;
+__p += '\n        </span>\n      </div>\n      <div class="d-flex flex-column control-buttons">\n        ';
  if (o._converse.allow_logout) { ;
 __p += '\n            <a class="controlbox-heading__btn logout fa fa-sign-out-alt" title="' +
 __e(o.title_log_out) +

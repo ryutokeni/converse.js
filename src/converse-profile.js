@@ -458,14 +458,19 @@ converse.plugins.add('converse-profile', {
             },
 
             initialize () {
+                // _converse.emit('profileModalReadyToListen');
                 this.model.on("change", this.render, this);
                 this.model.vcard.on("change", this.render, this);
+                // console.log('profile Modal initialized!!');
+                
                 _converse.on('numRequestChange', (num) => {
                     this.model.save({
                         'numRequest': num
                     })
                 })
-                
+                _converse.on("disabledNotificationFromCore", state => {
+                  this.model.set("stateNotification", state);
+                })
             },
 
             toHTML () {

@@ -323,7 +323,7 @@ converse.plugins.add('converse-notification', {
             // We only register event handlers after all plugins are
             // registered, because other plugins might override some of our
             // handlers.
-            _converse.on('disabledNotification', isDisabled => {
+            _converse.on('disabledNotificationFromCore', isDisabled => {
                 state = isDisabled;
             })
             _converse.on('contactRequest',  _converse.handleContactRequestNotification);

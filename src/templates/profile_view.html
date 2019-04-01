@@ -13,8 +13,10 @@
         <span>
           <span class="fa fa-circle chat-status change-status chat-status--{{{o.pageMeStatus}}}"></span> 
           <span class="currentName">{{{o.fullName}}}</span>
-          <span style="margin-left: 40px; font-weight: bold"
-            class="msgs-indicator badge badge-info">{{o.numRequest || ''}}</span>
+          <span style="margin-left: 15px; font-weight: bold; color: red; background-color: #fff; border-radius: 50%; min-width: 22px" class="msgs-indicator badge badge-info">{{o.numRequest || ''}}</span>
+          {[ if (o.stateNotification) { ]}
+          <span style="margin-left: 10px;"><i style="color: red; font-weight: bold; font-size: 15px" class="fas fa-bell-slash"></i></span>
+          {[ } ]}
         </span>
       </div>
       <div class="d-flex flex-column control-buttons">

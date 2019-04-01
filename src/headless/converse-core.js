@@ -1776,19 +1776,19 @@ const converse = {
     'onLeaveGroup' (callback) {
       return _converse.on('leavePageMeGroup', (jid) => {
         jid = jid.toLowerCase();
-        const chatbox = _converse.chatboxes.getChatBox(jid, {
-          type: _converse.CHATROOMS_TYPE,
-          id: jid,
-          box_id: b64_sha1(jid)
-        }, true)
-        let arrayParticipants =  chatbox.get('users');
-        let currentUser = _converse.user_settings.jid.split('@')[0];
-        let arrayUser = arrayParticipants.filter(e => (e.userName !== currentUser))
+        // const chatbox = _converse.chatboxes.getChatBox(jid, {
+        //   type: _converse.CHATROOMS_TYPE,
+        //   id: jid,
+        //   box_id: b64_sha1(jid)
+        // }, true)
+        // let arrayParticipants =  chatbox.get('users');
+        // let currentUser = _converse.user_settings.jid.split('@')[0];
+        // let arrayUser = arrayParticipants.filter(e => (e.userName !== currentUser))
           return callback(jid)
       });
     },
     'disabledNotification' (state) {
-        _converse.emit('disabledNotification', state);
+        return _converse.emit('disabledNotificationFromCore', state);
     },
     'createNewGroup' (jid, attrs, participants) {
         _converse.api.rooms.open(jid, attrs, participants);
