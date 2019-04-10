@@ -76,6 +76,7 @@ const {
   createNewGroup,
   onLeaveGroup,
   onShowPageMeMediaViewer,
+  onShowPageMeFormConfirmDownload,
   onShowPageMeMedicalRequest,
   onUploadFiles,
   onMedicalReqButtonClicked,
@@ -164,6 +165,9 @@ converse.onEditUserProfile = function (body, avatar, callback) {
 
 converse.onShowPageMeMediaViewer = function (callback) {
   return onShowPageMeMediaViewer(callback);
+}
+converse.onShowPageMeFormConfirmDownload = function (callback) {
+  return onShowPageMeFormConfirmDownload(callback);
 }
 
 converse.onShowPageMeMedicalRequest = function (callback) {

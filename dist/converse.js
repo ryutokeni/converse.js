@@ -72949,13 +72949,20 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         this.markScrolled = _.debounce(this._markScrolled, 100);
         this.show = _.debounce(this._show, 250, {
           'leading': true
-        }); // this.model.save({
+        });
+
+        if (localStorage.getItem('isOrganizationJoined') !== 'true' || localStorage.getItem('isPurchasedMedicalRequest') !== 'true') {
+          this.model.set('permission', false);
+        } else {
+          this.model.set('permission', true);
+        } // this.model.save({
         //     num_unread: this.model.messages.models.filter(e => (!e.get('silent') && e.get('sender') === 'them') && !e.get('received')).length,
         //     num_unread_general: 1
         // })
         // _converse.on('clearAllUnreadMessage', model => {
         //   if ()
         // })
+
       },
 
       ShowModalOptionPicture() {
@@ -75640,7 +75647,8 @@ const _converse$env = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_
       Backbone = _converse$env.Backbone,
       Strophe = _converse$env.Strophe,
       _ = _converse$env._,
-      moment = _converse$env.moment;
+      moment = _converse$env.moment,
+      b64_sha1 = _converse$env.b64_sha1;
 const medReqLabel = {
   wait4Appro: 'Waiting for Approval',
   wait4UrAppro: 'Waiting for Your Approval',
@@ -75714,7 +75722,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       events: {
         'click .chat-msg__edit-modal': 'showMessageVersionsModal',
         'click .pageme-media': 'showPageMeMediaViewer',
-        'click .pageme-medical-request': 'showPageMeMedicalRequest'
+        'click .pageme-medical-request': 'showPageMeMedicalRequest',
+        'click .download-image': 'showConfirmDownloadImage'
       },
 
       defaults() {
@@ -75740,8 +75749,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         this.model.on('change', this.onChanged, this);
         this.model.on('destroy', this.remove, this);
         this.model.on('change:senderName', this.render, this);
-
-        _converse.on('rerenderMessage', this.render, this);
       },
 
       async render(force) {
@@ -75866,7 +75873,11 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         })));
 
         if (mediaId) {
-          msg.querySelector('.chat-msg__media').innerHTML = _.flow(_.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderPageMeMedia, _converse, this.model.get('itemType')))(mediaId);
+          if (localStorage.getItem('isOrganizationJoined') === 'true' || localStorage.getItem('isPurchasedMedicalRequest') === 'true') {
+            msg.querySelector('.chat-msg__media').innerHTML = _.flow(_.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderPageMeMedia, _converse, this.model.get('itemType'), this.model.get('sender'), true))(mediaId);
+          } else {
+            msg.querySelector('.chat-msg__media').innerHTML = _.flow(_.partial(_converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderPageMeMedia, _converse, this.model.get('itemType'), this.model.get('sender'), false))(mediaId);
+          }
         }
 
         if (medialRequestKey) {
@@ -75922,6 +75933,16 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           }
 
           this.width = this.height = 60;
+
+          if (this.model.get('type') === 'groupchat' && this.model.get('sender') === 'them') {
+            if (this.model.get('senderJid')) {
+              //if it comes from webapp, jid can get by call attribute 'senderJid'
+              this.image = _converse.user_settings.avatarUrl + this.model.get('senderJid');
+            } else {
+              //if it comes from mobile, jid can get by split the attribute 'from'
+              this.image = _converse.user_settings.avatarUrl + this.model.get('from').split('/')[1].split('@')[0];
+            }
+          }
 
           _converse.api.listen.on('updateProfile', data => {
             if (data.avatarUrl.includes(jid)) {
@@ -76019,6 +76040,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         this.renderAvatar();
       },
 
+      showConfirmDownloadImage(event) {
+        // event.preventDefault();
+        event.stopPropagation();
+
+        _converse.emit('showPageMeFormConfirmDownload', event.target.id);
+      },
+
       showPageMeMediaViewer(ev) {
         ev.preventDefault();
 
@@ -76026,8 +76054,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       },
 
       showPageMeMedicalRequest(ev) {
-        ev.preventDefault();
-
         _converse.emit('showPageMeMedicalRequest', ev.target.id);
       },
 
@@ -78192,6 +78218,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         // processing inside a view is a "code smell".
         // Instead stanza processing should happen inside the
         // models/collections.
+        // console.log(pres);
         if (pres.getAttribute('type') === 'error') {
           this.showErrorMessageFromPresence(pres);
         } else {
@@ -81595,6 +81622,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
       },
 
       showStatusChangeModal(ev) {
+        if (localStorage.getItem('isOrganizationJoined') !== 'true') {
+          return;
+        }
+
         if (!_.isUndefined(this.status_modal)) {
           this.status_modal.remove();
         }
@@ -84349,6 +84380,7 @@ const initialize = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21_
       createNewGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].createNewGroup,
       onLeaveGroup = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onLeaveGroup,
       onShowPageMeMediaViewer = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onShowPageMeMediaViewer,
+      onShowPageMeFormConfirmDownload = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onShowPageMeFormConfirmDownload,
       onShowPageMeMedicalRequest = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onShowPageMeMedicalRequest,
       onUploadFiles = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onUploadFiles,
       onMedicalReqButtonClicked = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onMedicalReqButtonClicked,
@@ -84452,6 +84484,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onEdit
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onShowPageMeMediaViewer = function (callback) {
   return onShowPageMeMediaViewer(callback);
+};
+
+_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onShowPageMeFormConfirmDownload = function (callback) {
+  return onShowPageMeFormConfirmDownload(callback);
 };
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].onShowPageMeMedicalRequest = function (callback) {
@@ -85986,9 +86022,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
          *  Parameters:
          *    (Object) message - The Backbone.Model representing the message
          */
-        // if (type === 'medical_request') {
-        //     console.log('this is an medicalRequest message!', message);
-        // }
         let sentDate = message.get('sent');
         sentDate = Math.round(sentDate);
         let rawText = '';
@@ -86012,10 +86045,11 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
 
         body = body || '';
         const stanza = $msg({
+          // 'from': _converse.connection.jid.split('/')[0],
           'from': _converse.connection.jid,
           'to': this.get('jid'),
           'type': this.get('message_type'),
-          'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid')
+          'id': message.get('msgid')
         }).c('body').t(body).up().c(_converse.ACTIVE, {
           'xmlns': Strophe.NS.CHATSTATES
         }).up();
@@ -86023,7 +86057,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         if (message.get('type') === 'chat' || message.get('type') === 'groupchat') {
           stanza.c('data', {
             'xmlns': 'pageMe.message.data'
-          }).c('sentDate').t(sentDate).up().c('senderName').t(_converse.user_settings.fullname).up().c('timeToRead').t(timeToRead).up();
+          }).c('sentDate').t(sentDate).up().c('senderName').t(_converse.user_settings.fullname).up().c('timeToRead').t(timeToRead).up().c('senderJid').t(_converse.connection.jid.split('@')[0]).up(); //we set the jid of sender to stanza so we can get it later to render avatar
 
           if (type === 'file') {
             stanza.c('itemType').t(message.get('itemType')).up().c('mediaId').t(message.get('mediaId')).up().c('fileSize').t(message.get('fileSize')).up();
@@ -86328,6 +86362,12 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         if (attrs.type === 'groupchat') {
           attrs.from = stanza.getAttribute('from');
           attrs.nick = Strophe.unescapeNode(Strophe.getResourceFromJid(attrs.from));
+
+          if (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid')) {
+            //if it has senderId, create attrs SenderJid for load avatar in chatview
+            attrs.senderJid = stanza.querySelector('data').querySelector('senderJid').innerHTML;
+          }
+
           attrs.sender = attrs.nick === this.get('nick') ? 'me' : 'them';
         } else {
           attrs.from = Strophe.getBareJidFromJid(stanza.getAttribute('from'));
@@ -89059,11 +89099,14 @@ const converse = {
       e['joinedDate'] = moment__WEBPACK_IMPORTED_MODULE_7___default()(e['joinedDate'], 'YYYYMMDDHHmmssZ');
       return e;
     });
-    console.log(arrayUser);
     chatbox.save({
       users: arrayUser,
       latestMessageTime: null
     });
+  },
+
+  'onShowPageMeFormConfirmDownload'(callback) {
+    _converse.on('showPageMeFormConfirmDownload', callback);
   },
 
   'onShowPageMeMediaViewer'(callback) {
@@ -91253,6 +91296,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           'is_spoiler': is_spoiler,
           'message': text ? _utils_form__WEBPACK_IMPORTED_MODULE_7__["default"].httpToGeoUri(_utils_form__WEBPACK_IMPORTED_MODULE_7__["default"].shortnameToUnicode(text), _converse) : undefined,
           'nick': this.get('nick'),
+          // 'senderJid': _converse.connection.jid.split('@')[0],
           'references': references,
           'sender': 'me',
           'spoiler_hint': is_spoiler ? spoiler_hint : undefined,
@@ -91931,10 +91975,11 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
         if (this.isDuplicate(stanza)) {
           return;
-        }
+        } // const jid = stanza.getAttribute('from'),
 
-        const jid = stanza.getAttribute('from'),
-              resource = Strophe.getResourceFromJid(jid),
+
+        const jid = stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid') ? stanza.querySelector('data').querySelector('senderJid').innerHTML : stanza.getAttribute('from'),
+              resource = stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid') ? jid : Strophe.getResourceFromJid(jid),
               sender = resource && Strophe.unescapeNode(resource) || '';
 
         if (!this.handleMessageCorrection(stanza)) {
@@ -120084,7 +120129,7 @@ __p += '\n                <div class="chat-msg__text';
  if (o.is_spoiler) { ;
 __p += ' spoiler collapsed';
  } ;
-__p += '"><!-- message gets added here via renderMessage --></div>\n                <div class="chat-msg__media"></div>\n                <div class="chat-msg__medical_request"></div>\n\n                <span class="chat-msg__count_down">time here</span>\n            ';
+__p += '"><!-- message gets added here via renderMessage --></div>\n                <div class="chat-msg__media" style="display: flex"></div>\n                <div class="chat-msg__medical_request"></div>\n\n                <span class="chat-msg__count_down">time here</span>\n            ';
  if (!o.is_me_message) { ;
 __p += '</div>';
  } ;
@@ -120293,14 +120338,23 @@ return __p
 
 var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./node_modules/lodash/escape.js")};
 module.exports = function(o) {
-var __t, __p = '', __e = _.escape;
+var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
 __p += '<!-- src/templates/pageme_media.html -->\n<span id="' +
 __e(o.mediaId) +
 '#pageme#' +
 __e(o.type) +
-'" class="pageme-media pageme-' +
+'"  class="pageme-media pageme-' +
 __e(o.type) +
-'">&nbsp;</span>\n';
+'"></span>\n';
+ if (o.type === 'image' && o.sender === 'me' && o.permission) { ;
+__p += '\n<span style="align-self: flex-end; margin-left: 10px;">\n  <i id="' +
+__e(o.mediaId) +
+'#pageme#' +
+__e(o.type) +
+'"\n    style="align-self: flex-end;font-size: 20px;margin-bottom: 8px; cursor: pointer"\n    class="fas fa-cloud-download-alt download-image" aria-hidden="true"></i>\n</span>\n';
+ } ;
+__p += '\n';
 return __p
 };
 
@@ -121375,7 +121429,11 @@ __e(o.label_file_upload) +
 if (o.from_groupChat) {;
 __p += '\n      ';
  } else { ;
-__p += '\n      <div>\n        <div class="dropdown-divider"></div>\n        <span class="group-item-name"><b>Extensions:</b></span>\n        <div class="group-item">\n          <div style="padding: 0px 20px 0px 20px;" class="group">\n            <span class="toolbox-item toolbox-medical-request toggle-medical-requests"></span>\n            <h5 class="text-center" style="font-family: sans-serif;">Medical Request</h5>\n          </div>\n        </div>\n      </div>\n      ';
+__p += '\n      <div>\n        <div class="dropdown-divider"></div>\n        <span class="group-item-name"><b>Extensions:</b></span>\n        <div class="group-item">\n           ';
+ if (o.permission) { ;
+__p += '\n            <div style="padding: 0px 20px 0px 20px;" class="group">\n              <span class="toolbox-item toolbox-medical-request toggle-medical-requests"></span>\n              <h5 class="text-center" style="font-family: sans-serif;">Medical Request</h5>\n            </div>\n           ';
+ } ;
+__p += '\n        </div>\n      </div>\n      ';
 };
 __p += '\n      \n    </div>\n  </li>\n';
  } else { ;
@@ -121839,11 +121897,13 @@ _headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].renderAudioURL = f
   return url;
 };
 
-_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].renderPageMeMedia = function (_converse, type, mediaId) {
+_headless_utils_core__WEBPACK_IMPORTED_MODULE_18__["default"].renderPageMeMedia = function (_converse, type, sender, permission, mediaId) {
   const __ = _converse.__;
   return _templates_pageme_media_html__WEBPACK_IMPORTED_MODULE_16___default()({
     'type': type,
-    'mediaId': mediaId
+    'mediaId': mediaId,
+    'sender': sender,
+    'permission': permission
   });
 };
 

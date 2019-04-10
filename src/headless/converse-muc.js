@@ -412,6 +412,7 @@ converse.plugins.add('converse-muc', {
                     'is_spoiler': is_spoiler,
                     'message': text ? u.httpToGeoUri(u.shortnameToUnicode(text), _converse) : undefined,
                     'nick': this.get('nick'),
+                    // 'senderJid': _converse.connection.jid.split('@')[0],
                     'references': references,
                     'sender': 'me',
                     'spoiler_hint': is_spoiler ? spoiler_hint : undefined,
@@ -1001,8 +1002,9 @@ converse.plugins.add('converse-muc', {
                 if (this.isDuplicate(stanza)) {
                     return;
                 }
-                const jid = stanza.getAttribute('from'),
-                      resource = Strophe.getResourceFromJid(jid),
+                // const jid = stanza.getAttribute('from'),
+                const jid = (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid')) ? stanza.querySelector('data').querySelector('senderJid').innerHTML : stanza.getAttribute('from'),
+                      resource = (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid')) ? jid : Strophe.getResourceFromJid(jid),
                       sender = resource && Strophe.unescapeNode(resource) || '';
                
                 if (!this.handleMessageCorrection(stanza)) {

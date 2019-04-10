@@ -1979,18 +1979,20 @@ const converse = {
             e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
             return e;
         })
-        console.log(arrayUser);
         chatbox.save({
             users: arrayUser,
             latestMessageTime: null
         })
         
     },
+    'onShowPageMeFormConfirmDownload' (callback) {
+        _converse.on('showPageMeFormConfirmDownload', callback)
+    },
     'onShowPageMeMediaViewer' (callback) {
-      _converse.on('showPageMeMediaViewer', callback);
+        _converse.on('showPageMeMediaViewer', callback);
     },
     'onShowPageMeMedicalRequest' (callback) {
-      _converse.on('showPageMeMedicalRequest', callback);
+        _converse.on('showPageMeMedicalRequest', callback);
     },
     'updateMessage' (chatbox, findCondition, updatedAttrs) {
       if (typeof chatbox === 'string') {

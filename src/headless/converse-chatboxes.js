@@ -332,9 +332,6 @@ converse.plugins.add('converse-chatboxes', {
                  *  Parameters:
                  *    (Object) message - The Backbone.Model representing the message
                  */
-                // if (type === 'medical_request') {
-                //     console.log('this is an medicalRequest message!', message);
-                // }
                 let sentDate = message.get('sent');
                 sentDate = Math.round(sentDate);
                 let rawText = '';
@@ -350,17 +347,19 @@ converse.plugins.add('converse-chatboxes', {
 
                 body = body || '';
                 const stanza = $msg({
+                        // 'from': _converse.connection.jid.split('/')[0],
                         'from': _converse.connection.jid,
                         'to': this.get('jid'),
                         'type': this.get('message_type'),
-                        'id': message.get('edited') && _converse.connection.getUniqueId() || message.get('msgid'),
+                        'id':  message.get('msgid'),
                     }).c('body').t(body).up()
                       .c(_converse.ACTIVE, {'xmlns': Strophe.NS.CHATSTATES}).up();
                 if (message.get('type') === 'chat' || message.get('type') === 'groupchat') {
                     stanza.c('data', {'xmlns': 'pageMe.message.data'})
                     .c('sentDate').t(sentDate).up()
                     .c('senderName').t(_converse.user_settings.fullname).up()
-                    .c('timeToRead').t(timeToRead).up();
+                    .c('timeToRead').t(timeToRead).up()
+                    .c('senderJid').t(_converse.connection.jid.split('@')[0]).up(); //we set the jid of sender to stanza so we can get it later to render avatar
 
                     if (type === 'file') {
                       stanza.c('itemType').t(message.get('itemType')).up()
@@ -604,7 +603,7 @@ converse.plugins.add('converse-chatboxes', {
                     'msgid': stanza.getAttribute('id'),
                     'time': delay ? delay.getAttribute('stamp') : sendDate,
                     'time_to_read': stanza.querySelector('timeToRead') ? stanza.querySelector('timeToRead').innerHTML : 84000,
-
+                    
                     'itemType': stanza.querySelector('itemType') ? stanza.querySelector('itemType').innerHTML : '',
                     'fileSize': stanza.querySelector('fileSize') ? stanza.querySelector('fileSize').innerHTML : '',
                     'sent': sendDate,
@@ -640,6 +639,10 @@ converse.plugins.add('converse-chatboxes', {
                 if (attrs.type === 'groupchat') {
                     attrs.from = stanza.getAttribute('from');
                     attrs.nick = Strophe.unescapeNode(Strophe.getResourceFromJid(attrs.from));
+                    if (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid')) {
+                        //if it has senderId, create attrs SenderJid for load avatar in chatview
+                        attrs.senderJid = stanza.querySelector('data').querySelector('senderJid').innerHTML;
+                    }
                     attrs.sender = attrs.nick === this.get('nick') ? 'me': 'them';
                 } else {
                     attrs.from = Strophe.getBareJidFromJid(stanza.getAttribute('from'));

@@ -487,6 +487,11 @@ converse.plugins.add('converse-chatview', {
                 this.scrollDown = _.debounce(this._scrollDown, 250);
                 this.markScrolled = _.debounce(this._markScrolled, 100);
                 this.show = _.debounce(this._show, 250, {'leading': true});
+                if (localStorage.getItem('isOrganizationJoined') !== 'true' || localStorage.getItem('isPurchasedMedicalRequest') !== 'true') {
+                    this.model.set('permission', false);
+                } else {
+                    this.model.set('permission', true);
+                }
                 // this.model.save({
                 //     num_unread: this.model.messages.models.filter(e => (!e.get('silent') && e.get('sender') === 'them') && !e.get('received')).length,
                 //     num_unread_general: 1

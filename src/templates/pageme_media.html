@@ -1,1 +1,8 @@
-<span id="{{{o.mediaId}}}#pageme#{{{o.type}}}" class="pageme-media pageme-{{{o.type}}}">&nbsp;</span>
+<span id="{{{o.mediaId}}}#pageme#{{{o.type}}}"  class="pageme-media pageme-{{{o.type}}}"></span>
+{[ if (o.type === 'image' && o.sender === 'me' && o.permission) { ]}
+<span style="align-self: flex-end; margin-left: 10px;">
+  <i id="{{{o.mediaId}}}#pageme#{{{o.type}}}"
+    style="align-self: flex-end;font-size: 20px;margin-bottom: 8px; cursor: pointer"
+    class="fas fa-cloud-download-alt download-image" aria-hidden="true"></i>
+</span>
+{[ } ]}

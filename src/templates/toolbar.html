@@ -20,10 +20,12 @@
         <div class="dropdown-divider"></div>
         <span class="group-item-name"><b>Extensions:</b></span>
         <div class="group-item">
-          <div style="padding: 0px 20px 0px 20px;" class="group">
-            <span class="toolbox-item toolbox-medical-request toggle-medical-requests"></span>
-            <h5 class="text-center" style="font-family: sans-serif;">Medical Request</h5>
-          </div>
+           {[ if (o.permission) { ]}
+            <div style="padding: 0px 20px 0px 20px;" class="group">
+              <span class="toolbox-item toolbox-medical-request toggle-medical-requests"></span>
+              <h5 class="text-center" style="font-family: sans-serif;">Medical Request</h5>
+            </div>
+           {[ } ]}
         </div>
       </div>
       {[}]}

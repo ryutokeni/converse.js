@@ -514,6 +514,9 @@ converse.plugins.add('converse-profile', {
             },
 
             showStatusChangeModal (ev) {
+                if (localStorage.getItem('isOrganizationJoined') !== 'true') {
+                    return;
+                }
                 if (!_.isUndefined(this.status_modal)) {
                     this.status_modal.remove();
                 }

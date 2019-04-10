@@ -126,11 +126,13 @@ u.renderAudioURL = function (_converse, url) {
     return url;
 };
 
-u.renderPageMeMedia = function (_converse, type, mediaId) {
+u.renderPageMeMedia = function (_converse, type, sender, permission,  mediaId) {
     const { __ } = _converse;
     return tpl_pageme_media({
         'type': type,
-        'mediaId': mediaId
+        'mediaId': mediaId,
+        'sender' : sender,
+        'permission': permission
     })
 };
 

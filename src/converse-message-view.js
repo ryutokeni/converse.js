@@ -14,8 +14,13 @@ import tpl_message from "templates/message.html";
 import tpl_message_versions_modal from "templates/message_versions_modal.html";
 import u from "@converse/headless/utils/emoji";
 import xss from "xss";
-
-const { Backbone, Strophe, _, moment } = converse.env;
+const {
+  Backbone,
+  Strophe,
+  _,
+  moment,
+  b64_sha1,
+} = converse.env;
 const medReqLabel = {
   wait4Appro: 'Waiting for Approval',
   wait4UrAppro: 'Waiting for Your Approval',
@@ -93,7 +98,8 @@ converse.plugins.add('converse-message-view', {
             events: {
                 'click .chat-msg__edit-modal': 'showMessageVersionsModal',
                 'click .pageme-media': 'showPageMeMediaViewer',
-                'click .pageme-medical-request': 'showPageMeMedicalRequest'
+                'click .pageme-medical-request': 'showPageMeMedicalRequest',
+                'click .download-image': 'showConfirmDownloadImage'
             },
 
             defaults () {
@@ -115,7 +121,6 @@ converse.plugins.add('converse-message-view', {
                 this.model.on('change', this.onChanged, this);
                 this.model.on('destroy', this.remove, this);
                 this.model.on('change:senderName', this.render, this);
-                _converse.on('rerenderMessage', this.render, this);
             },
 
             async render (force) {                
@@ -227,9 +232,16 @@ converse.plugins.add('converse-message-view', {
                     })
                 ));
                 if (mediaId) {
-                    msg.querySelector('.chat-msg__media').innerHTML = _.flow(
-                      _.partial(u.renderPageMeMedia, _converse, this.model.get('itemType'))
-                    )(mediaId);
+                    if (localStorage.getItem('isOrganizationJoined') === 'true' || localStorage.getItem('isPurchasedMedicalRequest') === 'true') {
+                        msg.querySelector('.chat-msg__media').innerHTML = _.flow(
+                        _.partial(u.renderPageMeMedia, _converse, this.model.get('itemType'), this.model.get('sender'), true),
+                        )(mediaId);
+                    }else {
+                         msg.querySelector('.chat-msg__media').innerHTML = _.flow(
+                        _.partial(u.renderPageMeMedia, _converse, this.model.get('itemType'), this.model.get('sender'), false),
+                        )(mediaId);
+                    }
+                   
                 }
                 if (medialRequestKey) {
                     msg.querySelector('.chat-msg__medical_request').innerHTML = _.flow(
@@ -276,12 +288,26 @@ converse.plugins.add('converse-message-view', {
                 }
 
                 const promise = u.renderImageURLs(_converse, msg_content);
+                
                 if (this.model.get('type') !== 'headline') {
                     const jid = Strophe.getNodeFromJid(this.model.vcard.get('jid'));
                     if (!this.image || this.image.includes('/null')){
                         this.image = `${_converse.user_settings.avatarUrl}${jid}`;
                     }
                     this.width = this.height = 60;
+
+                    if (this.model.get('type') === 'groupchat' && this.model.get('sender') === 'them') {
+                     
+                       if (this.model.get('senderJid')) {
+                             //if it comes from webapp, jid can get by call attribute 'senderJid'
+                           this.image = _converse.user_settings.avatarUrl  + this.model.get('senderJid');
+                       }
+                       else {
+                           //if it comes from mobile, jid can get by split the attribute 'from'
+                           this.image = _converse.user_settings.avatarUrl + this.model.get('from').split('/')[1].split('@')[0];
+                       }
+                      
+                    }
                     
                     _converse.api.listen.on('updateProfile', (data) => {
                         if (data.avatarUrl.includes(jid)){
@@ -374,14 +400,18 @@ converse.plugins.add('converse-message-view', {
                 this.replaceElement(msg);
                 this.renderAvatar();
             },
-
+            
+            showConfirmDownloadImage (event) {
+                // event.preventDefault();
+                event.stopPropagation();
+                _converse.emit('showPageMeFormConfirmDownload', event.target.id);
+            },
             showPageMeMediaViewer (ev) {
               ev.preventDefault();
               _converse.emit('showPageMeMediaViewer', ev.target.id);
             },
 
             showPageMeMedicalRequest (ev) {
-              ev.preventDefault();
               _converse.emit('showPageMeMedicalRequest', ev.target.id);
             },
 
