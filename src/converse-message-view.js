@@ -121,9 +121,10 @@ converse.plugins.add('converse-message-view', {
                 this.model.on('change', this.onChanged, this);
                 this.model.on('destroy', this.remove, this);
                 this.model.on('change:senderName', this.render, this);
+                _converse.on('rerenderMessage', this.render, this);
             },
 
-            async render (force) {                
+            async render (force) {
                 if (this.rendered && !force) {
                   return;
                 }
@@ -241,7 +242,7 @@ converse.plugins.add('converse-message-view', {
                         _.partial(u.renderPageMeMedia, _converse, this.model.get('itemType'), this.model.get('sender'), false),
                         )(mediaId);
                     }
-                   
+
                 }
                 if (medialRequestKey) {
                     msg.querySelector('.chat-msg__medical_request').innerHTML = _.flow(
@@ -288,7 +289,7 @@ converse.plugins.add('converse-message-view', {
                 }
 
                 const promise = u.renderImageURLs(_converse, msg_content);
-                
+
                 if (this.model.get('type') !== 'headline') {
                     const jid = Strophe.getNodeFromJid(this.model.vcard.get('jid'));
                     if (!this.image || this.image.includes('/null')){
@@ -297,7 +298,7 @@ converse.plugins.add('converse-message-view', {
                     this.width = this.height = 60;
 
                     if (this.model.get('type') === 'groupchat' && this.model.get('sender') === 'them') {
-                     
+
                        if (this.model.get('senderJid')) {
                              //if it comes from webapp, jid can get by call attribute 'senderJid'
                            this.image = _converse.user_settings.avatarUrl  + this.model.get('senderJid');
@@ -306,9 +307,9 @@ converse.plugins.add('converse-message-view', {
                            //if it comes from mobile, jid can get by split the attribute 'from'
                            this.image = _converse.user_settings.avatarUrl + this.model.get('from').split('/')[1].split('@')[0];
                        }
-                      
+
                     }
-                    
+
                     _converse.api.listen.on('updateProfile', (data) => {
                         if (data.avatarUrl.includes(jid)){
                             this.image = data.avatarUrl;
@@ -400,7 +401,7 @@ converse.plugins.add('converse-message-view', {
                 this.replaceElement(msg);
                 this.renderAvatar();
             },
-            
+
             showConfirmDownloadImage (event) {
                 // event.preventDefault();
                 event.stopPropagation();

@@ -20034,7 +20034,7 @@ utils.intFromLE = intFromLE;
 /*! exports provided: _args, _development, _from, _id, _inBundle, _integrity, _location, _phantomChildren, _requested, _requiredBy, _resolved, _spec, _where, author, bugs, dependencies, description, devDependencies, files, homepage, keywords, license, main, name, repository, scripts, version, default */
 /***/ (function(module) {
 
-module.exports = {"_args":[["elliptic@6.4.0","/Users/macuser/Desktop/pageme/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/macuser/Desktop/pageme/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
+module.exports = {"_args":[["elliptic@6.4.0","/Users/admin/Ant-Tech/Projects/converse-test/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/admin/Ant-Tech/Projects/converse-test/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
 
 /***/ }),
 
@@ -75749,6 +75749,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         this.model.on('change', this.onChanged, this);
         this.model.on('destroy', this.remove, this);
         this.model.on('change:senderName', this.render, this);
+
+        _converse.on('rerenderMessage', this.render, this);
       },
 
       async render(force) {
@@ -78218,7 +78220,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         // processing inside a view is a "code smell".
         // Instead stanza processing should happen inside the
         // models/collections.
-        // console.log(pres);
         if (pres.getAttribute('type') === 'error') {
           this.showErrorMessageFromPresence(pres);
         } else {
@@ -87921,28 +87922,26 @@ _converse.initialize = function (settings, callback) {
     /* Ask the XMPP server to enable Message Carbons
      * See XEP-0280 https://xmpp.org/extensions/xep-0280.html#enabling
      */
-    if (!this.message_carbons || this.session.get('carbons_enabled')) {
-      return;
-    }
-
+    // if (!this.message_carbons || this.session.get('carbons_enabled')) {
+    //     return;
+    // }
     const carbons_iq = new strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].Builder('iq', {
       'from': this.connection.jid,
       'id': 'enablecarbons',
       'type': 'set'
     }).c('enable', {
       xmlns: strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].NS.CARBONS
-    });
-    this.connection.addHandler(iq => {
-      if (iq.querySelectorAll('error').length > 0) {
-        _converse.log('An error occurred while trying to enable message carbons.', strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].LogLevel.WARN);
-      } else {
-        this.session.save({
-          'carbons_enabled': true
-        });
+    }); // this.connection.addHandler((iq) => {
+    //     if (iq.querySelectorAll('error').length > 0) {
+    //         _converse.log(
+    //             'An error occurred while trying to enable message carbons.',
+    //             Strophe.LogLevel.WARN);
+    //     } else {
+    //         this.session.save({'carbons_enabled': true});
+    //         _converse.log('Message carbons have been enabled.');
+    //     }
+    // }, null, "iq", null, "enablecarbons");
 
-        _converse.log('Message carbons have been enabled.');
-      }
-    }, null, "iq", null, "enablecarbons");
     this.connection.send(carbons_iq);
   };
 
@@ -88833,6 +88832,7 @@ const converse = {
         },
         name: group.groupName
       });
+      chatbox.join(group.groupName);
     });
   },
 
@@ -91130,13 +91130,12 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
         if (!nick) {
           throw new TypeError('join: You need to provide a valid nickname');
-        }
+        } // if (this.get('connection_status') === converse.ROOMSTATUS.ENTERED) {
+        //     // We have restored a groupchat from session storage,
+        //     // so we don't send out a presence stanza again.
+        //     return this;
+        // }
 
-        if (this.get('connection_status') === _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].ROOMSTATUS.ENTERED) {
-          // We have restored a groupchat from session storage,
-          // so we don't send out a presence stanza again.
-          return this;
-        }
 
         const stanza = $pres({
           'from': _converse.connection.jid,
@@ -92015,7 +92014,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           //         'text' : stanza.children[0].tagName === 'subject' ? stanza.children[0].textContent : 'Loading...'
           //     }
           //  })
-          //  if (stanza.children[2]  && stanza.children[2].tagName === 'data' 
+          //  if (stanza.children[2]  && stanza.children[2].tagName === 'data'
           //  && stanza.children[2].children[1] && stanza.children[2].children[1].tagName === 'senderName') {
           //    console.log('this model chatroom: ', this);
           //  }

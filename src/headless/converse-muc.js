@@ -178,11 +178,11 @@ converse.plugins.add('converse-muc', {
                     b64_sha1(`converse.occupants-${_converse.bare_jid}${this.get('jid')}`)
                 );
                 this.occupants.chatroom  = this;
-               
-                
+
+
                 // console.log(this);
 
-               
+
 
                 this.pagemeGroupMembers = new _converse.PagemeGroupMembers();
                 this.pagemeGroupMembers.browserStorage = new Backbone.BrowserStorage.session(
@@ -284,11 +284,11 @@ converse.plugins.add('converse-muc', {
                 if (!nick) {
                     throw new TypeError('join: You need to provide a valid nickname');
                 }
-                if (this.get('connection_status') === converse.ROOMSTATUS.ENTERED) {
-                    // We have restored a groupchat from session storage,
-                    // so we don't send out a presence stanza again.
-                    return this;
-                }
+                // if (this.get('connection_status') === converse.ROOMSTATUS.ENTERED) {
+                //     // We have restored a groupchat from session storage,
+                //     // so we don't send out a presence stanza again.
+                //     return this;
+                // }
 
                 const stanza = $pres({
                     'from': _converse.connection.jid,
@@ -525,7 +525,7 @@ converse.plugins.add('converse-muc', {
                           'features_fetched': moment().format(),
                           'name': identity && identity.get('name')
                       };
-                      
+
                 features.each(feature => {
                     const fieldname = feature.get('var');
                     if (!fieldname.startsWith('muc_')) {
@@ -1006,7 +1006,7 @@ converse.plugins.add('converse-muc', {
                 const jid = (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid')) ? stanza.querySelector('data').querySelector('senderJid').innerHTML : stanza.getAttribute('from'),
                       resource = (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid')) ? jid : Strophe.getResourceFromJid(jid),
                       sender = resource && Strophe.unescapeNode(resource) || '';
-               
+
                 if (!this.handleMessageCorrection(stanza)) {
                     if (sender === '') {
                         return;
@@ -1026,19 +1026,19 @@ converse.plugins.add('converse-muc', {
                             senderName: stanza.querySelector('data').querySelector('senderName').textContent ? stanza.querySelector('data').querySelector('senderName').textContent : ''
                         })
                     }
-                     
+
                     //  this.save({
                     //     'subject' : {
                     //         'text' : stanza.children[0].tagName === 'subject' ? stanza.children[0].textContent : 'Loading...'
                     //     }
                     //  })
-                    //  if (stanza.children[2]  && stanza.children[2].tagName === 'data' 
+                    //  if (stanza.children[2]  && stanza.children[2].tagName === 'data'
                     //  && stanza.children[2].children[1] && stanza.children[2].children[1].tagName === 'senderName') {
-                      
+
                     //    console.log('this model chatroom: ', this);
                     //  }
-                   
-                     
+
+
                     if (forwarded && msg && msg.get('sender')  === 'me') {
                         msg.save({'received': moment().format()});
                     }

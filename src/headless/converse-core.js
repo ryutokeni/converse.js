@@ -870,25 +870,25 @@ _converse.initialize = function (settings, callback) {
         /* Ask the XMPP server to enable Message Carbons
          * See XEP-0280 https://xmpp.org/extensions/xep-0280.html#enabling
          */
-        if (!this.message_carbons || this.session.get('carbons_enabled')) {
-            return;
-        }
+        // if (!this.message_carbons || this.session.get('carbons_enabled')) {
+        //     return;
+        // }
         const carbons_iq = new Strophe.Builder('iq', {
             'from': this.connection.jid,
             'id': 'enablecarbons',
             'type': 'set'
           })
           .c('enable', {xmlns: Strophe.NS.CARBONS});
-        this.connection.addHandler((iq) => {
-            if (iq.querySelectorAll('error').length > 0) {
-                _converse.log(
-                    'An error occurred while trying to enable message carbons.',
-                    Strophe.LogLevel.WARN);
-            } else {
-                this.session.save({'carbons_enabled': true});
-                _converse.log('Message carbons have been enabled.');
-            }
-        }, null, "iq", null, "enablecarbons");
+        // this.connection.addHandler((iq) => {
+        //     if (iq.querySelectorAll('error').length > 0) {
+        //         _converse.log(
+        //             'An error occurred while trying to enable message carbons.',
+        //             Strophe.LogLevel.WARN);
+        //     } else {
+        //         this.session.save({'carbons_enabled': true});
+        //         _converse.log('Message carbons have been enabled.');
+        //     }
+        // }, null, "iq", null, "enablecarbons");
         this.connection.send(carbons_iq);
     };
 
@@ -1734,7 +1734,8 @@ const converse = {
           },
           name: group.groupName
         });
-      })
+        chatbox.join(group.groupName);
+      });
     },
     'onLogOut' (callback) {
       return _converse.on('disconnected', () => {
@@ -1969,7 +1970,7 @@ const converse = {
         participants.forEach(user => {
             chatbox.directInvite(user, 'pageme invite');
         });
-        
+
         let arrayParticipants = participants.map(e => (e.split('@')[0]))
         let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => (arrayParticipants.includes(e.userName)))
         let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => (arrayParticipants.includes(e.userName)))
@@ -1983,7 +1984,7 @@ const converse = {
             users: arrayUser,
             latestMessageTime: null
         })
-        
+
     },
     'onShowPageMeFormConfirmDownload' (callback) {
         _converse.on('showPageMeFormConfirmDownload', callback)
@@ -2044,7 +2045,7 @@ const converse = {
                 }
             }
 
-          
+
           return;
         }
         var existed = _.findIndex(_converse.pagemeMessages, oldMsg => (oldMsg.stanza.id === msg.stanza.id));
