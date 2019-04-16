@@ -121,7 +121,7 @@ converse.plugins.add('converse-chatboxes', {
 
             getDisplayName () {
                 if (this.get('type') === 'groupchat') {
-                    return this.vcard.get('fullname') ||  this.get('senderName') || this.get('nick');
+                    return this.get('senderName') || this.get('nick');
                 } else {
                     return this.vcard.get('fullname') || 'Loading...';
                 }
@@ -357,10 +357,11 @@ converse.plugins.add('converse-chatboxes', {
                 if (message.get('type') === 'chat' || message.get('type') === 'groupchat') {
                     stanza.c('data', {'xmlns': 'pageMe.message.data'})
                     .c('sentDate').t(sentDate).up()
-                    .c('senderName').t(_converse.user_settings.fullname).up()
-                    .c('timeToRead').t(timeToRead).up()
-                    .c('senderJid').t(_converse.connection.jid.split('@')[0]).up(); //we set the jid of sender to stanza so we can get it later to render avatar
-
+                    .c('timeToRead').t(timeToRead).up();
+                    if (message.get('type') === 'groupchat') {
+                        stanza.c('senderName').t(_converse.user_settings.fullname).up()
+                        stanza.c('senderJid').t(_converse.connection.jid.split('@')[0]).up(); //we set the jid of sender to stanza so we can get it later to render avatar
+                    }
                     if (type === 'file') {
                       stanza.c('itemType').t(message.get('itemType')).up()
                       .c('mediaId').t(message.get('mediaId')).up()
@@ -643,7 +644,13 @@ converse.plugins.add('converse-chatboxes', {
                         //if it has senderId, create attrs SenderJid for load avatar in chatview
                         attrs.senderJid = stanza.querySelector('data').querySelector('senderJid').innerHTML;
                     }
-                    attrs.sender = attrs.nick === this.get('nick') ? 'me': 'them';
+                    if (attrs.senderJid) {
+                        attrs.sender = _converse.user_settings.jid.split('@')[0] === attrs.senderJid ? 'me': 'them';
+                    } else {
+                        attrs.sender = _converse.user_settings.jid.split('@')[0] === attrs.nick ? 'me' : 'them'
+                    }
+                    
+                    // console.log(attrs);
                 } else {
                     attrs.from = Strophe.getBareJidFromJid(stanza.getAttribute('from'));
                     if (attrs.from === _converse.bare_jid) {
@@ -661,6 +668,7 @@ converse.plugins.add('converse-chatboxes', {
                 if (spoiler) {
                     attrs.spoiler_hint = spoiler.textContent.length > 0 ? spoiler.textContent : '';
                 }
+                // console.log(attrs);
                 return attrs;
             },
 
@@ -720,7 +728,7 @@ converse.plugins.add('converse-chatboxes', {
                 if (typeof result.then === "function") {
                     return new Promise((resolve, reject) => result.then(attrs => resolve(_create(attrs))));
                 } else {
-                    const message = _create(result)
+                    const message = _create(result);
                     return Promise.resolve(message);
                 }
             },
@@ -1118,6 +1126,7 @@ converse.plugins.add('converse-chatboxes', {
                             _converse.api.waitUntil('rosterContactsFetched'),
                             _converse.api.waitUntil('chatBoxesFetched')
                         ]).then(() => {
+                            // console.log('we get in there');
                             if (_.isUndefined(jids)) {
                                 const err_msg = "chats.open: You need to provide at least one JID";
                                 _converse.log(err_msg, Strophe.LogLevel.ERROR);
