@@ -75928,7 +75928,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         const promise = _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_8__["default"].renderImageURLs(_converse, msg_content);
 
         if (this.model.get('type') !== 'headline') {
-          const jid = Strophe.getNodeFromJid(this.model.vcard.get('jid'));
+          const jid = Strophe.getNodeFromJid(_converse.bare_jid);
 
           if (!this.image || this.image.includes('/null')) {
             this.image = `${_converse.user_settings.avatarUrl}${jid}`;
@@ -87983,9 +87983,8 @@ _converse.initialize = function (settings, callback) {
 
     _converse.setUserJID();
 
-    _converse.initSession();
+    _converse.initSession(); // _converse.enableCarbons();
 
-    _converse.enableCarbons();
 
     _converse.initStatus(reconnecting);
   };
@@ -89141,22 +89140,8 @@ const converse = {
 
     pagemeMessages.forEach(msg => {
       if (msg.type !== 'text') {
-        if (msg.stanza.getAttribute('type') === 'groupchat' && msg.stanza.querySelector('data') && msg.stanza.querySelector('data').querySelector('senderName')) {
-          if (msg.type === 'medical_request') {
-            _converse.chatboxes.onMessage(msg.stanza, {
-              medReqStt: msg.medReqStt,
-              isMedReqSender: msg.isMedReqSender,
-              senderSignedMedReq: msg.senderSignedMedReq,
-              rcvrSignedMedReq: msg.rcvrSignedMedReq,
-              silent: true,
-              senderName: msg.stanza.querySelector('data').querySelector('senderName').textContent ? msg.stanza.querySelector('data').querySelector('senderName').textContent : ''
-            });
-          } else {
-            _converse.chatboxes.onMessage(msg.stanza, {
-              silent: true,
-              senderName: msg.stanza.querySelector('data').querySelector('senderName').textContent ? msg.stanza.querySelector('data').querySelector('senderName').textContent : ''
-            });
-          }
+        if (msg.stanza.getAttribute('type') === 'groupchat') {
+          chatbox.onMessage(msg.stanza);
         } else {
           if (msg.type === 'medical_request') {
             _converse.chatboxes.onMessage(msg.stanza, {
@@ -89190,13 +89175,8 @@ const converse = {
         }
       }
 
-      if (msg.stanza.getAttribute('type') === 'groupchat' && msg.stanza.querySelector('data') && msg.stanza.querySelector('data').querySelector('senderName')) {
-        // console.log(msg.stanza);
-        // console.log(msg.stanza.querySelector('data').querySelector('senderName').textContent);
-        _converse.chatboxes.onMessage(msg.stanza, {
-          silent: true,
-          senderName: msg.stanza.querySelector('data').querySelector('senderName').textContent ? msg.stanza.querySelector('data').querySelector('senderName').textContent : ''
-        });
+      if (msg.stanza.getAttribute('type') === 'groupchat') {
+        chatbox.onMessage(msg.stanza);
       } else {
         _converse.chatboxes.onMessage(msg.stanza, {
           silent: true
@@ -94156,7 +94136,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins.add('converse-vca
       let iq;
 
       try {
-        iq = await _converse.api.sendIQ(createStanza("get", to));
+        iq = await _converse.api.sendIQ(createStanza("get"));
       } catch (iq) {
         return {
           'stanza': iq,

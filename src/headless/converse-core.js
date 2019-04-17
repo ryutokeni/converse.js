@@ -925,7 +925,7 @@ _converse.initialize = function (settings, callback) {
         _converse.connection.flush(); // Solves problem of returned PubSub BOSH response not received by browser
         _converse.setUserJID();
         _converse.initSession();
-        _converse.enableCarbons();
+        // _converse.enableCarbons();
         _converse.initStatus(reconnecting)
     };
 
@@ -2010,24 +2010,8 @@ const converse = {
       }
       pagemeMessages.forEach(msg => {
         if (msg.type !== 'text') {
-            if (msg.stanza.getAttribute('type') === 'groupchat' && msg.stanza.querySelector('data')  && msg.stanza.querySelector('data').querySelector('senderName')) {
-
-                if (msg.type === 'medical_request') {
-                  _converse.chatboxes.onMessage(msg.stanza, {
-                    medReqStt: msg.medReqStt,
-                    isMedReqSender: msg.isMedReqSender,
-                    senderSignedMedReq: msg.senderSignedMedReq,
-                    rcvrSignedMedReq: msg.rcvrSignedMedReq,
-                    silent: true,
-                    senderName: msg.stanza.querySelector('data').querySelector('senderName').textContent ? msg.stanza.querySelector('data').querySelector('senderName').textContent : ''
-
-                  }, );
-                } else {
-                  _converse.chatboxes.onMessage(msg.stanza, {
-                    silent: true,
-                    senderName: msg.stanza.querySelector('data').querySelector('senderName').textContent ? msg.stanza.querySelector('data').querySelector('senderName').textContent : ''
-                  });
-                }
+            if (msg.stanza.getAttribute('type') === 'groupchat') {
+                chatbox.onMessage(msg.stanza);
             }
             else {
                 if (msg.type === 'medical_request') {
@@ -2059,18 +2043,13 @@ const converse = {
             _converse.pagemeMessages[existed] = msg;
           }
         }
-        if (msg.stanza.getAttribute('type') === 'groupchat' && msg.stanza.querySelector('data') &&  msg.stanza.querySelector('data').querySelector('senderName')) {
-            // console.log(msg.stanza);
-            // console.log(msg.stanza.querySelector('data').querySelector('senderName').textContent);
-            _converse.chatboxes.onMessage(msg.stanza, {
-                silent: true,
-                senderName: msg.stanza.querySelector('data').querySelector('senderName').textContent ? msg.stanza.querySelector('data').querySelector('senderName').textContent : ''
-            });
+        if (msg.stanza.getAttribute('type') === 'groupchat') {
+          chatbox.onMessage(msg.stanza);
         }
         else {
-            _converse.chatboxes.onMessage(msg.stanza, {
-                silent: true
-            });
+          _converse.chatboxes.onMessage(msg.stanza, {
+              silent: true
+          });
         }
       });
       _converse.api.emit('rerenderMessage');
