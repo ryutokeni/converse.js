@@ -113,7 +113,7 @@ converse.plugins.add('converse-vcard', {
             const to = Strophe.getBareJidFromJid(jid) === _converse.bare_jid ? null : jid;
             let iq;
             try {
-                iq = await _converse.api.sendIQ(createStanza("get", to))
+                iq = await _converse.api.sendIQ(createStanza("get"))
             } catch (iq) {
                 return {
                     'stanza': iq,

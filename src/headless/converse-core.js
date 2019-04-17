@@ -925,7 +925,7 @@ _converse.initialize = function (settings, callback) {
         _converse.connection.flush(); // Solves problem of returned PubSub BOSH response not received by browser
         _converse.setUserJID();
         _converse.initSession();
-        _converse.enableCarbons();
+        // _converse.enableCarbons();
         _converse.initStatus(reconnecting)
     };
 
@@ -2044,14 +2044,12 @@ const converse = {
           }
         }
         if (msg.stanza.getAttribute('type') === 'groupchat') {
-            // console.log(msg.stanza);
-            // console.log(msg.stanza.querySelector('data').querySelector('senderName').textContent);
-            chatbox.onMessage(msg.stanza);
+          chatbox.onMessage(msg.stanza);
         }
         else {
-            _converse.chatboxes.onMessage(msg.stanza, {
-                silent: true
-            });
+          _converse.chatboxes.onMessage(msg.stanza, {
+              silent: true
+          });
         }
       });
       _converse.emit('rerenderMessage');

@@ -291,7 +291,7 @@ converse.plugins.add('converse-message-view', {
                 const promise = u.renderImageURLs(_converse, msg_content);
 
                 if (this.model.get('type') !== 'headline') {
-                    const jid = Strophe.getNodeFromJid(this.model.vcard.get('jid'));
+                    const jid = Strophe.getNodeFromJid(_converse.bare_jid);
                     if (!this.image || this.image.includes('/null')){
                         this.image = `${_converse.user_settings.avatarUrl}${jid}`;
                     }
