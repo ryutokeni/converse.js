@@ -86551,6 +86551,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
             chatbox.trigger('show');
           }
         });
+        console.log('emit chatboxes fetched event');
 
         _converse.emit('chatBoxesFetched');
       },
@@ -91285,7 +91286,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
         text = _this$parseTextForRef2[0];
         references = _this$parseTextForRef2[1];
-        console.log(this);
         return {
           'from': `${this.get('jid')}/${this.get('nick')}`,
           'fullname': this.get('nick'),
@@ -92460,14 +92460,19 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           const hasGroupChatBox = boxesExisting.filter(box => box.get('message_type') === 'groupchat');
 
           if (hasGroupChatBox) {
+            console.log('break it?');
             return;
           }
         }
 
         if (_.isString(groupchat)) {
           _converse.api.rooms.open(groupchat);
+
+          console.log('we open room string ', groupchat);
         } else if (_.isObject(groupchat)) {
-          _converse.api.rooms.open(jid, {
+          console.log('we open room object');
+
+          _converse.api.rooms.open(groupchat, {
             'name': name
           });
         } else {
@@ -93566,15 +93571,25 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         let iq;
 
         try {
-          _converse.api.sendIQ(stanza).then(res => {
-            this.onReceivedFromServer(res);
-          }, err => console.log(err));
+          //  _converse.api.sendIQ(stanza).then(
+          //      res => {
+          //          this.onReceivedFromServer(res);
+          //      },
+          //      err => console.log(err)
+          //  )
+          console.log(stanza);
+          iq = await _converse.api.sendIQ(stanza);
         } catch (e) {
           _converse.log(e, Strophe.LogLevel.ERROR);
 
-          return _converse.log("Error while trying to fetch roster from the server", Strophe.LogLevel.ERROR);
-        } // return this.onReceivedFromServer(iq);
+          _converse.emit('load-done', 'Address Book');
 
+          _converse.emit('load-done', 'Orgnazination');
+
+          return _converse.log("Error while trying to fetch roster from the server", Strophe.LogLevel.ERROR);
+        }
+
+        return this.onReceivedFromServer(iq);
       },
 
       onReceivedFromServer(iq) {
@@ -121098,7 +121113,7 @@ __p += '\n        <a class="controlbox-heading__btn add-contact align-self-cente
 __e(o.title_add_contact) +
 '"\n           data-toggle="modal"\n           data-target="#add-contact-modal"></a>\n    ';
  } ;
-__p += ' -->\n</div>\n\n<form class="roster-filter-form"></form>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #fff" class="hidden roster-loading-Contacts">\n  Loading Address Book...\n</div>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #fff" class="hidden roster-loading-Organization">\n  Loading My Organization...\n</div>\n\n<div class="roster-contacts">\n\n</div>\n';
+__p += ' -->\n</div>\n\n<form class="roster-filter-form"></form>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #fff" class="hidden roster-loading-Contacts">\n  <strong style="font-size: 1.2rem; color: #ACCCEA">Address Book</strong>\n  <span style="margin-top: 10px; color: #fff" class="spinner fa fa-spinner centered" />\n</div>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #fff" class="hidden roster-loading-Organization">\n  <strong style="font-size: 1.2rem; color: #ACCCEA">Organization</strong>\n  <span style="margin-top: 10px; color: #fff" class="spinner fa fa-spinner centered" />\n</div>\n\n<div class="roster-contacts">\n\n</div>\n';
 return __p
 };
 
