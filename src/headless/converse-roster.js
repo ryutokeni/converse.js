@@ -588,7 +588,13 @@ converse.plugins.add('converse-roster', {
                 }
                 let iq;
                 try {
-                    iq = await _converse.api.sendIQ(stanza);
+                     _converse.api.sendIQ(stanza).then(
+                         res => {
+                             this.onReceivedFromServer(res);
+                         },
+                         err => console.log(err)
+                     )
+                  
                 } catch (e) {
                     _converse.log(e, Strophe.LogLevel.ERROR);
                     return _converse.log(
@@ -596,7 +602,7 @@ converse.plugins.add('converse-roster', {
                         Strophe.LogLevel.ERROR
                     );
                 }
-                return this.onReceivedFromServer(iq);
+                // return this.onReceivedFromServer(iq);
             },
 
             onReceivedFromServer (iq) {

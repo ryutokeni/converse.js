@@ -136,6 +136,7 @@ converse.plugins.add('converse-muc', {
             settings.box_id = b64_sha1(jid)
             const chatbox = _converse.chatboxes.getChatBox(jid, settings, true);
             chatbox.trigger('show', true);
+            // console.log('chatbox show?', chatbox);
             return chatbox;
         }
 
@@ -405,7 +406,6 @@ converse.plugins.add('converse-muc', {
                 const is_spoiler = this.get('composing_spoiler');
                 var references;
                 [text, references] = this.parseTextForReferences(text);
-
                 return {
                     'from': `${this.get('jid')}/${this.get('nick')}`,
                     'fullname': this.get('nick'),
@@ -991,6 +991,7 @@ converse.plugins.add('converse-muc', {
                  * Parameters:
                  *  (XMLElement) stanza: The message stanza.
                  */
+                // console.log(stanza);
                 this.fetchFeaturesIfConfigurationChanged(stanza);
 
                 const original_stanza = stanza,
@@ -1000,13 +1001,14 @@ converse.plugins.add('converse-muc', {
                     stanza = forwarded.querySelector('message');
                 }
                 if (this.isDuplicate(stanza)) {
+                    // console.log('it duplicate???');
                     return;
                 }
                 // const jid = stanza.getAttribute('from'),
                 const jid = (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid')) ? stanza.querySelector('data').querySelector('senderJid').innerHTML : stanza.getAttribute('from'),
                       resource = (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid')) ? jid : Strophe.getResourceFromJid(jid),
                       sender = resource && Strophe.unescapeNode(resource) || '';
-
+                    // console.log(jid, resource, sender);
                 if (!this.handleMessageCorrection(stanza)) {
                     if (sender === '') {
                         return;
@@ -1021,11 +1023,15 @@ converse.plugins.add('converse-muc', {
                     // console.dir(stanza);
                     // console.log(this);
                     const msg = await this.createMessage(stanza, original_stanza);
-                    if (msg && stanza.querySelector('data')) {
+                    // console.log('stanza: ', stanza);
+                    if (msg && stanza.querySelector('data').querySelector('senderName')) {
                         msg.save({
-                            senderName: stanza.querySelector('data').querySelector('senderName').textContent ? stanza.querySelector('data').querySelector('senderName').textContent : ''
+                            senderName: stanza.querySelector('data').querySelector('senderName').textContent
                         })
+                        // console.log('senderName from Stanza: ', stanza.querySelector('data').querySelector('senderName').textContent);
+                        // console.log('senderName: ', msg);
                     }
+                    // console.log(this);
 
                     //  this.save({
                     //     'subject' : {

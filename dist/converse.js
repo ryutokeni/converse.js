@@ -85789,7 +85789,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
 
       getDisplayName() {
         if (this.get('type') === 'groupchat') {
-          return this.vcard.get('fullname') || this.get('senderName') || this.get('nick');
+          return this.get('senderName') || this.get('nick');
         } else {
           return this.vcard.get('fullname') || 'Loading...';
         }
@@ -86058,7 +86058,12 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         if (message.get('type') === 'chat' || message.get('type') === 'groupchat') {
           stanza.c('data', {
             'xmlns': 'pageMe.message.data'
-          }).c('sentDate').t(sentDate).up().c('senderName').t(_converse.user_settings.fullname).up().c('timeToRead').t(timeToRead).up().c('senderJid').t(_converse.connection.jid.split('@')[0]).up(); //we set the jid of sender to stanza so we can get it later to render avatar
+          }).c('sentDate').t(sentDate).up().c('timeToRead').t(timeToRead).up();
+
+          if (message.get('type') === 'groupchat') {
+            stanza.c('senderName').t(_converse.user_settings.fullname).up();
+            stanza.c('senderJid').t(_converse.connection.jid.split('@')[0]).up(); //we set the jid of sender to stanza so we can get it later to render avatar
+          }
 
           if (type === 'file') {
             stanza.c('itemType').t(message.get('itemType')).up().c('mediaId').t(message.get('mediaId')).up().c('fileSize').t(message.get('fileSize')).up();
@@ -86369,7 +86374,12 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
             attrs.senderJid = stanza.querySelector('data').querySelector('senderJid').innerHTML;
           }
 
-          attrs.sender = attrs.nick === this.get('nick') ? 'me' : 'them';
+          if (attrs.senderJid) {
+            attrs.sender = _converse.user_settings.jid.split('@')[0] === attrs.senderJid ? 'me' : 'them';
+          } else {
+            attrs.sender = _converse.user_settings.jid.split('@')[0] === attrs.nick ? 'me' : 'them';
+          } // console.log(attrs);
+
         } else {
           attrs.from = Strophe.getBareJidFromJid(stanza.getAttribute('from'));
 
@@ -86389,7 +86399,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
 
         if (spoiler) {
           attrs.spoiler_hint = spoiler.textContent.length > 0 ? spoiler.textContent : '';
-        }
+        } // console.log(attrs);
+
 
         return attrs;
       },
@@ -86894,6 +86905,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         'open'(jids, attrs) {
           return new Promise((resolve, reject) => {
             Promise.all([_converse.api.waitUntil('rosterContactsFetched'), _converse.api.waitUntil('chatBoxesFetched')]).then(() => {
+              // console.log('we get in there');
               if (_.isUndefined(jids)) {
                 const err_msg = "chats.open: You need to provide at least one JID";
 
@@ -89184,7 +89196,7 @@ const converse = {
       }
     });
 
-    _converse.api.emit('rerenderMessage');
+    _converse.emit('rerenderMessage');
 
     var notReceivedMessages = [];
     chatbox.messages.forEach(msg => {
@@ -90967,7 +90979,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
       const chatbox = _converse.chatboxes.getChatBox(jid, settings, true);
 
-      chatbox.trigger('show', true);
+      chatbox.trigger('show', true); // console.log('chatbox show?', chatbox);
+
       return chatbox;
     };
 
@@ -91944,6 +91957,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
          * Parameters:
          *  (XMLElement) stanza: The message stanza.
          */
+        // console.log(stanza);
         this.fetchFeaturesIfConfigurationChanged(stanza);
         const original_stanza = stanza,
               forwarded = sizzle(`forwarded[xmlns="${Strophe.NS.FORWARD}"]`, stanza).pop();
@@ -91953,13 +91967,14 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         }
 
         if (this.isDuplicate(stanza)) {
+          // console.log('it duplicate???');
           return;
         } // const jid = stanza.getAttribute('from'),
 
 
         const jid = stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid') ? stanza.querySelector('data').querySelector('senderJid').innerHTML : stanza.getAttribute('from'),
               resource = stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid') ? jid : Strophe.getResourceFromJid(jid),
-              sender = resource && Strophe.unescapeNode(resource) || '';
+              sender = resource && Strophe.unescapeNode(resource) || ''; // console.log(jid, resource, sender);
 
         if (!this.handleMessageCorrection(stanza)) {
           if (sender === '') {
@@ -91983,13 +91998,15 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           // console.log(this);
 
 
-          const msg = await this.createMessage(stanza, original_stanza);
+          const msg = await this.createMessage(stanza, original_stanza); // console.log('stanza: ', stanza);
 
-          if (msg && stanza.querySelector('data')) {
+          if (msg && stanza.querySelector('data').querySelector('senderName')) {
             msg.save({
-              senderName: stanza.querySelector('data').querySelector('senderName').textContent ? stanza.querySelector('data').querySelector('senderName').textContent : ''
-            });
-          } //  this.save({
+              senderName: stanza.querySelector('data').querySelector('senderName').textContent
+            }); // console.log('senderName from Stanza: ', stanza.querySelector('data').querySelector('senderName').textContent);
+            // console.log('senderName: ', msg);
+          } // console.log(this);
+          //  this.save({
           //     'subject' : {
           //         'text' : stanza.children[0].tagName === 'subject' ? stanza.children[0].textContent : 'Loading...'
           //     }
@@ -93545,14 +93562,15 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         let iq;
 
         try {
-          iq = await _converse.api.sendIQ(stanza);
+          _converse.api.sendIQ(stanza).then(res => {
+            this.onReceivedFromServer(res);
+          }, err => console.log(err));
         } catch (e) {
           _converse.log(e, Strophe.LogLevel.ERROR);
 
           return _converse.log("Error while trying to fetch roster from the server", Strophe.LogLevel.ERROR);
-        }
+        } // return this.onReceivedFromServer(iq);
 
-        return this.onReceivedFromServer(iq);
       },
 
       onReceivedFromServer(iq) {

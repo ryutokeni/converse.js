@@ -2021,7 +2021,7 @@ const converse = {
                     senderSignedMedReq: msg.senderSignedMedReq,
                     rcvrSignedMedReq: msg.rcvrSignedMedReq,
                     silent: true
-                  }, );
+                  });
                 } else {
                   _converse.chatboxes.onMessage(msg.stanza, {
                     silent: true
@@ -2052,7 +2052,7 @@ const converse = {
           });
         }
       });
-      _converse.api.emit('rerenderMessage');
+      _converse.emit('rerenderMessage');
 
       var notReceivedMessages = [];
       chatbox.messages.forEach(msg => {
