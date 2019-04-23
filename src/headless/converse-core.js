@@ -870,25 +870,25 @@ _converse.initialize = function (settings, callback) {
         /* Ask the XMPP server to enable Message Carbons
          * See XEP-0280 https://xmpp.org/extensions/xep-0280.html#enabling
          */
-        // if (!this.message_carbons || this.session.get('carbons_enabled')) {
-        //     return;
-        // }
+        if (!this.message_carbons || this.session.get('carbons_enabled')) {
+            return;
+        }
         const carbons_iq = new Strophe.Builder('iq', {
             'from': this.connection.jid,
             'id': 'enablecarbons',
             'type': 'set'
           })
           .c('enable', {xmlns: Strophe.NS.CARBONS});
-        // this.connection.addHandler((iq) => {
-        //     if (iq.querySelectorAll('error').length > 0) {
-        //         _converse.log(
-        //             'An error occurred while trying to enable message carbons.',
-        //             Strophe.LogLevel.WARN);
-        //     } else {
-        //         this.session.save({'carbons_enabled': true});
-        //         _converse.log('Message carbons have been enabled.');
-        //     }
-        // }, null, "iq", null, "enablecarbons");
+        this.connection.addHandler((iq) => {
+            if (iq.querySelectorAll('error').length > 0) {
+                _converse.log(
+                    'An error occurred while trying to enable message carbons.',
+                    Strophe.LogLevel.WARN);
+            } else {
+                this.session.save({'carbons_enabled': true});
+                _converse.log('Message carbons have been enabled.');
+            }
+        }, null, "iq", null, "enablecarbons");
         this.connection.send(carbons_iq);
     };
 
@@ -925,7 +925,7 @@ _converse.initialize = function (settings, callback) {
         _converse.connection.flush(); // Solves problem of returned PubSub BOSH response not received by browser
         _converse.setUserJID();
         _converse.initSession();
-        // _converse.enableCarbons();
+        _converse.enableCarbons();
         _converse.initStatus(reconnecting)
     };
 
@@ -1713,8 +1713,8 @@ const converse = {
     'updateContacts' (contacts, group) {
       if (_converse.roster) {
         return _converse.roster.compareContacts(contacts, group, true);
-      }
-      return _converse.api.listen.on('roster', () => {
+      } 
+      return _converse.api.listen.on('rosterContactsFetched', () => {
         _converse.roster.compareContacts(contacts, group, true);
       });
     },
@@ -1726,15 +1726,20 @@ const converse = {
           },
           nick: group.nick
         });
-        chatbox.save({
-          users: group.users,
-          latestMessageTime: group.latestMessageTime,
-          subject: {
-            text: group.groupName
-          },
-          name: group.groupName
-        });
-        chatbox.join(group.groupName);
+        if (chatbox) {
+            // console.log(chatbox);
+            chatbox.save({
+              users: group.users,
+              latestMessageTime: group.latestMessageTime,
+              subject: {
+                text: group.groupName
+              },
+              name: group.groupName,
+              nick: group.nick
+            });
+            // console.log('chatbox after we update: ', chatbox);
+        }
+        // chatbox.join(group.nick);
       });
     },
     'onLogOut' (callback) {
@@ -1971,19 +1976,19 @@ const converse = {
             chatbox.directInvite(user, 'pageme invite');
         });
 
-        let arrayParticipants = participants.map(e => (e.split('@')[0]))
-        let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => (arrayParticipants.includes(e.userName)))
-        let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => (arrayParticipants.includes(e.userName)))
-        let arrayUser = arrayAddressBook.concat(arrayOrganization);
-        arrayUser = _.uniq(arrayUser);
-        arrayUser = arrayUser.map(e => {
-            e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
-            return e;
-        })
-        chatbox.save({
-            users: arrayUser,
-            latestMessageTime: null
-        })
+        // let arrayParticipants = participants.map(e => (e.split('@')[0]))
+        // let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => (arrayParticipants.includes(e.userName)))
+        // let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => (arrayParticipants.includes(e.userName)))
+        // let arrayUser = arrayAddressBook.concat(arrayOrganization);
+        // arrayUser = _.uniq(arrayUser);
+        // arrayUser = arrayUser.map(e => {
+        //     e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
+        //     return e;
+        // })
+        // chatbox.save({
+        //     users: arrayUser,
+        //     latestMessageTime: null
+        // })
 
     },
     'onShowPageMeFormConfirmDownload' (callback) {
@@ -2045,6 +2050,7 @@ const converse = {
         }
         if (msg.stanza.getAttribute('type') === 'groupchat') {
           chatbox.onMessage(msg.stanza);
+        //   console.log('stanza we got from converse-core: ', msg.stanza);
         }
         else {
           _converse.chatboxes.onMessage(msg.stanza, {
@@ -2114,6 +2120,7 @@ const converse = {
     'updateProfile' (data) {
       _converse.api.waitUntil('statusInitialized').then(() => {
           _converse.emit('updateProfile', data);
+        //   const vcard = _converse.vcards.
           _converse.xmppstatus.save(data)
       })
     },

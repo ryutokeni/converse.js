@@ -174,6 +174,7 @@ converse.plugins.add('converse-muc', {
                 this.constructor.__super__.initialize.apply(this, arguments);
                 this.on('change:connection_status', this.onConnectionStatusChanged, this);
                 this.on('change:users', this.updateGroupMembers, this);
+                // this.on('change:chat_state', this.sendChatState, this);
                 this.occupants = new _converse.ChatRoomOccupants();
                 this.occupants.browserStorage = new Backbone.BrowserStorage.session(
                     b64_sha1(`converse.occupants-${_converse.bare_jid}${this.get('jid')}`)
@@ -285,11 +286,11 @@ converse.plugins.add('converse-muc', {
                 if (!nick) {
                     throw new TypeError('join: You need to provide a valid nickname');
                 }
-                // if (this.get('connection_status') === converse.ROOMSTATUS.ENTERED) {
-                //     // We have restored a groupchat from session storage,
-                //     // so we don't send out a presence stanza again.
-                //     return this;
-                // }
+                if (this.get('connection_status') === converse.ROOMSTATUS.ENTERED) {
+                    // We have restored a groupchat from session storage,
+                    // so we don't send out a presence stanza again.
+                    return this;
+                }
 
                 const stanza = $pres({
                     'from': _converse.connection.jid,
@@ -406,13 +407,13 @@ converse.plugins.add('converse-muc', {
                 const is_spoiler = this.get('composing_spoiler');
                 var references;
                 [text, references] = this.parseTextForReferences(text);
+                // console.log('this model: ', this);
                 return {
                     'from': `${this.get('jid')}/${this.get('nick')}`,
                     'fullname': this.get('nick'),
                     'is_spoiler': is_spoiler,
                     'message': text ? u.httpToGeoUri(u.shortnameToUnicode(text), _converse) : undefined,
                     'nick': this.get('nick'),
-                    // 'senderJid': _converse.connection.jid.split('@')[0],
                     'references': references,
                     'sender': 'me',
                     'spoiler_hint': is_spoiler ? spoiler_hint : undefined,
@@ -991,7 +992,6 @@ converse.plugins.add('converse-muc', {
                  * Parameters:
                  *  (XMLElement) stanza: The message stanza.
                  */
-                // console.log(stanza);
                 this.fetchFeaturesIfConfigurationChanged(stanza);
 
                 const original_stanza = stanza,
@@ -1007,7 +1007,7 @@ converse.plugins.add('converse-muc', {
                 // const jid = stanza.getAttribute('from'),
                 const jid = (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid')) ? stanza.querySelector('data').querySelector('senderJid').innerHTML : stanza.getAttribute('from'),
                       resource = (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid')) ? jid : Strophe.getResourceFromJid(jid),
-                      sender = resource && Strophe.unescapeNode(resource) || '';
+                      sender = (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderName').textContent)  ? stanza.querySelector('data').querySelector('senderName').textContent : '';
                     // console.log(jid, resource, sender);
                 if (!this.handleMessageCorrection(stanza)) {
                     if (sender === '') {
@@ -1021,7 +1021,7 @@ converse.plugins.add('converse-muc', {
                         }
                     }
                     // console.dir(stanza);
-                    // console.log(this);
+                    // console.log(stanza);
                     const msg = await this.createMessage(stanza, original_stanza);
                     // console.log('stanza: ', stanza);
                     if (msg && stanza.querySelector('data').querySelector('senderName')) {
@@ -1382,8 +1382,8 @@ converse.plugins.add('converse-muc', {
                     room_jid, {'password': x_el.getAttribute('password') });
 
                 if (chatroom.get('connection_status') === converse.ROOMSTATUS.DISCONNECTED) {
-                    const myVCard = _converse.vcards.findWhere({jid: _converse.bare_jid});
-                    _converse.chatboxviews.get(room_jid).join(myVCard.get('fullname'));
+                    // const myVCard = _converse.vcards.findWhere({jid: _converse.bare_jid});
+                    chatroom.join(_converse.user_settings.fullname);
                 }
             }
         };
@@ -1404,7 +1404,8 @@ converse.plugins.add('converse-muc', {
             jid = jid.toLowerCase();
             attrs.type = _converse.CHATROOMS_TYPE;
             attrs.id = jid;
-            attrs.box_id = b64_sha1(jid)
+            attrs.box_id = b64_sha1(jid);
+            // console.log(jid, attrs, create);
             return _converse.chatboxes.getChatBox(jid, attrs, create);
         };
 

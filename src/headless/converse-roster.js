@@ -75,7 +75,7 @@ converse.plugins.add('converse-roster', {
         };
 
 
-        _converse.populateRoster = function (ignore_cache=false) {
+        _converse.populateRoster = function (ignore_cache=true) {
             /* Fetch all the roster groups, and then the roster contacts.
              * Emit an event after fetching is done in each case.
              *
@@ -423,6 +423,7 @@ converse.plugins.add('converse-roster', {
                     _converse.send_initial_presence = true;
                     _converse.roster.fetchFromServer();
                 } else {
+                    // rawItems = collection;
                     _converse.emit('cachedRoster', collection);
                 }
             },
@@ -587,33 +588,35 @@ converse.plugins.add('converse-roster', {
                     stanza.attrs({'ver': this.data.get('version')});
                 }
                 let iq;
-                try {
-                     _converse.api.sendIQ(stanza).then(
-                         res => {
-                             this.onReceivedFromServer(res);
-                         },
-                         err => console.log(err)
-                     )
-                  
-                } catch (e) {
-                    _converse.log(e, Strophe.LogLevel.ERROR);
-                    return _converse.log(
-                        "Error while trying to fetch roster from the server",
-                        Strophe.LogLevel.ERROR
-                    );
+                
+                while(iq === undefined) {
+                    // we fetch rsoter from server until iq recieve value :)
+                    try {
+                        iq = await _converse.api.sendIQ(stanza);
+                    } catch (error) {
+                        _converse.log(error, Strophe.LogLevel.ERROR);
+                        // return this.onReceivedFromServer(iq);
+                        _converse.log(
+                            "Error while trying to fetch roster from the server",
+                            Strophe.LogLevel.ERROR
+                        );
+                    }
                 }
-                // return this.onReceivedFromServer(iq);
+             
+                return this.onReceivedFromServer(iq);
             },
 
             onReceivedFromServer (iq) {
                 /* An IQ stanza containing the roster has been received from
                  * the XMPP server.
                  */
+               
                 const query = sizzle(`query[xmlns="${Strophe.NS.ROSTER}"]`, iq).pop();
                 if (query) {
                     const items = sizzle(`item`, query);
                     currentItems = _.cloneDeep(items);
                     rawItems = _.cloneDeep(items);
+                    // console.log(items);
                     this.compareContacts(importedContacts, 'Address Book');
                     this.compareContacts(organizationContacts, 'My Organization');
                     this.data.save('version', query.getAttribute('ver'));
@@ -685,19 +688,61 @@ converse.plugins.add('converse-roster', {
                 const contact = this.get(jid),
                     subscription = 'both',
                     ask = item.getAttribute("ask");
+                let rosterName = item.getAttribute("name");
                     // groups = _.map(item.getElementsByTagName('group'), Strophe.getText);
 
                 if (!contact) {
                     // if ((subscription === "none" && ask === null) || (subscription === "remove")) {
                     //     return; // We're lazy when adding contacts.
                     // }
-                    this.create({
-                        'ask': ask,
-                        'nickname': item.getAttribute("name"),
-                        'groups': groups,
-                        'jid': jid,
-                        'subscription': subscription
-                    }, {sort: true});
+                    const that =this;
+                    if (!rosterName) {
+                        var ping = {
+                        userName: `${jid.split('@')[0]}`
+                        };
+                        var json = JSON.stringify(ping);
+                        var url = `${_converse.user_settings.baseUrl}/userProfile`
+                        var xhr = new XMLHttpRequest();
+                        xhr.open("POST", url, false);
+                        xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+                        xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+                        xhr.onload = function () { // Call a function when the state changes.
+                        if (xhr.status >= 200 && xhr.status < 400) {
+                            // Request finished. Do processing here.
+                            const res = JSON.parse(xhr.responseText);
+                            if (res.response) {
+                                rosterName = res.response.fullName;
+
+                                 that.create({
+                                   'ask': ask,
+                                   'nickname': rosterName,
+                                   'groups': groups,
+                                   'jid': jid,
+                                   'subscription': subscription
+                                 }, {
+                                   sort: true
+                                 });
+
+                            } else {
+                            console.log('nothing here');
+                            }
+                        } else {
+                            xhr.onerror();
+                        }
+                        }
+                        xhr.send(json);
+                    } else {
+                         this.create({
+                           'ask': ask,
+                           'nickname': rosterName,
+                           'groups': groups,
+                           'jid': jid,
+                           'subscription': subscription
+                         }, {
+                           sort: true
+                         });
+                    }
+
                 } else {
                     // We only find out about requesting contacts via the
                     // presence handler, so if we receive a contact

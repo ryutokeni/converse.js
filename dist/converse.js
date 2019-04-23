@@ -20034,7 +20034,7 @@ utils.intFromLE = intFromLE;
 /*! exports provided: _args, _development, _from, _id, _inBundle, _integrity, _location, _phantomChildren, _requested, _requiredBy, _resolved, _spec, _where, author, bugs, dependencies, description, devDependencies, files, homepage, keywords, license, main, name, repository, scripts, version, default */
 /***/ (function(module) {
 
-module.exports = {"_args":[["elliptic@6.4.0","/Users/admin/Ant-Tech/Projects/converse-test/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/admin/Ant-Tech/Projects/converse-test/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
+module.exports = {"_args":[["elliptic@6.4.0","/Users/macuser/Desktop/pageme/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/macuser/Desktop/pageme/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
 
 /***/ }),
 
@@ -73468,20 +73468,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
           this.insertIntoTextArea(message.get('message'), true, true);
         }
 
-        if (!message.get('received') && this.model.get('hidden') && message.get('sender') !== 'me') {// _converse.incrementMsgCounter();
-          //  this.model.save({
-          //    num_unread: this.model.messages.models.filter(e => (!e.get('silent') && !e.get('received'))).length,
-          //    num_unread_general:  1
-          //  });
-          // if (message.get('type') !== 'chat') {
-          //     console.log(this.model);
-          // }
-          // this.model.save({
-          //     'num_unread': this.model.get('num_unread') + 1,
-          //     'num_unread_general': 1
-          // })
-        }
-
         _converse.emit('messageAdded', {
           'message': message,
           'chatbox': this.model
@@ -73518,6 +73504,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
         if (this.parseMessageForCommands(text)) {
           return;
+        } // console.log(this.model.get('connection_status'));
+
+
+        if (this.model.get('connection_status') !== 5) {
+          // console.log(this.model);
+          // _converse.emit('forceReconnectChatroom');
+          return this.showHelpMessages(['Sorry, your connection have some problem!'], 'info');
         }
 
         const attrs = this.model.getOutgoingMessageAttributes(text, spoiler_hint);
@@ -75749,8 +75742,16 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         this.model.on('change', this.onChanged, this);
         this.model.on('destroy', this.remove, this);
         this.model.on('change:senderName', this.render, this);
+        this.model.on('change:senderFullName', this.render, this);
 
         _converse.on('rerenderMessage', this.render, this);
+
+        _converse.on('updateProfile', data => {
+          if (this.model.get('sender') === 'me') {
+            this.image = data.avatarUrl;
+            this.model.get('type') === 'groupchat' ? this.model.set('senderName', data.fullName) : this.model.set('senderFullName', data.fullName); // this.renderAvatar(msg);
+          }
+        });
       },
 
       async render(force) {
@@ -75936,23 +75937,21 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
 
           this.width = this.height = 60;
 
-          if (this.model.get('type') === 'groupchat' && this.model.get('sender') === 'them') {
-            if (this.model.get('senderJid')) {
-              //if it comes from webapp, jid can get by call attribute 'senderJid'
-              this.image = _converse.user_settings.avatarUrl + this.model.get('senderJid');
+          if (this.model.get('sender') === 'them') {
+            if (this.model.get('type') === 'groupchat') {
+              if (this.model.get('senderJid')) {
+                //if it comes from webapp, jid can get by call attribute 'senderJid'
+                this.image = _converse.user_settings.avatarUrl + this.model.get('senderJid');
+              } else {
+                //if it comes from mobile, jid can get by split the attribute 'from'
+                this.image = _converse.user_settings.avatarUrl + this.model.get('from').split('/')[1].split('@')[0];
+              }
             } else {
-              //if it comes from mobile, jid can get by split the attribute 'from'
-              this.image = _converse.user_settings.avatarUrl + this.model.get('from').split('/')[1].split('@')[0];
+              if (this.model.get('type') === 'chat') {
+                this.image = _converse.user_settings.avatarUrl + this.model.get('from').split('@')[0];
+              }
             }
           }
-
-          _converse.api.listen.on('updateProfile', data => {
-            if (data.avatarUrl.includes(jid)) {
-              this.image = data.avatarUrl;
-              this.model.set('senderName', data.fullName);
-              this.renderAvatar(msg);
-            }
-          });
 
           this.renderAvatar(msg);
         }
@@ -77467,15 +77466,18 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
 
         this.model.on('configurationNeeded', this.getAndRenderConfigurationForm, this);
         this.model.on('destroy', this.hide, this);
-        this.model.on('show', this.show, this);
-        this.model.attributes.from_groupChat = true; // this.model.occupants.on('add', this.onOccupantAdded, this);
+        this.model.on('show', this.show, this); // this.model.attributes.from_groupChat = true;
+        // this.model.occupants.on('add', this.onOccupantAdded, this);
         // this.model.occupants.on('remove', this.onOccupantRemoved, this);
         // this.model.occupants.on('change:show', this.showJoinOrLeaveNotification, this);
         // this.model.occupants.on('change:role', this.informOfOccupantsRoleChange, this);
         // this.model.occupants.on('change:affiliation', this.informOfOccupantsAffiliationChange, this);
 
         this.createEmojiPicker();
-        this.createOccupantsView();
+        this.createOccupantsView(); // this.model.save({
+        // 'connection_status': converse.ROOMSTATUS.DISCONNECTED
+        // })
+
         this.render().insertIntoDOM();
         this.registerHandlers();
         this.enterRoom();
@@ -77484,7 +77486,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         _converse.on('AllMessageAreLoaded', jid => {
           if (jid === this.model.get('jid')) {
             u.hideElement(this.el.querySelector('button.load-more-messages'));
-            u.hideElement(this.el.querySelector('.fa-spinner'));
+            u.hideElement(this.el.querySelector('.loading-more-spin'));
             this.model.save({
               isAllLoaded: true
             });
@@ -77493,7 +77495,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
 
         _converse.on('UnDisabledButtonLoadmore', () => {
           //    this.hideSpinner();
-          u.hideElement(this.el.querySelector('.fa-spinner'));
+          u.hideElement(this.el.querySelector('.loading-more-spin'));
           this.model.save({
             loadingMore: false
           });
@@ -77510,12 +77512,12 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
               });
               u.hideElement(this.el.querySelector('button.load-more-messages'));
             } else {
-              u.showElement(this.el.querySelector('.fa-spinner'));
+              u.showElement(this.el.querySelector('.loading-more-spin'));
 
               if (!this.model.get('loadingMore')) {
+                console.log('load more mess', this.model);
                 this.loadMoreMessages();
-              } // u.showElement(this.el.querySelector('button.load-more-messages'))
-
+              }
             }
           } else {
             u.hideElement(this.el.querySelector('button.load-more-messages'));
@@ -77523,46 +77525,12 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         });
       },
 
-      // checkMessageLength() {
-      //     // const that = this;
-      //     //     var ping = {
-      //     //         numberOfMinutes: 1440,
-      //     //         id: this.model.get('jid'),
-      //     //         pageSize: 20,
-      //     //         pageNumber: 1,
-      //     //         lastLoadedTime: ''
-      //     //     };
-      //     //     var json = JSON.stringify(ping);
-      //     //     var xhr = new XMLHttpRequest();
-      //     //     var url = `${_converse.user_settings.baseUrl}/group/messageList`
-      //     //     xhr.open("POST", url, false);
-      //     //     xhr.setRequestHeader("securityToken", _converse.user_settings.password);
-      //     //     xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-      //     //     xhr.onload = function () { // Call a function when the state changes.
-      //     //         if (xhr.status >= 200 && xhr.status < 400) {
-      //     //         // Request finished. Do processing here.
-      //     //             const res = JSON.parse(xhr.responseText);
-      //     //             if (res.response && res.response.length >= 20) {
-      //     //                     that.model.save({
-      //     //                         isShowLoadMore: true
-      //     //                     })
-      //     //             } else {
-      //     //                     that.model.save({
-      //     //                       isShowLoadMore: false
-      //     //                     })
-      //     //                     //    u.hideElement(that.model.querySelector('.load-more-messages'));
-      //     //                     //    console.log('nothing here');
-      //     //             }
-      //     //             } else {
-      //     //              xhr.onerror();
-      //     //             }
-      //     //     }
-      //     //     xhr.send(json);
-      // },
       enterRoom(ev) {
         if (ev) {
           ev.preventDefault();
-        }
+        } // this.populateAndJoin();//we obviously want to join the chatroom by calling join function of the model
+        // this.model.get('connection_status') !== converse.ROOMSTATUS.ENTERED
+
 
         if (this.model.get('connection_status') !== _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].ROOMSTATUS.ENTERED) {
           const handler = () => {
@@ -78235,7 +78203,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
       populateAndJoin() {
         // this.model.occupants.fetchMembers();
         this.join();
-        this.fetchMessages();
+        this.fetchMessages(); // this.hideSpinner();
       },
 
       join(nick, password) {
@@ -78418,24 +78386,23 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         /* Render a form which allows the user to choose their
          * nickname.
          */
-        this.hideChatRoomContents();
-
-        _.each(this.el.querySelectorAll('span.centered.spinner'), u.removeElement);
-
-        if (!_.isString(message)) {
-          message = '';
-        }
-
-        const container_el = this.el.querySelector('.chatroom-body');
-        container_el.insertAdjacentHTML('beforeend', templates_chatroom_nickname_form_html__WEBPACK_IMPORTED_MODULE_15___default()({
-          heading: __('Please choose your nickname'),
-          label_nickname: __('Nickname'),
-          label_join: __('Enter groupchat'),
-          validation_message: message
-        }));
-        this.model.save('connection_status', _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].ROOMSTATUS.NICKNAME_REQUIRED);
-        const form_el = this.el.querySelector('.chatroom-form');
-        form_el.addEventListener('submit', this.submitNickname.bind(this), false);
+        // this.hideChatRoomContents();
+        // _.each(this.el.querySelectorAll('span.centered.spinner'), u.removeElement);
+        // if (!_.isString(message)) {
+        //     message = '';
+        // }
+        // const container_el = this.el.querySelector('.chatroom-body');
+        // container_el.insertAdjacentHTML(
+        //     'beforeend',
+        //     tpl_chatroom_nickname_form({
+        //         heading: __('Please choose your nickname'),
+        //         label_nickname: __('Nickname'),
+        //         label_join: __('Enter groupchat'),
+        //         validation_message: message
+        //     }));
+        // this.model.save('connection_status', converse.ROOMSTATUS.NICKNAME_REQUIRED);
+        // const form_el = this.el.querySelector('.chatroom-form');
+        // form_el.addEventListener('submit', this.submitNickname.bind(this), false);
       },
 
       submitPassword(ev) {
@@ -78893,8 +78860,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
          * example after the spinner has been removed or after a
          * form has been submitted and removed.
          */
-        if (this.model.get('connection_status') == _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].ROOMSTATUS.NICKNAME_REQUIRED) {
-          this.renderNicknameForm();
+        if (this.model.get('connection_status') == _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].ROOMSTATUS.NICKNAME_REQUIRED) {// this.renderNicknameForm();
         } else if (this.model.get('connection_status') == _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].ROOMSTATUS.PASSWORD_REQUIRED) {
           this.renderPasswordForm();
         } else {
@@ -79288,12 +79254,16 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         this.model.on('change:status', this.render, this);
         this.model.set('avatarUrl', `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`);
 
-        _converse.api.listen.on('updateProfile', data => {
+        _converse.on('updateProfile', data => {
           if (data.avatarUrl.includes(this.model.get('userName'))) {
-            this.model.set('avatarUrl', data.avatarUrl);
-            this.model.set('fullName', data.fullName);
+            this.model.save({
+              'avatarUrl': data.avatarUrl,
+              'fullName': data.fullName
+            });
           }
-        });
+        }); // _converse.on('updateProfile', data => {
+        // });
+
       },
 
       toHTML() {
@@ -79446,6 +79416,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
     }
 
     _converse.on('reconnected', reconnectToChatRooms);
+
+    _converse.on('forceReconnectChatroom', reconnectToChatRooms);
     /************************ END Event Handlers ************************/
 
     /************************ BEGIN API ************************/
@@ -81566,9 +81538,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
       },
 
       initialize() {
-        // _converse.emit('profileModalReadyToListen');
         this.model.on("change", this.render, this);
-        this.model.vcard.on("change", this.render, this); // console.log('profile Modal initialized!!');
+        this.model.vcard.on("change", this.render, this);
+        this.model.on("change:avatarUrl", this.afterRender, this);
+        this.model.save({
+          'avatarUrl': _converse.user_settings.avatarUrl + _converse.user_settings.jid.split('@')[0],
+          'fullName': _converse.user_settings.fullname
+        });
 
         _converse.on('numRequestChange', num => {
           this.model.save({
@@ -81578,6 +81554,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_4__["default"].plugins
 
         _converse.on("disabledNotificationFromCore", state => {
           this.model.set("stateNotification", state);
+        });
+
+        _converse.on('updateProfile', data => {
+          this.model.save({
+            'avatarUrl': data.avatarUrl,
+            'fullName': data.fullName
+          });
         });
       },
 
@@ -85780,6 +85763,12 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           }) || _converse.vcards.create({
             'jid': jid
           });
+
+          _converse.on('updateProfile', data => {
+            this.vcard.save({
+              'fullname': data.fullName
+            });
+          });
         }
       },
 
@@ -85789,9 +85778,9 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
 
       getDisplayName() {
         if (this.get('type') === 'groupchat') {
-          return this.get('senderName') || this.get('nick');
+          return this.get('senderName') || this.vcard.get('fullname') || 'Loading...';
         } else {
-          return this.vcard.get('fullname') || 'Loading...';
+          return this.get('senderFullName') || this.vcard.get('fullname') || 'Loading...';
         }
       },
 
@@ -86061,7 +86050,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           }).c('sentDate').t(sentDate).up().c('timeToRead').t(timeToRead).up();
 
           if (message.get('type') === 'groupchat') {
-            stanza.c('senderName').t(_converse.user_settings.fullname).up();
+            stanza.c('senderName').t(_converse.user_settings.fullname).up(); // console.log(_converse.user_settings.fullname);
+
             stanza.c('senderJid').t(_converse.connection.jid.split('@')[0]).up(); //we set the jid of sender to stanza so we can get it later to render avatar
           }
 
@@ -86132,9 +86122,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           decrypted: rawText,
           sentDate: sentDate,
           stanza: stanza.node
-        });
+        }); // _converse.api.emit('rerenderMessage');
 
-        _converse.api.emit('rerenderMessage');
 
         return stanza;
       },
@@ -86154,6 +86143,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
             'stamp': moment().format()
           }).up().cnode(stanza.tree()));
         }
+
+        _converse.api.emit('rerenderMessage');
       },
 
       getOutgoingMessageAttributes(text, spoiler_hint) {
@@ -86177,7 +86168,10 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
          *  Parameters:
          *    (Message) message - The chat message
          */
-        attrs.sent = new Date().getTime() / 1000;
+        attrs.sent = new Date().getTime() / 1000; // if (attrs.type === 'groupchat') {
+        //     attrs.received = (new Date()).getTime() / 1000;
+        // }
+
         const body = attrs.message;
         const mediaId = attrs.mediaId;
         const medialRequestKey = attrs.medialRequestKey;
@@ -86369,6 +86363,10 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           attrs.from = stanza.getAttribute('from');
           attrs.nick = Strophe.unescapeNode(Strophe.getResourceFromJid(attrs.from));
 
+          if (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderName')) {
+            attrs.senderName = stanza.querySelector('data').querySelector('senderName').textContent; // console.log('the senderName we got from stanza: ', attrs.senderName);
+          }
+
           if (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid')) {
             //if it has senderId, create attrs SenderJid for load avatar in chatview
             attrs.senderJid = stanza.querySelector('data').querySelector('senderJid').innerHTML;
@@ -86551,7 +86549,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
             chatbox.trigger('show');
           }
         });
-        console.log('emit chatboxes fetched event');
 
         _converse.emit('chatBoxesFetched');
       },
@@ -86701,33 +86698,99 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         }
 
         const attrs = {
-          'fullname': _.get(_converse.api.contacts.get(contact_jid), 'attributes.fullname') // Get chat box, but only create a new one when the message has a body.
-
+          'fullname': _.get(_converse.api.contacts.get(contact_jid), 'attributes.fullname')
         };
-        const has_body = sizzle(`body, encrypted[xmlns="${Strophe.NS.OMEMO}"]`).length > 0;
-        const chatbox = this.getChatBox(contact_jid, attrs, has_body);
+        let senderFullName = attrs.fullname;
 
-        if (chatbox && !chatbox.handleMessageCorrection(stanza) && !chatbox.handleReceipt(stanza)) {
-          const msgid = stanza.getAttribute('id'),
-                message = msgid && chatbox.messages.findWhere({
-            msgid
-          });
+        if (!attrs.fullname && !is_me) {
+          const that = this;
+          var ping = {
+            userName: `${contact_jid.split('@')[0]}`
+          };
+          var json = JSON.stringify(ping);
+          var url = `${_converse.user_settings.baseUrl}/userProfile`;
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", url, false);
+          xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+          xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
 
-          if (!message) {
-            // Only create the message when we're sure it's not a duplicate
-            chatbox.createMessage(stanza, original_stanza, extraAttrs).then(msg => chatbox.incrementUnreadMsgCounter(msg)).catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
-          } else {
-            message.save(extraAttrs);
+          xhr.onload = function () {
+            // Call a function when the state changes.
+            if (xhr.status >= 200 && xhr.status < 400) {
+              // Request finished. Do processing here.
+              const res = JSON.parse(xhr.responseText);
 
-            _converse.emit('rerenderMessage');
+              if (res.response) {
+                attrs.fullname = res.response.fullName;
+                senderFullName = res.response.fullName;
+                const has_body = sizzle(`body, encrypted[xmlns="${Strophe.NS.OMEMO}"]`).length > 0;
+                const chatbox = that.getChatBox(contact_jid, attrs, has_body);
+
+                if (chatbox && !chatbox.handleMessageCorrection(stanza) && !chatbox.handleReceipt(stanza)) {
+                  const msgid = stanza.getAttribute('id'),
+                        message = msgid && chatbox.messages.findWhere({
+                    'msgid': msgid
+                  });
+
+                  if (!message) {
+                    // Only create the message when we're sure it's not a duplicate
+                    chatbox.createMessage(stanza, original_stanza, extraAttrs).then(msg => {
+                      chatbox.incrementUnreadMsgCounter(msg);
+                      msg.set('senderFullName', senderFullName);
+                    }).catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
+                  } else {
+                    message.save(extraAttrs);
+                    message.set('senderFullName', senderFullName);
+
+                    _converse.emit('rerenderMessage');
+                  }
+                }
+
+                _converse.emit('message', {
+                  'stanza': original_stanza,
+                  'chatbox': chatbox,
+                  'silent': (extraAttrs || {}).silent
+                });
+              } else {
+                console.log('nothing here');
+              }
+            } else {
+              xhr.onerror();
+            }
+          };
+
+          xhr.send(json);
+        } else {
+          const has_body = sizzle(`body, encrypted[xmlns="${Strophe.NS.OMEMO}"]`).length > 0;
+          const chatbox = this.getChatBox(contact_jid, attrs, has_body);
+
+          if (chatbox && !chatbox.handleMessageCorrection(stanza) && !chatbox.handleReceipt(stanza)) {
+            const msgid = stanza.getAttribute('id'),
+                  message = msgid && chatbox.messages.findWhere({
+              'msgid': msgid
+            });
+
+            if (!message) {
+              // Only create the message when we're sure it's not a duplicate
+              chatbox.createMessage(stanza, original_stanza, extraAttrs).then(msg => {
+                chatbox.incrementUnreadMsgCounter(msg);
+                msg.set('senderFullName', senderFullName); //   } 
+              }).catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
+            } else {
+              message.save(extraAttrs);
+              message.set('senderFullName', senderFullName);
+
+              _converse.emit('rerenderMessage');
+            }
           }
-        }
 
-        _converse.emit('message', {
-          'stanza': original_stanza,
-          'chatbox': chatbox,
-          'silent': (extraAttrs || {}).silent
-        });
+          _converse.emit('message', {
+            'stanza': original_stanza,
+            'chatbox': chatbox,
+            'silent': (extraAttrs || {}).silent
+          });
+        } // Get chat box, but only create a new one when the message has a body.
+
 
         return true;
       },
@@ -87935,26 +87998,28 @@ _converse.initialize = function (settings, callback) {
     /* Ask the XMPP server to enable Message Carbons
      * See XEP-0280 https://xmpp.org/extensions/xep-0280.html#enabling
      */
-    // if (!this.message_carbons || this.session.get('carbons_enabled')) {
-    //     return;
-    // }
+    if (!this.message_carbons || this.session.get('carbons_enabled')) {
+      return;
+    }
+
     const carbons_iq = new strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].Builder('iq', {
       'from': this.connection.jid,
       'id': 'enablecarbons',
       'type': 'set'
     }).c('enable', {
       xmlns: strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].NS.CARBONS
-    }); // this.connection.addHandler((iq) => {
-    //     if (iq.querySelectorAll('error').length > 0) {
-    //         _converse.log(
-    //             'An error occurred while trying to enable message carbons.',
-    //             Strophe.LogLevel.WARN);
-    //     } else {
-    //         this.session.save({'carbons_enabled': true});
-    //         _converse.log('Message carbons have been enabled.');
-    //     }
-    // }, null, "iq", null, "enablecarbons");
+    });
+    this.connection.addHandler(iq => {
+      if (iq.querySelectorAll('error').length > 0) {
+        _converse.log('An error occurred while trying to enable message carbons.', strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].LogLevel.WARN);
+      } else {
+        this.session.save({
+          'carbons_enabled': true
+        });
 
+        _converse.log('Message carbons have been enabled.');
+      }
+    }, null, "iq", null, "enablecarbons");
     this.connection.send(carbons_iq);
   };
 
@@ -87996,8 +88061,9 @@ _converse.initialize = function (settings, callback) {
 
     _converse.setUserJID();
 
-    _converse.initSession(); // _converse.enableCarbons();
+    _converse.initSession();
 
+    _converse.enableCarbons();
 
     _converse.initStatus(reconnecting);
   };
@@ -88823,7 +88889,7 @@ const converse = {
       return _converse.roster.compareContacts(contacts, group, true);
     }
 
-    return _converse.api.listen.on('roster', () => {
+    return _converse.api.listen.on('rosterContactsFetched', () => {
       _converse.roster.compareContacts(contacts, group, true);
     });
   },
@@ -88836,15 +88902,20 @@ const converse = {
         },
         nick: group.nick
       });
-      chatbox.save({
-        users: group.users,
-        latestMessageTime: group.latestMessageTime,
-        subject: {
-          text: group.groupName
-        },
-        name: group.groupName
-      });
-      chatbox.join(group.groupName);
+
+      if (chatbox) {
+        // console.log(chatbox);
+        chatbox.save({
+          users: group.users,
+          latestMessageTime: group.latestMessageTime,
+          subject: {
+            text: group.groupName
+          },
+          name: group.groupName,
+          nick: group.nick
+        }); // console.log('chatbox after we update: ', chatbox);
+      } // chatbox.join(group.nick);
+
     });
   },
 
@@ -89101,20 +89172,19 @@ const converse = {
 
     participants.forEach(user => {
       chatbox.directInvite(user, 'pageme invite');
-    });
-    let arrayParticipants = participants.map(e => e.split('@')[0]);
-    let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => arrayParticipants.includes(e.userName));
-    let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => arrayParticipants.includes(e.userName));
-    let arrayUser = arrayAddressBook.concat(arrayOrganization);
-    arrayUser = _lodash_noconflict__WEBPACK_IMPORTED_MODULE_4___default.a.uniq(arrayUser);
-    arrayUser = arrayUser.map(e => {
-      e['joinedDate'] = moment__WEBPACK_IMPORTED_MODULE_7___default()(e['joinedDate'], 'YYYYMMDDHHmmssZ');
-      return e;
-    });
-    chatbox.save({
-      users: arrayUser,
-      latestMessageTime: null
-    });
+    }); // let arrayParticipants = participants.map(e => (e.split('@')[0]))
+    // let arrayAddressBook = (_converse.user_settings.imported_contacts || []).filter(e => (arrayParticipants.includes(e.userName)))
+    // let arrayOrganization = (_converse.user_settings.my_organization || []).filter(e => (arrayParticipants.includes(e.userName)))
+    // let arrayUser = arrayAddressBook.concat(arrayOrganization);
+    // arrayUser = _.uniq(arrayUser);
+    // arrayUser = arrayUser.map(e => {
+    //     e['joinedDate'] = moment(e['joinedDate'], 'YYYYMMDDHHmmssZ')
+    //     return e;
+    // })
+    // chatbox.save({
+    //     users: arrayUser,
+    //     latestMessageTime: null
+    // })
   },
 
   'onShowPageMeFormConfirmDownload'(callback) {
@@ -89189,7 +89259,7 @@ const converse = {
       }
 
       if (msg.stanza.getAttribute('type') === 'groupchat') {
-        chatbox.onMessage(msg.stanza);
+        chatbox.onMessage(msg.stanza); //   console.log('stanza we got from converse-core: ', msg.stanza);
       } else {
         _converse.chatboxes.onMessage(msg.stanza, {
           silent: true
@@ -89280,7 +89350,8 @@ const converse = {
 
   'updateProfile'(data) {
     _converse.api.waitUntil('statusInitialized').then(() => {
-      _converse.emit('updateProfile', data);
+      _converse.emit('updateProfile', data); //   const vcard = _converse.vcards.
+
 
       _converse.xmppstatus.save(data);
     });
@@ -91014,7 +91085,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         this.constructor.__super__.initialize.apply(this, arguments);
 
         this.on('change:connection_status', this.onConnectionStatusChanged, this);
-        this.on('change:users', this.updateGroupMembers, this);
+        this.on('change:users', this.updateGroupMembers, this); // this.on('change:chat_state', this.sendChatState, this);
+
         this.occupants = new _converse.ChatRoomOccupants();
         this.occupants.browserStorage = new Backbone.BrowserStorage.session(b64_sha1(`converse.occupants-${_converse.bare_jid}${this.get('jid')}`));
         this.occupants.chatroom = this; // console.log(this);
@@ -91124,12 +91196,13 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
         if (!nick) {
           throw new TypeError('join: You need to provide a valid nickname');
-        } // if (this.get('connection_status') === converse.ROOMSTATUS.ENTERED) {
-        //     // We have restored a groupchat from session storage,
-        //     // so we don't send out a presence stanza again.
-        //     return this;
-        // }
+        }
 
+        if (this.get('connection_status') === _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].ROOMSTATUS.ENTERED) {
+          // We have restored a groupchat from session storage,
+          // so we don't send out a presence stanza again.
+          return this;
+        }
 
         const stanza = $pres({
           'from': _converse.connection.jid,
@@ -91283,13 +91356,13 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
         text = _this$parseTextForRef2[0];
         references = _this$parseTextForRef2[1];
+        // console.log('this model: ', this);
         return {
           'from': `${this.get('jid')}/${this.get('nick')}`,
           'fullname': this.get('nick'),
           'is_spoiler': is_spoiler,
           'message': text ? _utils_form__WEBPACK_IMPORTED_MODULE_7__["default"].httpToGeoUri(_utils_form__WEBPACK_IMPORTED_MODULE_7__["default"].shortnameToUnicode(text), _converse) : undefined,
           'nick': this.get('nick'),
-          // 'senderJid': _converse.connection.jid.split('@')[0],
           'references': references,
           'sender': 'me',
           'spoiler_hint': is_spoiler ? spoiler_hint : undefined,
@@ -91958,7 +92031,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
          * Parameters:
          *  (XMLElement) stanza: The message stanza.
          */
-        // console.log(stanza);
         this.fetchFeaturesIfConfigurationChanged(stanza);
         const original_stanza = stanza,
               forwarded = sizzle(`forwarded[xmlns="${Strophe.NS.FORWARD}"]`, stanza).pop();
@@ -91975,7 +92047,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
         const jid = stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid') ? stanza.querySelector('data').querySelector('senderJid').innerHTML : stanza.getAttribute('from'),
               resource = stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid') ? jid : Strophe.getResourceFromJid(jid),
-              sender = resource && Strophe.unescapeNode(resource) || ''; // console.log(jid, resource, sender);
+              sender = stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderName').textContent ? stanza.querySelector('data').querySelector('senderName').textContent : ''; // console.log(jid, resource, sender);
 
         if (!this.handleMessageCorrection(stanza)) {
           if (sender === '') {
@@ -91996,7 +92068,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
               });
             }
           } // console.dir(stanza);
-          // console.log(this);
+          // console.log(stanza);
 
 
           const msg = await this.createMessage(stanza, original_stanza); // console.log('stanza: ', stanza);
@@ -92403,11 +92475,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         });
 
         if (chatroom.get('connection_status') === _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].ROOMSTATUS.DISCONNECTED) {
-          const myVCard = _converse.vcards.findWhere({
-            jid: _converse.bare_jid
-          });
-
-          _converse.chatboxviews.get(room_jid).join(myVCard.get('fullname'));
+          // const myVCard = _converse.vcards.findWhere({jid: _converse.bare_jid});
+          chatroom.join(_converse.user_settings.fullname);
         }
       }
     };
@@ -92430,7 +92499,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
       jid = jid.toLowerCase();
       attrs.type = _converse.CHATROOMS_TYPE;
       attrs.id = jid;
-      attrs.box_id = b64_sha1(jid);
+      attrs.box_id = b64_sha1(jid); // console.log(jid, attrs, create);
+
       return _converse.chatboxes.getChatBox(jid, attrs, create);
     };
 
@@ -92457,19 +92527,14 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           const hasGroupChatBox = boxesExisting.filter(box => box.get('message_type') === 'groupchat');
 
           if (hasGroupChatBox) {
-            console.log('break it?');
             return;
           }
         }
 
         if (_.isString(groupchat)) {
           _converse.api.rooms.open(groupchat);
-
-          console.log('we open room string ', groupchat);
         } else if (_.isObject(groupchat)) {
-          console.log('we open room object');
-
-          _converse.api.rooms.open(groupchat, {
+          _converse.api.rooms.open(jid, {
             'name': name
           });
         } else {
@@ -92984,7 +93049,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
       _converse.emit('rosterInitialized');
     };
 
-    _converse.populateRoster = function (ignore_cache = false) {
+    _converse.populateRoster = function (ignore_cache = true) {
       /* Fetch all the roster groups, and then the roster contacts.
        * Emit an event after fetching is done in each case.
        *
@@ -93364,6 +93429,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
 
           _converse.roster.fetchFromServer();
         } else {
+          // rawItems = collection;
           _converse.emit('cachedRoster', collection);
         }
       },
@@ -93567,23 +93633,16 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
 
         let iq;
 
-        try {
-          //  _converse.api.sendIQ(stanza).then(
-          //      res => {
-          //          this.onReceivedFromServer(res);
-          //      },
-          //      err => console.log(err)
-          //  )
-          console.log(stanza);
-          iq = await _converse.api.sendIQ(stanza);
-        } catch (e) {
-          _converse.log(e, Strophe.LogLevel.ERROR);
+        while (iq === undefined) {
+          // we fetch rsoter from server until iq recieve value :)
+          try {
+            iq = await _converse.api.sendIQ(stanza);
+          } catch (error) {
+            _converse.log(error, Strophe.LogLevel.ERROR); // return this.onReceivedFromServer(iq);
 
-          _converse.emit('load-done', 'Address Book');
 
-          _converse.emit('load-done', 'Orgnazination');
-
-          return _converse.log("Error while trying to fetch roster from the server", Strophe.LogLevel.ERROR);
+            _converse.log("Error while trying to fetch roster from the server", Strophe.LogLevel.ERROR);
+          }
         }
 
         return this.onReceivedFromServer(iq);
@@ -93598,7 +93657,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         if (query) {
           const items = sizzle(`item`, query);
           currentItems = _.cloneDeep(items);
-          rawItems = _.cloneDeep(items);
+          rawItems = _.cloneDeep(items); // console.log(items);
+
           this.compareContacts(importedContacts, 'Address Book');
           this.compareContacts(organizationContacts, 'My Organization');
           this.data.save('version', query.getAttribute('ver'));
@@ -93680,21 +93740,63 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
 
         const contact = this.get(jid),
               subscription = 'both',
-              ask = item.getAttribute("ask"); // groups = _.map(item.getElementsByTagName('group'), Strophe.getText);
+              ask = item.getAttribute("ask");
+        let rosterName = item.getAttribute("name"); // groups = _.map(item.getElementsByTagName('group'), Strophe.getText);
 
         if (!contact) {
           // if ((subscription === "none" && ask === null) || (subscription === "remove")) {
           //     return; // We're lazy when adding contacts.
           // }
-          this.create({
-            'ask': ask,
-            'nickname': item.getAttribute("name"),
-            'groups': groups,
-            'jid': jid,
-            'subscription': subscription
-          }, {
-            sort: true
-          });
+          const that = this;
+
+          if (!rosterName) {
+            var ping = {
+              userName: `${jid.split('@')[0]}`
+            };
+            var json = JSON.stringify(ping);
+            var url = `${_converse.user_settings.baseUrl}/userProfile`;
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, false);
+            xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+            xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+
+            xhr.onload = function () {
+              // Call a function when the state changes.
+              if (xhr.status >= 200 && xhr.status < 400) {
+                // Request finished. Do processing here.
+                const res = JSON.parse(xhr.responseText);
+
+                if (res.response) {
+                  rosterName = res.response.fullName;
+                  that.create({
+                    'ask': ask,
+                    'nickname': rosterName,
+                    'groups': groups,
+                    'jid': jid,
+                    'subscription': subscription
+                  }, {
+                    sort: true
+                  });
+                } else {
+                  console.log('nothing here');
+                }
+              } else {
+                xhr.onerror();
+              }
+            };
+
+            xhr.send(json);
+          } else {
+            this.create({
+              'ask': ask,
+              'nickname': rosterName,
+              'groups': groups,
+              'jid': jid,
+              'subscription': subscription
+            }, {
+              sort: true
+            });
+          }
         } else {
           // We only find out about requesting contacts via the
           // presence handler, so if we receive a contact
@@ -94170,7 +94272,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins.add('converse-vca
       let iq;
 
       try {
-        iq = await _converse.api.sendIQ(createStanza("get"));
+        iq = await _converse.api.sendIQ(createStanza("get", to));
       } catch (iq) {
         return {
           'stanza': iq,
@@ -118566,7 +118668,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/chatarea.html -->\n<div class="chat-area col-md-9 col-8">\n    <div class="text-center">\n        <i class="fas hidden fa-spinner"></i>\n        <button  class="btn btn-primary hidden load-more-messages ' +
+__p += '<!-- src/templates/chatarea.html -->\n<div class="chat-area col-md-9 col-8">\n    <div class="text-center">\n        <!-- <i class="fas  fa-spinner "></i> -->\n        <span class="spinner fa fa-spinner loading-more-spin centered hidden" />\n        <button  class="btn btn-primary hidden load-more-messages ' +
 __e(o.user_id) +
 '">Load more...</button>\n    </div>\n    <div class="chat-content ';
  if (o.show_send_button) { ;
@@ -121110,7 +121212,7 @@ __p += '\n        <a class="controlbox-heading__btn add-contact align-self-cente
 __e(o.title_add_contact) +
 '"\n           data-toggle="modal"\n           data-target="#add-contact-modal"></a>\n    ';
  } ;
-__p += ' -->\n</div>\n\n<form class="roster-filter-form"></form>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #fff" class="hidden roster-loading-Contacts">\n  <strong style="font-size: 1.2rem; color: #ACCCEA">Address Book</strong>\n  <span style="margin-top: 10px; color: #fff" class="spinner fa fa-spinner centered" />\n</div>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #fff" class="hidden roster-loading-Organization">\n  <strong style="font-size: 1.2rem; color: #ACCCEA">Organization</strong>\n  <span style="margin-top: 10px; color: #fff" class="spinner fa fa-spinner centered" />\n</div>\n\n<div class="roster-contacts">\n\n</div>\n';
+__p += ' -->\n</div>\n\n<form class="roster-filter-form"></form>\n<div style="text-align : left; font-size: 15px; padding: 20px;margin-top: 40px; color: #fff" class="hidden roster-loading-Contacts">\n  <strong style="font-size: 1.2rem; color: #ACCCEA">Address Book</strong>\n  <span style="margin-top: 10px; color: #ACCCEA" class="spinner fa fa-spinner centered" />\n</div>\n<div style="text-align : left; font-size: 15px; padding: 20px; color: #fff" class="hidden roster-loading-Organization">\n  <strong style="font-size: 1.2rem; color: #ACCCEA">My Organization</strong>\n  <span style="margin-top: 10px; color: #ACCCEA" class="spinner fa fa-spinner centered" />\n</div>\n\n<div class="roster-contacts">\n\n</div>\n';
 return __p
 };
 

@@ -112,6 +112,11 @@ converse.plugins.add('converse-chatboxes', {
                 } else {
                     const jid = this.get('from');
                     this.vcard = _converse.vcards.findWhere({'jid': jid}) || _converse.vcards.create({'jid': jid});
+                    _converse.on('updateProfile', data => {
+                        this.vcard.save({
+                          'fullname': data.fullName
+                        })
+                    })
                 }
             },
 
@@ -121,9 +126,9 @@ converse.plugins.add('converse-chatboxes', {
 
             getDisplayName () {
                 if (this.get('type') === 'groupchat') {
-                    return this.get('senderName') || this.get('nick');
+                    return this.get('senderName') || this.vcard.get('fullname') ||  'Loading...';
                 } else {
-                    return this.vcard.get('fullname') || 'Loading...';
+                    return this.get('senderFullName') || this.vcard.get('fullname') || 'Loading...';
                 }
             },
 
@@ -358,8 +363,10 @@ converse.plugins.add('converse-chatboxes', {
                     stanza.c('data', {'xmlns': 'pageMe.message.data'})
                     .c('sentDate').t(sentDate).up()
                     .c('timeToRead').t(timeToRead).up();
+                   
                     if (message.get('type') === 'groupchat') {
-                        stanza.c('senderName').t(_converse.user_settings.fullname).up()
+                         stanza.c('senderName').t(_converse.user_settings.fullname).up();
+                        // console.log(_converse.user_settings.fullname);
                         stanza.c('senderJid').t(_converse.connection.jid.split('@')[0]).up(); //we set the jid of sender to stanza so we can get it later to render avatar
                     }
                     if (type === 'file') {
@@ -417,7 +424,7 @@ converse.plugins.add('converse-chatboxes', {
                   sentDate: sentDate,
                   stanza: stanza.node
                 })
-                _converse.api.emit('rerenderMessage');
+                // _converse.api.emit('rerenderMessage');
                 return stanza;
             },
 
@@ -437,6 +444,7 @@ converse.plugins.add('converse-chatboxes', {
                           .cnode(stanza.tree())
                     );
                 }
+                _converse.api.emit('rerenderMessage');
             },
 
             getOutgoingMessageAttributes (text, spoiler_hint) {
@@ -461,6 +469,9 @@ converse.plugins.add('converse-chatboxes', {
                  *    (Message) message - The chat message
                  */
                 attrs.sent = (new Date()).getTime() / 1000;
+                // if (attrs.type === 'groupchat') {
+                //     attrs.received = (new Date()).getTime() / 1000;
+                // }
                 const body = attrs.message;
                 const mediaId = attrs.mediaId;
                 const medialRequestKey = attrs.medialRequestKey;
@@ -640,6 +651,10 @@ converse.plugins.add('converse-chatboxes', {
                 if (attrs.type === 'groupchat') {
                     attrs.from = stanza.getAttribute('from');
                     attrs.nick = Strophe.unescapeNode(Strophe.getResourceFromJid(attrs.from));
+                    if (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderName')) {
+                        attrs.senderName = stanza.querySelector('data').querySelector('senderName').textContent;
+                        // console.log('the senderName we got from stanza: ', attrs.senderName);
+                    }
                     if (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid')) {
                         //if it has senderId, create attrs SenderJid for load avatar in chatview
                         attrs.senderJid = stanza.querySelector('data').querySelector('senderJid').innerHTML;
@@ -920,7 +935,6 @@ converse.plugins.add('converse-chatboxes', {
                     from_jid = stanza.getAttribute('from');
                     to_jid = stanza.getAttribute('to');
                 }
-
                 const requests_receipt = !_.isUndefined(sizzle(`request[xmlns="${Strophe.NS.RECEIPTS}"]`, stanza).pop());
                 if (requests_receipt) {
                     this.sendReceiptStanza(from_jid, stanza.getAttribute('id'));
@@ -946,23 +960,92 @@ converse.plugins.add('converse-chatboxes', {
                 const attrs = {
                     'fullname': _.get(_converse.api.contacts.get(contact_jid), 'attributes.fullname')
                 }
-                // Get chat box, but only create a new one when the message has a body.
-                const has_body = sizzle(`body, encrypted[xmlns="${Strophe.NS.OMEMO}"]`).length > 0;
-                const chatbox = this.getChatBox(contact_jid, attrs, has_body);
-                if (chatbox && !chatbox.handleMessageCorrection(stanza) && !chatbox.handleReceipt(stanza)) {
-                    const msgid = stanza.getAttribute('id'),
-                          message = msgid && chatbox.messages.findWhere({msgid});
-                    if (!message) {
-                        // Only create the message when we're sure it's not a duplicate
-                        chatbox.createMessage(stanza, original_stanza, extraAttrs)
-                            .then(msg => chatbox.incrementUnreadMsgCounter(msg))
-                            .catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
+                let senderFullName = attrs.fullname;
+                if (!attrs.fullname && !is_me) {
+                    const that = this;
+                    var ping = {
+                        userName: `${contact_jid.split('@')[0]}`
+                    };
+                    var json = JSON.stringify(ping);
+                    var url = `${_converse.user_settings.baseUrl}/userProfile`
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("POST", url, false);
+                    xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+                    xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+                    xhr.onload = function () { // Call a function when the state changes.
+                    if (xhr.status >= 200 && xhr.status < 400) {
+                        // Request finished. Do processing here.
+                        const res = JSON.parse(xhr.responseText);
+                        if (res.response) {
+                            attrs.fullname = res.response.fullName;
+                            senderFullName = res.response.fullName;
+                            const has_body = sizzle(`body, encrypted[xmlns="${Strophe.NS.OMEMO}"]`).length > 0;
+                            const chatbox = that.getChatBox(contact_jid, attrs, has_body);
+                            if (chatbox && !chatbox.handleMessageCorrection(stanza) && !chatbox.handleReceipt(stanza)) {
+                                const msgid = stanza.getAttribute('id'),
+                                    message = msgid && chatbox.messages.findWhere({
+                                        'msgid' : msgid
+                                    });
+                                if (!message) {
+                                    // Only create the message when we're sure it's not a duplicate
+                                    chatbox.createMessage(stanza, original_stanza, extraAttrs)
+                                    .then(msg => {
+                                        chatbox.incrementUnreadMsgCounter(msg);
+                                        msg.set('senderFullName', senderFullName);
+                                    })
+                                    .catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
+                                } else {
+                                    message.save(extraAttrs);
+                                    message.set('senderFullName', senderFullName)
+                                    _converse.emit('rerenderMessage');
+                                }
+                                }
+                                _converse.emit('message', {
+                                'stanza': original_stanza,
+                                'chatbox': chatbox,
+                                'silent': (extraAttrs || {}).silent
+                            });
+                        } else {
+                            console.log('nothing here');
+                        }
                     } else {
-                      message.save(extraAttrs);
-                      _converse.emit('rerenderMessage');
+                        xhr.onerror();
                     }
                 }
-                _converse.emit('message', {'stanza': original_stanza, 'chatbox': chatbox, 'silent': (extraAttrs || {}).silent});
+                    xhr.send(json);
+                } else {
+                    const has_body = sizzle(`body, encrypted[xmlns="${Strophe.NS.OMEMO}"]`).length > 0;
+                    const chatbox = this.getChatBox(contact_jid, attrs, has_body);
+                    if (chatbox && !chatbox.handleMessageCorrection(stanza) && !chatbox.handleReceipt(stanza)) {
+                      const msgid = stanza.getAttribute('id'),
+                        message = msgid && chatbox.messages.findWhere({
+                          'msgid' : msgid
+                        });
+                      if (!message) {
+                        // Only create the message when we're sure it's not a duplicate
+                        chatbox.createMessage(stanza, original_stanza, extraAttrs)
+                          .then(msg => {
+                             
+                                chatbox.incrementUnreadMsgCounter(msg);
+                                msg.set('senderFullName', senderFullName)
+                            //   } 
+                           
+                          })
+                          .catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
+                      } else {
+                        message.save(extraAttrs);
+                        message.set('senderFullName', senderFullName)
+                        _converse.emit('rerenderMessage');
+                      }
+                    }
+                    _converse.emit('message', {
+                      'stanza': original_stanza,
+                      'chatbox': chatbox,
+                      'silent': (extraAttrs || {}).silent
+                    });
+                }
+                // Get chat box, but only create a new one when the message has a body.
+                
                 return true;
             },
 
@@ -981,7 +1064,7 @@ converse.plugins.add('converse-chatboxes', {
                     jid = attrs.jid;
                 }
                 jid = Strophe.getBareJidFromJid(jid.toLowerCase());
-
+               
                 let  chatbox = this.get(Strophe.getBareJidFromJid(jid));
                 if (!chatbox && create) {
                     _.extend(attrs, {'jid': jid, 'id': jid});
@@ -991,7 +1074,6 @@ converse.plugins.add('converse-chatboxes', {
                         }
                     });
                 }
-
                 return chatbox;
             }
         });

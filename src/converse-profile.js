@@ -458,11 +458,13 @@ converse.plugins.add('converse-profile', {
             },
 
             initialize () {
-                // _converse.emit('profileModalReadyToListen');
                 this.model.on("change", this.render, this);
                 this.model.vcard.on("change", this.render, this);
-                // console.log('profile Modal initialized!!');
-                
+                this.model.on("change:avatarUrl", this.afterRender, this);
+                this.model.save({
+                    'avatarUrl': _converse.user_settings.avatarUrl + _converse.user_settings.jid.split('@')[0],
+                    'fullName': _converse.user_settings.fullname
+                })
                 _converse.on('numRequestChange', (num) => {
                     this.model.save({
                         'numRequest': num
@@ -470,6 +472,12 @@ converse.plugins.add('converse-profile', {
                 })
                 _converse.on("disabledNotificationFromCore", state => {
                   this.model.set("stateNotification", state);
+                })
+                _converse.on('updateProfile', data => {
+                    this.model.save({
+                        'avatarUrl' : data.avatarUrl,
+                        'fullName' : data.fullName
+                    });
                 })
             },
 

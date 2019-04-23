@@ -519,7 +519,7 @@ converse.plugins.add('converse-muc-views', {
                 this.model.on('configurationNeeded', this.getAndRenderConfigurationForm, this);
                 this.model.on('destroy', this.hide, this);
                 this.model.on('show', this.show, this);
-                this.model.attributes.from_groupChat = true;
+                // this.model.attributes.from_groupChat = true;
 
                 // this.model.occupants.on('add', this.onOccupantAdded, this);
                 // this.model.occupants.on('remove', this.onOccupantRemoved, this);
@@ -528,24 +528,25 @@ converse.plugins.add('converse-muc-views', {
                 // this.model.occupants.on('change:affiliation', this.informOfOccupantsAffiliationChange, this);
                 this.createEmojiPicker();
                 this.createOccupantsView();
+                // this.model.save({
+                // 'connection_status': converse.ROOMSTATUS.DISCONNECTED
+                // })
                 this.render().insertIntoDOM();
-
                 this.registerHandlers();
                 this.enterRoom();
                 this.hideOccupants();
                 _converse.on('AllMessageAreLoaded', (jid) => {
                     if (jid === this.model.get('jid')) {
                         u.hideElement(this.el.querySelector('button.load-more-messages'));
-                        u.hideElement(this.el.querySelector('.fa-spinner'));
+                        u.hideElement(this.el.querySelector('.loading-more-spin'));
                         this.model.save({
                             isAllLoaded: true
                         })
                     }
-                   
                 })
                 _converse.on('UnDisabledButtonLoadmore', () => {
                 //    this.hideSpinner();
-                        u.hideElement(this.el.querySelector('.fa-spinner'));
+                        u.hideElement(this.el.querySelector('.loading-more-spin'));
                         this.model.save({
                             loadingMore: false
                         })
@@ -561,60 +562,24 @@ converse.plugins.add('converse-muc-views', {
                             u.hideElement(this.el.querySelector('button.load-more-messages'))
                         }
                         else {
-                            u.showElement(this.el.querySelector('.fa-spinner'));
+                            u.showElement(this.el.querySelector('.loading-more-spin'));
                             if (!this.model.get('loadingMore')) {
+                                console.log('load more mess', this.model);
                                 this.loadMoreMessages();
                             }
-                            // u.showElement(this.el.querySelector('button.load-more-messages'))
                         }
                     }
                     else {
                         u.hideElement(this.el.querySelector('button.load-more-messages'))
                     }
                 })
+               
             },
-            // checkMessageLength() {
-                
-            //     // const that = this;
-            //     //     var ping = {
-            //     //         numberOfMinutes: 1440,
-            //     //         id: this.model.get('jid'),
-            //     //         pageSize: 20,
-            //     //         pageNumber: 1,
-            //     //         lastLoadedTime: ''
-            //     //     };
-            //     //     var json = JSON.stringify(ping);
-
-            //     //     var xhr = new XMLHttpRequest();
-            //     //     var url = `${_converse.user_settings.baseUrl}/group/messageList`
-            //     //     xhr.open("POST", url, false);
-            //     //     xhr.setRequestHeader("securityToken", _converse.user_settings.password);
-            //     //     xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-            //     //     xhr.onload = function () { // Call a function when the state changes.
-            //     //         if (xhr.status >= 200 && xhr.status < 400) {
-            //     //         // Request finished. Do processing here.
-            //     //             const res = JSON.parse(xhr.responseText);
-            //     //             if (res.response && res.response.length >= 20) {
-            //     //                     that.model.save({
-            //     //                         isShowLoadMore: true
-            //     //                     })
-            //     //             } else {
-            //     //                     that.model.save({
-            //     //                       isShowLoadMore: false
-            //     //                     })
-            //     //                     //    u.hideElement(that.model.querySelector('.load-more-messages'));
-            //     //                     //    console.log('nothing here');
-            //     //             }
-            //     //             } else {
-            //     //              xhr.onerror();
-            //     //             }
-            //     //     }
-            //     //     xhr.send(json);
-                
-            // },
             enterRoom (ev) {
                 if (ev) { ev.preventDefault(); }
-                if (this.model.get('connection_status') !==  converse.ROOMSTATUS.ENTERED) {
+                // this.populateAndJoin();//we obviously want to join the chatroom by calling join function of the model
+                // this.model.get('connection_status') !== converse.ROOMSTATUS.ENTERED
+                if (this.model.get('connection_status') !== converse.ROOMSTATUS.ENTERED) {
                     const handler = () => {
                         if (!u.isPersistableModel(this.model)) {
                             // Happens during tests, nothing to do if this
@@ -1223,6 +1188,7 @@ converse.plugins.add('converse-muc-views', {
                 // this.model.occupants.fetchMembers();
                 this.join();
                 this.fetchMessages();
+                // this.hideSpinner();
             },
 
             join (nick, password) {
@@ -1411,24 +1377,25 @@ converse.plugins.add('converse-muc-views', {
                 /* Render a form which allows the user to choose their
                  * nickname.
                  */
-                this.hideChatRoomContents();
-                _.each(this.el.querySelectorAll('span.centered.spinner'), u.removeElement);
-                if (!_.isString(message)) {
-                    message = '';
-                }
-                const container_el = this.el.querySelector('.chatroom-body');
-                container_el.insertAdjacentHTML(
-                    'beforeend',
-                    tpl_chatroom_nickname_form({
-                        heading: __('Please choose your nickname'),
-                        label_nickname: __('Nickname'),
-                        label_join: __('Enter groupchat'),
-                        validation_message: message
-                    }));
-                this.model.save('connection_status', converse.ROOMSTATUS.NICKNAME_REQUIRED);
+                
+                // this.hideChatRoomContents();
+                // _.each(this.el.querySelectorAll('span.centered.spinner'), u.removeElement);
+                // if (!_.isString(message)) {
+                //     message = '';
+                // }
+                // const container_el = this.el.querySelector('.chatroom-body');
+                // container_el.insertAdjacentHTML(
+                //     'beforeend',
+                //     tpl_chatroom_nickname_form({
+                //         heading: __('Please choose your nickname'),
+                //         label_nickname: __('Nickname'),
+                //         label_join: __('Enter groupchat'),
+                //         validation_message: message
+                //     }));
+                // this.model.save('connection_status', converse.ROOMSTATUS.NICKNAME_REQUIRED);
 
-                const form_el = this.el.querySelector('.chatroom-form');
-                form_el.addEventListener('submit', this.submitNickname.bind(this), false);
+                // const form_el = this.el.querySelector('.chatroom-form');
+                // form_el.addEventListener('submit', this.submitNickname.bind(this), false);
             },
 
             submitPassword (ev) {
@@ -1838,7 +1805,7 @@ converse.plugins.add('converse-muc-views', {
                  * form has been submitted and removed.
                  */
                 if (this.model.get('connection_status') == converse.ROOMSTATUS.NICKNAME_REQUIRED) {
-                    this.renderNicknameForm();
+                    // this.renderNicknameForm();
                 } else if (this.model.get('connection_status') == converse.ROOMSTATUS.PASSWORD_REQUIRED) {
                     this.renderPasswordForm();
                 } else {
@@ -2232,12 +2199,18 @@ converse.plugins.add('converse-muc-views', {
                 this.model.on('change', this.render, this);
                 this.model.on('change:status', this.render, this)
                 this.model.set('avatarUrl', `${_converse.user_settings.avatarUrl}${this.model.get('userName')}`);
-                _converse.api.listen.on('updateProfile', (data) => {
+
+                _converse.on('updateProfile', data => {
                     if (data.avatarUrl.includes(this.model.get('userName'))){
-                        this.model.set('avatarUrl', data.avatarUrl);
-                        this.model.set('fullName', data.fullName);
+                        this.model.save({
+                            'avatarUrl': data.avatarUrl,
+                            'fullName': data.fullName
+                        });
                     }
-                });
+                })
+                // _converse.on('updateProfile', data => {
+                    
+                // });
             },
             toHTML () {
                 // console.log('PagemeGroupMemberView model',this.model);
@@ -2380,6 +2353,7 @@ converse.plugins.add('converse-muc-views', {
             });
         }
         _converse.on('reconnected', reconnectToChatRooms);
+        _converse.on('forceReconnectChatroom', reconnectToChatRooms);
         /************************ END Event Handlers ************************/
 
 

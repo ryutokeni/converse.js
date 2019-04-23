@@ -984,23 +984,6 @@ converse.plugins.add('converse-chatview', {
                 if (message.get('correcting')) {
                     this.insertIntoTextArea(message.get('message'), true, true);
                 }
-                
-                if ( !message.get('received') && this.model.get('hidden')  && message.get('sender') !== 'me') {
-                    // _converse.incrementMsgCounter();
-                    //  this.model.save({
-                    //    num_unread: this.model.messages.models.filter(e => (!e.get('silent') && !e.get('received'))).length,
-                    //    num_unread_general:  1
-                    //  });
-
-                    // if (message.get('type') !== 'chat') {
-                    //     console.log(this.model);
-                    // }
-                    // this.model.save({
-                    //     'num_unread': this.model.get('num_unread') + 1,
-                    //     'num_unread_general': 1
-                    // })
-                   
-                }
                 _converse.emit('messageAdded', {
                     'message': message,
                     'chatbox': this.model
@@ -1048,6 +1031,16 @@ converse.plugins.add('converse-chatview', {
                 }
                 if (this.parseMessageForCommands(text)) {
                     return;
+                }
+                // console.log(this.model.get('connection_status'));
+                if (this.model.get('connection_status') !== 5) {
+                    // console.log(this.model);
+                    // _converse.emit('forceReconnectChatroom');
+                    return this.showHelpMessages(
+                      ['Sorry, your connection have some problem!'
+                      ],
+                      'info'
+                    );
                 }
                 const attrs = this.model.getOutgoingMessageAttributes(text, spoiler_hint);
                 this.model.sendMessage(attrs);

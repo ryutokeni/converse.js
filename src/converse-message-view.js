@@ -121,7 +121,16 @@ converse.plugins.add('converse-message-view', {
                 this.model.on('change', this.onChanged, this);
                 this.model.on('destroy', this.remove, this);
                 this.model.on('change:senderName', this.render, this);
+                this.model.on('change:senderFullName', this.render, this)
                 _converse.on('rerenderMessage', this.render, this);
+            
+                _converse.on('updateProfile', data => {
+                    if (this.model.get('sender') === 'me') {
+                        this.image = data.avatarUrl;
+                        this.model.get('type') === 'groupchat' ? this.model.set('senderName', data.fullName) : this.model.set('senderFullName', data.fullName);
+                    // this.renderAvatar(msg);
+                    }
+                })
             },
 
             async render (force) {
@@ -296,27 +305,23 @@ converse.plugins.add('converse-message-view', {
                         this.image = `${_converse.user_settings.avatarUrl}${jid}`;
                     }
                     this.width = this.height = 60;
+                    if (this.model.get('sender') === 'them') {
+                        if (this.model.get('type') === 'groupchat') {
 
-                    if (this.model.get('type') === 'groupchat' && this.model.get('sender') === 'them') {
+                          if (this.model.get('senderJid')) {
+                            //if it comes from webapp, jid can get by call attribute 'senderJid'
+                            this.image = _converse.user_settings.avatarUrl + this.model.get('senderJid');
+                          } else {
+                            //if it comes from mobile, jid can get by split the attribute 'from'
+                            this.image = _converse.user_settings.avatarUrl + this.model.get('from').split('/')[1].split('@')[0];
+                          }
 
-                       if (this.model.get('senderJid')) {
-                             //if it comes from webapp, jid can get by call attribute 'senderJid'
-                           this.image = _converse.user_settings.avatarUrl  + this.model.get('senderJid');
-                       }
-                       else {
-                           //if it comes from mobile, jid can get by split the attribute 'from'
-                           this.image = _converse.user_settings.avatarUrl + this.model.get('from').split('/')[1].split('@')[0];
-                       }
-
-                    }
-
-                    _converse.api.listen.on('updateProfile', (data) => {
-                        if (data.avatarUrl.includes(jid)){
-                            this.image = data.avatarUrl;
-                            this.model.set('senderName', data.fullName);
-                            this.renderAvatar(msg);
+                        } else {
+                          if (this.model.get('type') === 'chat') {
+                            this.image = _converse.user_settings.avatarUrl + this.model.get('from').split('@')[0];
+                          }
                         }
-                    });
+                    }
                     this.renderAvatar(msg);
                 }
                 await promise;
