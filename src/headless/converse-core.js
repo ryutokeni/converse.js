@@ -294,7 +294,8 @@ const PROMISES = [
     'initialized',
     'connectionInitialized',
     'pluginsInitialized',
-    'statusInitialized'
+    'statusInitialized',
+    'sendPresence'
 ];
 
 function addPromise (promise) {
@@ -917,15 +918,18 @@ _converse.initialize = function (settings, callback) {
         _converse.domain = Strophe.getDomainFromJid(_converse.connection.jid);
         _converse.emit('setUserJID');
     };
-
+    let check = false;
     this.onConnected = function (reconnecting) {
         /* Called as soon as a new connection has been established, either
          * by logging in or by attaching to an existing BOSH session.
          */
+        // this.sendPresence();
+        check = !reconnecting? true : false;
         _converse.connection.flush(); // Solves problem of returned PubSub BOSH response not received by browser
         _converse.setUserJID();
         _converse.initSession();
         _converse.enableCarbons();
+        // _converse.sendInitialPresence();
         _converse.initStatus(reconnecting)
     };
 
@@ -959,7 +963,7 @@ _converse.initialize = function (settings, callback) {
             if (_.isNil(this.vcard)) {
                 this.vcard = _converse.vcards.create({'jid': this.get('jid')});
             }
-
+            this.sendPresence();
             this.on('change:status', (item) => {
                 const status = this.get('status');
                 this.sendPresence(status);
@@ -971,6 +975,7 @@ _converse.initialize = function (settings, callback) {
                 this.sendPresence(this.get('status'), status_message);
                 _converse.emit('statusMessageChanged', status_message);
             });
+            // _converse.on('ConverseRe')
         },
 
         constructPresence (type, status_message) {
@@ -1009,7 +1014,19 @@ _converse.initialize = function (settings, callback) {
         },
 
         sendPresence (type, status_message) {
+            // if (type !== 'online') {
+            //     console.log('we return this cause it is not online status');
+            //     return;
+            // }
+          
             _converse.api.send(this.constructPresence(type, status_message));
+            if (!type) {
+                if (check) {
+                    _converse.emit('sendPresence');
+                }
+                
+            }
+            
         }
     });
 
@@ -1727,7 +1744,6 @@ const converse = {
           nick: group.nick
         });
         if (chatbox) {
-            // console.log(chatbox);
             chatbox.save({
               users: group.users,
               latestMessageTime: group.latestMessageTime,
@@ -1737,7 +1753,6 @@ const converse = {
               name: group.groupName,
               nick: group.nick
             });
-            // console.log('chatbox after we update: ', chatbox);
         }
         // chatbox.join(group.nick);
       });
@@ -2016,7 +2031,7 @@ const converse = {
       pagemeMessages.forEach(msg => {
         if (msg.type !== 'text') {
             if (msg.stanza.getAttribute('type') === 'groupchat') {
-                chatbox.onMessage(msg.stanza);
+                return;
             }
             else {
                 if (msg.type === 'medical_request') {
@@ -2033,8 +2048,6 @@ const converse = {
                   });
                 }
             }
-
-
           return;
         }
         var existed = _.findIndex(_converse.pagemeMessages, oldMsg => (oldMsg.stanza.id === msg.stanza.id));
@@ -2049,8 +2062,9 @@ const converse = {
           }
         }
         if (msg.stanza.getAttribute('type') === 'groupchat') {
-          chatbox.onMessage(msg.stanza);
-        //   console.log('stanza we got from converse-core: ', msg.stanza);
+        //   _converse.chatboxes.onMessage(msg.stanza, {'silent': true});
+            
+            return;
         }
         else {
           _converse.chatboxes.onMessage(msg.stanza, {

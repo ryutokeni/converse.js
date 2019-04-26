@@ -1033,15 +1033,15 @@ converse.plugins.add('converse-chatview', {
                     return;
                 }
                 // console.log(this.model.get('connection_status'));
-                if (this.model.get('connection_status') !== 5) {
-                    // console.log(this.model);
-                    // _converse.emit('forceReconnectChatroom');
-                    return this.showHelpMessages(
-                      ['Sorry, your connection have some problem!'
-                      ],
-                      'info'
-                    );
-                }
+                // if (this.model.get('connection_status') !== 5) {
+                //     // console.log(this.model);
+                //     // _converse.emit('forceReconnectChatroom');
+                //     return this.showHelpMessages(
+                //       ['Sorry, your connection have some problem!'
+                //       ],
+                //       'info'
+                //     );
+                // }
                 const attrs = this.model.getOutgoingMessageAttributes(text, spoiler_hint);
                 this.model.sendMessage(attrs);
             },

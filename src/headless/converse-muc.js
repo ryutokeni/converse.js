@@ -294,6 +294,7 @@ converse.plugins.add('converse-muc', {
 
                 const stanza = $pres({
                     'from': _converse.connection.jid,
+                    // 'to': `${this.get('jid')}/${_converse.connection.jid.split('/')[0]}`
                     'to': this.getRoomJIDAndNick(nick)
                 }).c("x", {'xmlns': Strophe.NS.MUC})
                   .c("history", {'maxstanzas': this.get('mam_enabled') ? 0 : _converse.muc_history_max_stanzas}).up();
@@ -1022,6 +1023,8 @@ converse.plugins.add('converse-muc', {
                     }
                     // console.dir(stanza);
                     // console.log(stanza);
+                    
+                  
                     const msg = await this.createMessage(stanza, original_stanza);
                     // console.log('stanza: ', stanza);
                     if (msg && stanza.querySelector('data').querySelector('senderName')) {
@@ -1031,6 +1034,9 @@ converse.plugins.add('converse-muc', {
                         // console.log('senderName from Stanza: ', stanza.querySelector('data').querySelector('senderName').textContent);
                         // console.log('senderName: ', msg);
                     }
+
+
+
                     // console.log(this);
 
                     //  this.save({
@@ -1068,6 +1074,7 @@ converse.plugins.add('converse-muc', {
                     this.save('connection_status', converse.ROOMSTATUS.DISCONNECTED);
                     return;
                 }
+                // return _converse.emit('forceReconnectChatroom');
                 const is_self = pres.querySelector("status[code='110']");
                 if (is_self && pres.getAttribute('type') !== 'unavailable') {
                     this.onOwnPresence(pres);

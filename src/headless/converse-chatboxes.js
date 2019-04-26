@@ -620,6 +620,7 @@ converse.plugins.add('converse-chatboxes', {
                     'fileSize': stanza.querySelector('fileSize') ? stanza.querySelector('fileSize').innerHTML : '',
                     'sent': sendDate,
                     'type': stanza.getAttribute('type')
+                    // 'url': 'URL'
                 };
                 if (!extraAttrs) {
                   extraAttrs = {};
@@ -736,7 +737,11 @@ converse.plugins.add('converse-chatboxes', {
                             that.save('latestMessageTime', new Date());
                           }
                         }
-                        return that.messages.create(attrs);
+                        return that.messages.create({
+                            ...attrs,
+                            'url' : ' '
+                        });
+                        return that.messages.create(attrs)
                     }
                 }
                 const result = this.getMessageAttributesFromStanza(message, original_stanza, extraAttrs)
@@ -897,6 +902,7 @@ converse.plugins.add('converse-chatboxes', {
                  *    (XMLElement) stanza       - The incoming message stanza
                  *    (Object)     extraAttrs   - Extra params received from pageme app
                  */
+            
                 let to_jid = stanza.getAttribute('to');
                 const to_resource = Strophe.getResourceFromJid(to_jid);
 
@@ -942,10 +948,10 @@ converse.plugins.add('converse-chatboxes', {
 
                 const from_bare_jid = Strophe.getBareJidFromJid(from_jid),
                       from_resource = Strophe.getResourceFromJid(from_jid),
-                      is_me = from_bare_jid === _converse.bare_jid;
+                      is_me =  from_bare_jid === _converse.bare_jid;
 
                 let contact_jid;
-                if (is_me) {
+                if (is_me ) {
                     // I am the sender, so this must be a forwarded message...
                     if (_.isNull(to_jid)) {
                         return _converse.log(
@@ -961,7 +967,7 @@ converse.plugins.add('converse-chatboxes', {
                     'fullname': _.get(_converse.api.contacts.get(contact_jid), 'attributes.fullname')
                 }
                 let senderFullName = attrs.fullname;
-                if (!attrs.fullname && !is_me) {
+                if (!attrs.fullname && !is_me && stanza.querySelector('received')) {
                     const that = this;
                     var ping = {
                         userName: `${contact_jid.split('@')[0]}`
@@ -1044,7 +1050,6 @@ converse.plugins.add('converse-chatboxes', {
                       'silent': (extraAttrs || {}).silent
                     });
                 }
-                // Get chat box, but only create a new one when the message has a body.
                 
                 return true;
             },

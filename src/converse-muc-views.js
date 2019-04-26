@@ -528,12 +528,12 @@ converse.plugins.add('converse-muc-views', {
                 // this.model.occupants.on('change:affiliation', this.informOfOccupantsAffiliationChange, this);
                 this.createEmojiPicker();
                 this.createOccupantsView();
-                // this.model.save({
-                // 'connection_status': converse.ROOMSTATUS.DISCONNECTED
-                // })
+                this.model.save({
+                    'connection_status': converse.ROOMSTATUS.DISCONNECTED
+                })
                 this.render().insertIntoDOM();
-                this.registerHandlers();
-                this.enterRoom();
+                // this.registerHandlers();
+                // this.enterRoom();
                 this.hideOccupants();
                 _converse.on('AllMessageAreLoaded', (jid) => {
                     if (jid === this.model.get('jid')) {
@@ -551,28 +551,33 @@ converse.plugins.add('converse-muc-views', {
                             loadingMore: false
                         })
                 })
-                $('.chat-content').on('scroll',  () => {
-                    var x = this.el.querySelector('.chat-content').scrollTop;
-                    if (x === 0 ) {
-                        // console.log('we scroll on top');
-                        if (this.model.get('isAllLoaded')) {
-                             this.model.save({
-                               loadingMore: false
-                             })
-                            u.hideElement(this.el.querySelector('button.load-more-messages'))
-                        }
-                        else {
-                            u.showElement(this.el.querySelector('.loading-more-spin'));
-                            if (!this.model.get('loadingMore')) {
-                                console.log('load more mess', this.model);
-                                this.loadMoreMessages();
-                            }
-                        }
-                    }
-                    else {
-                        u.hideElement(this.el.querySelector('button.load-more-messages'))
-                    }
+
+                _converse.on('sendPresence', () => {
+                    this.registerHandlers();
+                    this.enterRoom();
                 })
+                // $('.chat-content').on('scroll',  () => {
+                //     var x = this.el.querySelector('.chat-content').scrollTop;
+                //     if (x === 0 ) {
+                //         // console.log('we scroll on top');
+                //         if (this.model.get('isAllLoaded')) {
+                //              this.model.save({
+                //                loadingMore: false
+                //              })
+                //             u.hideElement(this.el.querySelector('button.load-more-messages'))
+                //         }
+                //         else {
+                //             u.showElement(this.el.querySelector('.loading-more-spin'));
+                //             if (!this.model.get('loadingMore')) {
+                //                 console.log('load more mess', this.model);
+                //                 this.loadMoreMessages();
+                //             }
+                //         }
+                //     }
+                //     else {
+                //         u.hideElement(this.el.querySelector('button.load-more-messages'))
+                //     }
+                // })
                
             },
             enterRoom (ev) {
@@ -603,9 +608,9 @@ converse.plugins.add('converse-muc-views', {
                 this.renderChatArea();
                 this.renderMessageForm();
                 this.initAutoComplete();
-                if (this.model.get('connection_status') !== converse.ROOMSTATUS.ENTERED) {
-                    this.showSpinner();
-                }
+                // if (this.model.get('connection_status') !== converse.ROOMSTATUS.ENTERED) {
+                //     this.showSpinner();
+                // }
                 return this;
             },
 

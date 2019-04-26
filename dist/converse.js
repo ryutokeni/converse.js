@@ -73505,13 +73505,16 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         if (this.parseMessageForCommands(text)) {
           return;
         } // console.log(this.model.get('connection_status'));
+        // if (this.model.get('connection_status') !== 5) {
+        //     // console.log(this.model);
+        //     // _converse.emit('forceReconnectChatroom');
+        //     return this.showHelpMessages(
+        //       ['Sorry, your connection have some problem!'
+        //       ],
+        //       'info'
+        //     );
+        // }
 
-
-        if (this.model.get('connection_status') !== 5) {
-          // console.log(this.model);
-          // _converse.emit('forceReconnectChatroom');
-          return this.showHelpMessages(['Sorry, your connection have some problem!'], 'info');
-        }
 
         const attrs = this.model.getOutgoingMessageAttributes(text, spoiler_hint);
         this.model.sendMessage(attrs);
@@ -77474,13 +77477,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         // this.model.occupants.on('change:affiliation', this.informOfOccupantsAffiliationChange, this);
 
         this.createEmojiPicker();
-        this.createOccupantsView(); // this.model.save({
-        // 'connection_status': converse.ROOMSTATUS.DISCONNECTED
-        // })
+        this.createOccupantsView();
+        this.model.save({
+          'connection_status': _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].ROOMSTATUS.DISCONNECTED
+        });
+        this.render().insertIntoDOM(); // this.registerHandlers();
+        // this.enterRoom();
 
-        this.render().insertIntoDOM();
-        this.registerHandlers();
-        this.enterRoom();
         this.hideOccupants();
 
         _converse.on('AllMessageAreLoaded', jid => {
@@ -77501,28 +77504,33 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
           });
         });
 
-        $('.chat-content').on('scroll', () => {
-          var x = this.el.querySelector('.chat-content').scrollTop;
+        _converse.on('sendPresence', () => {
+          console.log('asdbvahjsdasjdnas');
+          this.registerHandlers();
+          this.enterRoom();
+        }); // $('.chat-content').on('scroll',  () => {
+        //     var x = this.el.querySelector('.chat-content').scrollTop;
+        //     if (x === 0 ) {
+        //         // console.log('we scroll on top');
+        //         if (this.model.get('isAllLoaded')) {
+        //              this.model.save({
+        //                loadingMore: false
+        //              })
+        //             u.hideElement(this.el.querySelector('button.load-more-messages'))
+        //         }
+        //         else {
+        //             u.showElement(this.el.querySelector('.loading-more-spin'));
+        //             if (!this.model.get('loadingMore')) {
+        //                 console.log('load more mess', this.model);
+        //                 this.loadMoreMessages();
+        //             }
+        //         }
+        //     }
+        //     else {
+        //         u.hideElement(this.el.querySelector('button.load-more-messages'))
+        //     }
+        // })
 
-          if (x === 0) {
-            // console.log('we scroll on top');
-            if (this.model.get('isAllLoaded')) {
-              this.model.save({
-                loadingMore: false
-              });
-              u.hideElement(this.el.querySelector('button.load-more-messages'));
-            } else {
-              u.showElement(this.el.querySelector('.loading-more-spin'));
-
-              if (!this.model.get('loadingMore')) {
-                console.log('load more mess', this.model);
-                this.loadMoreMessages();
-              }
-            }
-          } else {
-            u.hideElement(this.el.querySelector('button.load-more-messages'));
-          }
-        });
       },
 
       enterRoom(ev) {
@@ -86325,7 +86333,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           'itemType': stanza.querySelector('itemType') ? stanza.querySelector('itemType').innerHTML : '',
           'fileSize': stanza.querySelector('fileSize') ? stanza.querySelector('fileSize').innerHTML : '',
           'sent': sendDate,
-          'type': stanza.getAttribute('type')
+          'type': stanza.getAttribute('type') // 'url': 'URL'
+
         };
 
         if (!extraAttrs) {
@@ -86453,6 +86462,9 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
               }
             }
 
+            return that.messages.create(_objectSpread({}, attrs, {
+              'url': ' '
+            }));
             return that.messages.create(attrs);
           }
         }
@@ -86702,7 +86714,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         };
         let senderFullName = attrs.fullname;
 
-        if (!attrs.fullname && !is_me) {
+        if (!attrs.fullname && !is_me && stanza.querySelector('received')) {
           const that = this;
           var ping = {
             userName: `${contact_jid.split('@')[0]}`
@@ -86789,8 +86801,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
             'chatbox': chatbox,
             'silent': (extraAttrs || {}).silent
           });
-        } // Get chat box, but only create a new one when the message has a body.
-
+        }
 
         return true;
       },
@@ -87349,7 +87360,7 @@ _converse.__ = function (str) {
 };
 
 const __ = _converse.__;
-const PROMISES = ['initialized', 'connectionInitialized', 'pluginsInitialized', 'statusInitialized'];
+const PROMISES = ['initialized', 'connectionInitialized', 'pluginsInitialized', 'statusInitialized', 'sendPresence'];
 
 function addPromise(promise) {
   /* Private function, used to add a new promise to the ones already
@@ -88052,10 +88063,15 @@ _converse.initialize = function (settings, callback) {
     _converse.emit('setUserJID');
   };
 
+  let check = false;
+
   this.onConnected = function (reconnecting) {
     /* Called as soon as a new connection has been established, either
      * by logging in or by attaching to an existing BOSH session.
      */
+    // this.sendPresence();
+    check = !reconnecting ? true : false;
+
     _converse.connection.flush(); // Solves problem of returned PubSub BOSH response not received by browser
 
 
@@ -88063,7 +88079,8 @@ _converse.initialize = function (settings, callback) {
 
     _converse.initSession();
 
-    _converse.enableCarbons();
+    _converse.enableCarbons(); // _converse.sendInitialPresence();
+
 
     _converse.initStatus(reconnecting);
   };
@@ -88101,6 +88118,7 @@ _converse.initialize = function (settings, callback) {
         });
       }
 
+      this.sendPresence();
       this.on('change:status', item => {
         const status = this.get('status');
         this.sendPresence(status);
@@ -88112,7 +88130,7 @@ _converse.initialize = function (settings, callback) {
         this.sendPresence(this.get('status'), status_message);
 
         _converse.emit('statusMessageChanged', status_message);
-      });
+      }); // _converse.on('ConverseRe')
     },
 
     constructPresence(type, status_message) {
@@ -88154,7 +88172,19 @@ _converse.initialize = function (settings, callback) {
     },
 
     sendPresence(type, status_message) {
+      // if (type !== 'online') {
+      //     console.log('we return this cause it is not online status');
+      //     return;
+      // }
       _converse.api.send(this.constructPresence(type, status_message));
+
+      if (!type) {
+        console.log(type, status_message);
+
+        if (check) {
+          _converse.emit('sendPresence');
+        }
+      }
     }
 
   });
@@ -88904,7 +88934,6 @@ const converse = {
       });
 
       if (chatbox) {
-        // console.log(chatbox);
         chatbox.save({
           users: group.users,
           latestMessageTime: group.latestMessageTime,
@@ -88913,7 +88942,7 @@ const converse = {
           },
           name: group.groupName,
           nick: group.nick
-        }); // console.log('chatbox after we update: ', chatbox);
+        });
       } // chatbox.join(group.nick);
 
     });
@@ -89224,7 +89253,7 @@ const converse = {
     pagemeMessages.forEach(msg => {
       if (msg.type !== 'text') {
         if (msg.stanza.getAttribute('type') === 'groupchat') {
-          chatbox.onMessage(msg.stanza);
+          return;
         } else {
           if (msg.type === 'medical_request') {
             _converse.chatboxes.onMessage(msg.stanza, {
@@ -89259,7 +89288,8 @@ const converse = {
       }
 
       if (msg.stanza.getAttribute('type') === 'groupchat') {
-        chatbox.onMessage(msg.stanza); //   console.log('stanza we got from converse-core: ', msg.stanza);
+        //   _converse.chatboxes.onMessage(msg.stanza, {'silent': true});
+        return;
       } else {
         _converse.chatboxes.onMessage(msg.stanza, {
           silent: true
@@ -91206,6 +91236,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
         const stanza = $pres({
           'from': _converse.connection.jid,
+          // 'to': `${this.get('jid')}/${_converse.connection.jid.split('/')[0]}`
           'to': this.getRoomJIDAndNick(nick)
         }).c("x", {
           'xmlns': Strophe.NS.MUC
@@ -91218,6 +91249,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         }
 
         this.save('connection_status', _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].ROOMSTATUS.CONNECTING);
+        console.log('we send stanza to join this chatroom', stanza);
 
         _converse.api.send(stanza);
 
@@ -92118,7 +92150,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         if (pres.getAttribute('type') === 'error') {
           this.save('connection_status', _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].ROOMSTATUS.DISCONNECTED);
           return;
-        }
+        } // return _converse.emit('forceReconnectChatroom');
+
 
         const is_self = pres.querySelector("status[code='110']");
 
