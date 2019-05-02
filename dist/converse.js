@@ -20034,7 +20034,7 @@ utils.intFromLE = intFromLE;
 /*! exports provided: _args, _development, _from, _id, _inBundle, _integrity, _location, _phantomChildren, _requested, _requiredBy, _resolved, _spec, _where, author, bugs, dependencies, description, devDependencies, files, homepage, keywords, license, main, name, repository, scripts, version, default */
 /***/ (function(module) {
 
-module.exports = {"_args":[["elliptic@6.4.0","/Users/macuser/Desktop/pageme/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/macuser/Desktop/pageme/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
+module.exports = {"_args":[["elliptic@6.4.0","/Users/tltthuan/Desktop/pageme/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/tltthuan/Desktop/pageme/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
 
 /***/ }),
 
@@ -77505,7 +77505,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         });
 
         _converse.on('sendPresence', () => {
-          console.log('asdbvahjsdasjdnas');
           this.registerHandlers();
           this.enterRoom();
         }); // $('.chat-content').on('scroll',  () => {
@@ -77567,11 +77566,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         this.renderHeading();
         this.renderChatArea();
         this.renderMessageForm();
-        this.initAutoComplete();
-
-        if (this.model.get('connection_status') !== _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].ROOMSTATUS.ENTERED) {
-          this.showSpinner();
-        }
+        this.initAutoComplete(); // if (this.model.get('connection_status') !== converse.ROOMSTATUS.ENTERED) {
+        //     this.showSpinner();
+        // }
 
         return this;
       },
@@ -83468,15 +83465,18 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
         this.el.classList.add('current-xmpp-contact');
         this.el.classList.remove(_.without(['both', 'to'], subscription)[0]);
-        this.el.classList.add(subscription);
-        const parentElement = this.el.parentElement;
-        let group = '';
+        this.el.classList.add(subscription); //wait for group to finish rendering first, so that we can access it as parent of this.el
 
-        if (parentElement) {
-          group = parentElement.getAttribute('data-group');
-        }
+        setTimeout(() => {
+          const parentElement = this.el.parentElement;
+          let group = '';
 
-        this.renderRosterItem(this.model, group);
+          if (parentElement) {
+            group = parentElement.getAttribute('data-group');
+          }
+
+          this.renderRosterItem(this.model, group);
+        }, 0);
         return this;
       },
 
@@ -83491,7 +83491,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
               this.el.classList.remove('open');
             } else {
               if (!chatbox.get('latestMessageTime')) {
-                //  console.log('it dont have messages yet');
                 this.el.classList.add('open');
               }
             }
@@ -83836,7 +83835,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
         _converse.roster.on('change:groups', this.onContactAdded, this);
 
-        _converse.roster.on('change', this.onContactChange, this);
+        _converse.roster.on('change', this.onContactAdded, this);
 
         _converse.roster.on("destroy", this.update, this);
 
@@ -83855,9 +83854,12 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         _converse.on('rosterGroupsFetched', this.sortAndPositionAllItems.bind(this));
 
         _converse.on('rosterContactsFetched', () => {
-          // _converse.roster.each((contact) => this.addRosterContact(contact, {'silent': true}));
-          // this.update();
-          // this.updateFilter();
+          _converse.roster.each(contact => this.addRosterContact(contact, {
+            'silent': true
+          }));
+
+          this.update();
+          this.updateFilter();
           this.trigger('rosterContactsFetchedAndProcessed');
         });
 
@@ -83987,23 +83989,19 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
       onContactChange(contact) {
         this.updateChatBox(contact);
-        this.update();
-
-        if (_.has(contact.changed, 'subscription')) {
-          if (contact.changed.subscription === 'from') {
-            this.addContactToGroup(contact, HEADER_PENDING_CONTACTS);
-          } else if (_.includes(['both', 'to'], contact.get('subscription'))) {
-            this.addExistingContact(contact);
-          }
-        }
-
-        if (_.has(contact.changed, 'ask') && contact.changed.ask === 'subscribe') {
-          this.addContactToGroup(contact, HEADER_PENDING_CONTACTS);
-        }
-
-        if (_.has(contact.changed, 'subscription') && contact.changed.requesting === 'true') {
-          this.addContactToGroup(contact, HEADER_REQUESTING_CONTACTS);
-        }
+        this.update(); // if (_.has(contact.changed, 'subscription')) {
+        //     if (contact.changed.subscription === 'from') {
+        //         this.addContactToGroup(contact, HEADER_PENDING_CONTACTS);
+        //     } else if (_.includes(['both', 'to'], contact.get('subscription'))) {
+        //         this.addExistingContact(contact);
+        //     }
+        // }
+        // if (_.has(contact.changed, 'ask') && contact.changed.ask === 'subscribe') {
+        //     this.addContactToGroup(contact, HEADER_PENDING_CONTACTS);
+        // }
+        // if (_.has(contact.changed, 'subscription') && contact.changed.requesting === 'true') {
+        //     this.addContactToGroup(contact, HEADER_REQUESTING_CONTACTS);
+        // }
 
         this.updateFilter();
       },
@@ -88179,8 +88177,6 @@ _converse.initialize = function (settings, callback) {
       _converse.api.send(this.constructPresence(type, status_message));
 
       if (!type) {
-        console.log(type, status_message);
-
         if (check) {
           _converse.emit('sendPresence');
         }
@@ -91249,7 +91245,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
         }
 
         this.save('connection_status', _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].ROOMSTATUS.CONNECTING);
-        console.log('we send stanza to join this chatroom', stanza);
 
         _converse.api.send(stanza);
 
@@ -93019,6 +93014,7 @@ const _converse$env = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_
       Promise = _converse$env.Promise,
       Strophe = _converse$env.Strophe,
       $iq = _converse$env.$iq,
+      $build = _converse$env.$build,
       $pres = _converse$env.$pres,
       b64_sha1 = _converse$env.b64_sha1,
       moment = _converse$env.moment,
@@ -93091,33 +93087,41 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
        *      will be ignored it's guaranteed that the XMPP server
        *      will be queried for the roster.
        */
-      if (ignore_cache) {
-        _converse.send_initial_presence = true;
+      _converse.rostergroups.fetchRosterGroups().then(() => {
+        _converse.emit('rosterGroupsFetched');
 
-        _converse.roster.fetchFromServer().then(() => {
-          _converse.emit('rosterContactsFetched');
+        return _converse.roster.fetchRosterContacts();
+      }).then(() => {
+        _converse.emit('rosterContactsFetched');
 
-          _converse.sendInitialPresence();
-        }).catch(reason => {
-          _converse.log(reason, Strophe.LogLevel.ERROR);
+        _converse.sendInitialPresence();
+      }).catch(reason => {
+        _converse.log(reason, Strophe.LogLevel.ERROR);
 
-          _converse.sendInitialPresence();
-        });
-      } else {
-        _converse.rostergroups.fetchRosterGroups().then(() => {
-          _converse.emit('rosterGroupsFetched');
+        _converse.sendInitialPresence();
+      }); // if (ignore_cache) {
+      //     _converse.send_initial_presence = true;
+      //     _converse.roster.fetchFromServer()
+      //         .then(() => {
+      //             _converse.emit('rosterContactsFetched');
+      //             _converse.sendInitialPresence();
+      //         }).catch((reason) => {
+      //             _converse.log(reason, Strophe.LogLevel.ERROR);
+      //             _converse.sendInitialPresence();
+      //         });
+      // } else {
+      //     _converse.rostergroups.fetchRosterGroups().then(() => {
+      //         _converse.emit('rosterGroupsFetched');
+      //         return _converse.roster.fetchRosterContacts();
+      //     }).then(() => {
+      //         _converse.emit('rosterContactsFetched');
+      //         _converse.sendInitialPresence();
+      //     }).catch((reason) => {
+      //         _converse.log(reason, Strophe.LogLevel.ERROR);
+      //         _converse.sendInitialPresence();
+      //     });
+      // }
 
-          return _converse.roster.fetchRosterContacts();
-        }).then(() => {
-          _converse.emit('rosterContactsFetched');
-
-          _converse.sendInitialPresence();
-        }).catch(reason => {
-          _converse.log(reason, Strophe.LogLevel.ERROR);
-
-          _converse.sendInitialPresence();
-        });
-      }
     };
 
     _converse.Presence = Backbone.Model.extend({
@@ -93462,7 +93466,13 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
 
           _converse.roster.fetchFromServer();
         } else {
-          // rawItems = collection;
+          rawItems = collection.models.map(model => $build('item', {
+            jid: model.get('jid'),
+            name: model.get('name') || model.get('nickname'),
+            ask: model.get('ask'),
+            subscription: model.get('subscription')
+          }).node);
+
           _converse.emit('cachedRoster', collection);
         }
       },
@@ -93690,8 +93700,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         if (query) {
           const items = sizzle(`item`, query);
           currentItems = _.cloneDeep(items);
-          rawItems = _.cloneDeep(items); // console.log(items);
-
+          rawItems = _.cloneDeep(items);
           this.compareContacts(importedContacts, 'Address Book');
           this.compareContacts(organizationContacts, 'My Organization');
           this.data.save('version', query.getAttribute('ver'));
@@ -93733,10 +93742,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
           if (matched) {
             if (group === 'Address Book' && this.isExistedInImportedContacts(item, organizationContacts) || group === 'My Organization' && this.isExistedInImportedContacts(item, importedContacts)) {
               this.updateContact(item, ['Address Book', 'My Organization']);
-              this.updateContact(item, ['Address Book', 'My Organization']); // a glitch to force the view render to get correct group
             } else {
               this.updateContact(item, [group]);
-              this.updateContact(item, [group]); // a glitch to force the view render to get correct group
             }
           } else {
             try {
@@ -93810,9 +93817,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
                   }, {
                     sort: true
                   });
-                } else {
-                  console.log('nothing here');
-                }
+                } else {}
               } else {
                 xhr.onerror();
               }
@@ -93839,7 +93844,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
             'subscription': subscription,
             'ask': ask,
             'requesting': null,
-            'groups': groups
+            'groups': groups,
+            'timestamp': new Date().getTime()
           });
         }
       },

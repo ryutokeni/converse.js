@@ -6,7 +6,7 @@
 
 import converse from "@converse/headless/converse-core";
 
-const { Backbone, Promise, Strophe, $iq, $pres, b64_sha1, moment, sizzle, _ } = converse.env;
+const { Backbone, Promise, Strophe, $iq, $build, $pres, b64_sha1, moment, sizzle, _ } = converse.env;
 const u = converse.env.utils;
 
 converse.plugins.add('converse-roster', {
@@ -84,28 +84,38 @@ converse.plugins.add('converse-roster', {
              *      will be ignored it's guaranteed that the XMPP server
              *      will be queried for the roster.
              */
-            if (ignore_cache) {
-                _converse.send_initial_presence = true;
-                _converse.roster.fetchFromServer()
-                    .then(() => {
-                        _converse.emit('rosterContactsFetched');
-                        _converse.sendInitialPresence();
-                    }).catch((reason) => {
-                        _converse.log(reason, Strophe.LogLevel.ERROR);
-                        _converse.sendInitialPresence();
-                    });
-            } else {
-                _converse.rostergroups.fetchRosterGroups().then(() => {
-                    _converse.emit('rosterGroupsFetched');
-                    return _converse.roster.fetchRosterContacts();
-                }).then(() => {
-                    _converse.emit('rosterContactsFetched');
-                    _converse.sendInitialPresence();
-                }).catch((reason) => {
-                    _converse.log(reason, Strophe.LogLevel.ERROR);
-                    _converse.sendInitialPresence();
-                });
-            }
+             _converse.rostergroups.fetchRosterGroups().then(() => {
+                 _converse.emit('rosterGroupsFetched');
+                 return _converse.roster.fetchRosterContacts();
+             }).then(() => {
+                 _converse.emit('rosterContactsFetched');
+                 _converse.sendInitialPresence();
+             }).catch((reason) => {
+                 _converse.log(reason, Strophe.LogLevel.ERROR);
+                 _converse.sendInitialPresence();
+             });
+            // if (ignore_cache) {
+            //     _converse.send_initial_presence = true;
+            //     _converse.roster.fetchFromServer()
+            //         .then(() => {
+            //             _converse.emit('rosterContactsFetched');
+            //             _converse.sendInitialPresence();
+            //         }).catch((reason) => {
+            //             _converse.log(reason, Strophe.LogLevel.ERROR);
+            //             _converse.sendInitialPresence();
+            //         });
+            // } else {
+            //     _converse.rostergroups.fetchRosterGroups().then(() => {
+            //         _converse.emit('rosterGroupsFetched');
+            //         return _converse.roster.fetchRosterContacts();
+            //     }).then(() => {
+            //         _converse.emit('rosterContactsFetched');
+            //         _converse.sendInitialPresence();
+            //     }).catch((reason) => {
+            //         _converse.log(reason, Strophe.LogLevel.ERROR);
+            //         _converse.sendInitialPresence();
+            //     });
+            // }
         };
 
 
@@ -423,7 +433,12 @@ converse.plugins.add('converse-roster', {
                     _converse.send_initial_presence = true;
                     _converse.roster.fetchFromServer();
                 } else {
-                    // rawItems = collection;
+                    rawItems = collection.models.map(model => $build('item', {
+                      jid: model.get('jid'),
+                      name: model.get('name') || model.get('nickname'),
+                      ask: model.get('ask'),
+                      subscription: model.get('subscription')
+                    }).node);
                     _converse.emit('cachedRoster', collection);
                 }
             },
@@ -588,7 +603,7 @@ converse.plugins.add('converse-roster', {
                     stanza.attrs({'ver': this.data.get('version')});
                 }
                 let iq;
-                
+
                 while(iq === undefined) {
                     // we fetch rsoter from server until iq recieve value :)
                     try {
@@ -602,7 +617,7 @@ converse.plugins.add('converse-roster', {
                         );
                     }
                 }
-             
+
                 return this.onReceivedFromServer(iq);
             },
 
@@ -610,13 +625,12 @@ converse.plugins.add('converse-roster', {
                 /* An IQ stanza containing the roster has been received from
                  * the XMPP server.
                  */
-               
+
                 const query = sizzle(`query[xmlns="${Strophe.NS.ROSTER}"]`, iq).pop();
                 if (query) {
                     const items = sizzle(`item`, query);
                     currentItems = _.cloneDeep(items);
                     rawItems = _.cloneDeep(items);
-                    // console.log(items);
                     this.compareContacts(importedContacts, 'Address Book');
                     this.compareContacts(organizationContacts, 'My Organization');
                     this.data.save('version', query.getAttribute('ver'));
@@ -653,11 +667,9 @@ converse.plugins.add('converse-roster', {
                     (group === 'Address Book' && this.isExistedInImportedContacts(item, organizationContacts)) ||
                     (group === 'My Organization' && this.isExistedInImportedContacts(item, importedContacts))
                   ) {
-                    this.updateContact(item, ['Address Book', 'My Organization']);
-                    this.updateContact(item, ['Address Book', 'My Organization']); // a glitch to force the view render to get correct group
+                    this.updateContact(item, ['Address Book', 'My Organization'])
                   } else {
-                    this.updateContact(item, [group]);
-                    this.updateContact(item, [group]); // a glitch to force the view render to get correct group
+                    this.updateContact(item, [group])
                   }
                 } else {
                   try {
@@ -690,7 +702,6 @@ converse.plugins.add('converse-roster', {
                     ask = item.getAttribute("ask");
                 let rosterName = item.getAttribute("name");
                     // groups = _.map(item.getElementsByTagName('group'), Strophe.getText);
-
                 if (!contact) {
                     // if ((subscription === "none" && ask === null) || (subscription === "remove")) {
                     //     return; // We're lazy when adding contacts.
@@ -724,7 +735,6 @@ converse.plugins.add('converse-roster', {
                                  });
 
                             } else {
-                            console.log('nothing here');
                             }
                         } else {
                             xhr.onerror();
@@ -753,6 +763,7 @@ converse.plugins.add('converse-roster', {
                         'ask': ask,
                         'requesting': null,
                         'groups': groups,
+                        'timestamp': (new Date()).getTime()
                     });
                 }
             },

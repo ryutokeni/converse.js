@@ -408,12 +408,15 @@ converse.plugins.add('converse-rosterview', {
                 this.el.classList.add('current-xmpp-contact');
                 this.el.classList.remove(_.without(['both', 'to'], subscription)[0]);
                 this.el.classList.add(subscription);
-                const parentElement = this.el.parentElement;
-                let group = '';
-                if (parentElement) {
-                  group = parentElement.getAttribute('data-group');
-                }
-                this.renderRosterItem(this.model, group);
+                //wait for group to finish rendering first, so that we can access it as parent of this.el
+                setTimeout(() => {
+                  const parentElement = this.el.parentElement;
+                  let group = '';
+                  if (parentElement) {
+                    group = parentElement.getAttribute('data-group');
+                  }
+                  this.renderRosterItem(this.model, group);
+                }, 0)
                 return this;
             },
 
@@ -427,7 +430,6 @@ converse.plugins.add('converse-rosterview', {
                             this.el.classList.remove('open');
                         } else {
                             if (!chatbox.get('latestMessageTime')) {
-                              //  console.log('it dont have messages yet');
                                 this.el.classList.add('open');
                             }
                         }
@@ -737,7 +739,7 @@ converse.plugins.add('converse-rosterview', {
                 Backbone.OrderedListView.prototype.initialize.apply(this, arguments);
                 _converse.roster.on("add", this.onContactAdded, this);
                 _converse.roster.on('change:groups', this.onContactAdded, this);
-                _converse.roster.on('change', this.onContactChange, this);
+                _converse.roster.on('change', this.onContactAdded, this);
                 _converse.roster.on("destroy", this.update, this);
                 _converse.roster.on("remove", this.update, this);
                 _converse.presences.on('change:show', () => {
@@ -754,9 +756,9 @@ converse.plugins.add('converse-rosterview', {
                 this.sortAndPositionAllItems.bind(this));
 
                 _converse.on('rosterContactsFetched', () => {
-                    // _converse.roster.each((contact) => this.addRosterContact(contact, {'silent': true}));
-                    // this.update();
-                    // this.updateFilter();
+                    _converse.roster.each((contact) => this.addRosterContact(contact, {'silent': true}));
+                    this.update();
+                    this.updateFilter();
                     this.trigger('rosterContactsFetchedAndProcessed');
                 });
                 this.createRosterFilter();
@@ -872,19 +874,19 @@ converse.plugins.add('converse-rosterview', {
             onContactChange (contact) {
                 this.updateChatBox(contact)
                 this.update();
-                if (_.has(contact.changed, 'subscription')) {
-                    if (contact.changed.subscription === 'from') {
-                        this.addContactToGroup(contact, HEADER_PENDING_CONTACTS);
-                    } else if (_.includes(['both', 'to'], contact.get('subscription'))) {
-                        this.addExistingContact(contact);
-                    }
-                }
-                if (_.has(contact.changed, 'ask') && contact.changed.ask === 'subscribe') {
-                    this.addContactToGroup(contact, HEADER_PENDING_CONTACTS);
-                }
-                if (_.has(contact.changed, 'subscription') && contact.changed.requesting === 'true') {
-                    this.addContactToGroup(contact, HEADER_REQUESTING_CONTACTS);
-                }
+                // if (_.has(contact.changed, 'subscription')) {
+                //     if (contact.changed.subscription === 'from') {
+                //         this.addContactToGroup(contact, HEADER_PENDING_CONTACTS);
+                //     } else if (_.includes(['both', 'to'], contact.get('subscription'))) {
+                //         this.addExistingContact(contact);
+                //     }
+                // }
+                // if (_.has(contact.changed, 'ask') && contact.changed.ask === 'subscribe') {
+                //     this.addContactToGroup(contact, HEADER_PENDING_CONTACTS);
+                // }
+                // if (_.has(contact.changed, 'subscription') && contact.changed.requesting === 'true') {
+                //     this.addContactToGroup(contact, HEADER_REQUESTING_CONTACTS);
+                // }
                 this.updateFilter();
             },
 
