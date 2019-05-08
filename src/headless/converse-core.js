@@ -1018,15 +1018,15 @@ _converse.initialize = function (settings, callback) {
             //     console.log('we return this cause it is not online status');
             //     return;
             // }
-          
+
             _converse.api.send(this.constructPresence(type, status_message));
             if (!type) {
                 if (check) {
                     _converse.emit('sendPresence');
                 }
-                
+
             }
-            
+
         }
     });
 
@@ -1730,7 +1730,7 @@ const converse = {
     'updateContacts' (contacts, group) {
       if (_converse.roster) {
         return _converse.roster.compareContacts(contacts, group, true);
-      } 
+      }
       return _converse.api.listen.on('rosterContactsFetched', () => {
         _converse.roster.compareContacts(contacts, group, true);
       });
@@ -1742,7 +1742,7 @@ const converse = {
             text: group.groupName
           },
           nick: group.nick
-        });
+        }, null, true);
         if (chatbox) {
             chatbox.save({
               users: group.users,
@@ -2063,7 +2063,7 @@ const converse = {
         }
         if (msg.stanza.getAttribute('type') === 'groupchat') {
         //   _converse.chatboxes.onMessage(msg.stanza, {'silent': true});
-            
+
             return;
         }
         else {

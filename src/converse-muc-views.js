@@ -503,8 +503,6 @@ converse.plugins.add('converse-muc-views', {
             },
 
             initialize () {
-                // this.model.set('hidden_occupants', false);
-                
                 this.initDebounced();
                 this.model.messages.on('add', this.onMessageAdded, this);
                 this.model.messages.on('rendered', this.scrollDown, this);
@@ -515,71 +513,47 @@ converse.plugins.add('converse-muc-views', {
                 this.model.on('change:jid', this.renderHeading, this);
                 this.model.on('change:name', this.renderHeading, this);
                 this.model.on('change:subject', this.renderHeading, this);
-                // this.model.on('change:subject', this.setChatRoomSubject, this);
                 this.model.on('configurationNeeded', this.getAndRenderConfigurationForm, this);
                 this.model.on('destroy', this.hide, this);
                 this.model.on('show', this.show, this);
-                // this.model.attributes.from_groupChat = true;
-
-                // this.model.occupants.on('add', this.onOccupantAdded, this);
-                // this.model.occupants.on('remove', this.onOccupantRemoved, this);
-                // this.model.occupants.on('change:show', this.showJoinOrLeaveNotification, this);
-                // this.model.occupants.on('change:role', this.informOfOccupantsRoleChange, this);
-                // this.model.occupants.on('change:affiliation', this.informOfOccupantsAffiliationChange, this);
+                this.model.on('showRoom', this.showRoom, this);
                 this.createEmojiPicker();
                 this.createOccupantsView();
                 this.model.save({
                     'connection_status': converse.ROOMSTATUS.DISCONNECTED
                 })
-                this.render().insertIntoDOM();
-                // this.registerHandlers();
-                // this.enterRoom();
-                this.hideOccupants();
-                _converse.on('AllMessageAreLoaded', (jid) => {
-                    if (jid === this.model.get('jid')) {
-                        u.hideElement(this.el.querySelector('button.load-more-messages'));
-                        u.hideElement(this.el.querySelector('.loading-more-spin'));
-                        this.model.save({
-                            isAllLoaded: true
-                        })
-                    }
-                })
-                _converse.on('UnDisabledButtonLoadmore', () => {
-                //    this.hideSpinner();
-                        u.hideElement(this.el.querySelector('.loading-more-spin'));
-                        this.model.save({
-                            loadingMore: false
-                        })
-                })
+                if (!this.model.silent) {
+
+                } else {
+                  _converse.emit('aChatRoomClose');
+                }
 
                 _converse.on('sendPresence', () => {
                     this.registerHandlers();
                     this.enterRoom();
                 })
-                // $('.chat-content').on('scroll',  () => {
-                //     var x = this.el.querySelector('.chat-content').scrollTop;
-                //     if (x === 0 ) {
-                //         // console.log('we scroll on top');
-                //         if (this.model.get('isAllLoaded')) {
-                //              this.model.save({
-                //                loadingMore: false
-                //              })
-                //             u.hideElement(this.el.querySelector('button.load-more-messages'))
-                //         }
-                //         else {
-                //             u.showElement(this.el.querySelector('.loading-more-spin'));
-                //             if (!this.model.get('loadingMore')) {
-                //                 console.log('load more mess', this.model);
-                //                 this.loadMoreMessages();
-                //             }
-                //         }
-                //     }
-                //     else {
-                //         u.hideElement(this.el.querySelector('button.load-more-messages'))
-                //     }
-                // })
-               
             },
+
+            showRoom() {
+              this.render().insertIntoDOM();
+              this.hideOccupants();
+              _converse.on('AllMessageAreLoaded', (jid) => {
+                  if (jid === this.model.get('jid')) {
+                      u.hideElement(this.el.querySelector('button.load-more-messages'));
+                      u.hideElement(this.el.querySelector('.loading-more-spin'));
+                      this.model.save({
+                          isAllLoaded: true
+                      })
+                  }
+              })
+              _converse.on('UnDisabledButtonLoadmore', () => {
+                      u.hideElement(this.el.querySelector('.loading-more-spin'));
+                      this.model.save({
+                          loadingMore: false
+                      })
+              })
+            },
+
             enterRoom (ev) {
                 if (ev) { ev.preventDefault(); }
                 // this.populateAndJoin();//we obviously want to join the chatroom by calling join function of the model
@@ -616,7 +590,9 @@ converse.plugins.add('converse-muc-views', {
 
             renderHeading () {
                 /* Render the heading UI of the groupchat. */
-                this.el.querySelector('.chat-head-chatroom').innerHTML = this.generateHeadingHTML();
+                if (this.el && this.el.querySelector('.chat-head-chatroom')) {
+                  this.el.querySelector('.chat-head-chatroom').innerHTML = this.generateHeadingHTML();
+                }
             },
 
             renderChatArea () {
@@ -1382,7 +1358,7 @@ converse.plugins.add('converse-muc-views', {
                 /* Render a form which allows the user to choose their
                  * nickname.
                  */
-                
+
                 // this.hideChatRoomContents();
                 // _.each(this.el.querySelectorAll('span.centered.spinner'), u.removeElement);
                 // if (!_.isString(message)) {
@@ -2148,7 +2124,7 @@ converse.plugins.add('converse-muc-views', {
             events: {
                 'click .avatar': 'showProfileMember'
             },
-            
+
             tagName: 'li',
 
             showProfileMember(ev) {
@@ -2195,7 +2171,7 @@ converse.plugins.add('converse-muc-views', {
                     },
                     err => console.log(err)
                     )
-                } 
+                }
                 this.profile_modal = new _converse.ProfileModal({model: this.model});
                 this.profile_modal.show(ev);
             },
@@ -2214,7 +2190,7 @@ converse.plugins.add('converse-muc-views', {
                     }
                 })
                 // _converse.on('updateProfile', data => {
-                    
+
                 // });
             },
             toHTML () {
@@ -2332,6 +2308,8 @@ converse.plugins.add('converse-muc-views', {
             const that = _converse.chatboxviews;
             _converse.chatboxes.on('add', item => {
                 if (!that.get(item.get('id')) && item.get('type') === _converse.CHATROOMS_TYPE) {
+                  console.log('add new room', item);
+                  item.silent = true;
                     return that.add(item.get('id'), new _converse.ChatRoomView({'model': item}));
                 }
             });

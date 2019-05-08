@@ -1023,8 +1023,8 @@ converse.plugins.add('converse-muc', {
                     }
                     // console.dir(stanza);
                     // console.log(stanza);
-                    
-                  
+
+
                     const msg = await this.createMessage(stanza, original_stanza);
                     // console.log('stanza: ', stanza);
                     if (msg && stanza.querySelector('data').querySelector('senderName')) {
@@ -1604,7 +1604,7 @@ converse.plugins.add('converse-muc', {
                  *     true
                  * );
                  */
-                'open': async function (jids, attrs, participants) {
+                'open': async function (jids, attrs, participants, silent) {
                     await _converse.api.waitUntil('chatBoxesFetched');
                     if (_.isUndefined(jids)) {
                         const err_msg = 'rooms.open: You need to provide at least one JID';
@@ -1612,7 +1612,9 @@ converse.plugins.add('converse-muc', {
                         throw(new TypeError(err_msg));
                     } else if (_.isString(jids)) {
                         const newChatRoom = _converse.api.rooms.create(jids, attrs);
-                        newChatRoom.trigger('show');
+                        if (!silent) {
+                          newChatRoom.trigger('showRoom');
+                        }
                         newChatRoom.save('participants', participants);
                         return newChatRoom;
                     } else {
