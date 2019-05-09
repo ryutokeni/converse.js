@@ -15,7 +15,7 @@ const { Backbone, _, utils } = converse.env;
 const u = utils;
 
 const AvatarMixin = {
-    
+
     renderAvatar (el, me, Url) {
         el = el || this.el;
         const canvas_el = el.querySelector('canvas');
@@ -109,25 +109,25 @@ converse.plugins.add('converse-chatboxviews', {
 
             initialize () {
                 this.model.on("destroy", this.removeChat, this);
-                this.el.classList.add(`converse-${_converse.view_mode}`); 
-               
+                this.el.classList.add(`converse-${_converse.view_mode}`);
+
                 this.render();
                  let backgroundEl = this.el.querySelector('.row');
                  _converse.on('justShowbackground', () => {
                    backgroundEl.style.backgroundPositionX = 'calc(var(--fullpage-chat-width)/1.45)'
                  })
-               
+
                 _converse.on('aChatRoomClose', () => {
                     backgroundEl.style.backgroundImage=  "url('./assets/background.png')";
                 })
-                _converse.on('aChatRoomOpen', () => {
-                    if (backgroundEl.style.backgroundImage === 'none') {
-                        return;
-                    }
-                    else {
-                        backgroundEl.style.backgroundImage = 'none';
-                    }
-                })
+                // _converse.on('aChatRoomOpen', () => {
+                //     if (backgroundEl.style.backgroundImage === 'none') {
+                //         return;
+                //     }
+                //     else {
+                //         backgroundEl.style.backgroundImage = 'none';
+                //     }
+                // })
             },
 
             render () {

@@ -536,6 +536,13 @@ converse.plugins.add('converse-muc-views', {
 
             showRoom() {
               this.render().insertIntoDOM();
+              _.forEach(_converse.chatboxviews.views, view => {
+                if (view.el && !view. controlbox_pane) {
+                  u.addClass('hidden', view.el);
+                }
+              });
+              this.show();
+
               this.hideOccupants();
               _converse.on('AllMessageAreLoaded', (jid) => {
                   if (jid === this.model.get('jid')) {
@@ -2308,7 +2315,6 @@ converse.plugins.add('converse-muc-views', {
             const that = _converse.chatboxviews;
             _converse.chatboxes.on('add', item => {
                 if (!that.get(item.get('id')) && item.get('type') === _converse.CHATROOMS_TYPE) {
-                  console.log('add new room', item);
                   item.silent = true;
                     return that.add(item.get('id'), new _converse.ChatRoomView({'model': item}));
                 }

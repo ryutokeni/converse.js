@@ -667,15 +667,17 @@ converse.plugins.add('converse-chatview', {
             afterMessagesFetched () {
                 this.insertIntoDOM();
                 this.scrollDown();
-                this.content.addEventListener('scroll', this.markScrolled.bind(this));
+                if (this.content) {
+                  this.content.addEventListener('scroll', this.markScrolled.bind(this));
+                }
                 _converse.emit('afterMessagesFetched', this);
             },
 
             fetchMessages () {
                 this.model.messages.fetch({
                     'add': true,
-                    'success': this.afterMessagesFetched.bind(this),
-                    'error': this.afterMessagesFetched.bind(this),
+                    'success': () => this.afterMessagesFetched(),
+                    'error': () => this.afterMessagesFetched(),
                 });
                 return this;
             },
@@ -979,7 +981,7 @@ converse.plugins.add('converse-chatview', {
                  * Parameters:
                  *    (Object) message - The message Backbone object that was added.
                  */
-           
+
                 this.showMessage(message);
                 if (message.get('correcting')) {
                     this.insertIntoTextArea(message.get('message'), true, true);
@@ -988,8 +990,8 @@ converse.plugins.add('converse-chatview', {
                     'message': message,
                     'chatbox': this.model
                 });
-                
-                
+
+
 
 
             },

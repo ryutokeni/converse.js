@@ -72312,15 +72312,15 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
 
         _converse.on('aChatRoomClose', () => {
           backgroundEl.style.backgroundImage = "url('./assets/background.png')";
-        });
+        }); // _converse.on('aChatRoomOpen', () => {
+        //     if (backgroundEl.style.backgroundImage === 'none') {
+        //         return;
+        //     }
+        //     else {
+        //         backgroundEl.style.backgroundImage = 'none';
+        //     }
+        // })
 
-        _converse.on('aChatRoomOpen', () => {
-          if (backgroundEl.style.backgroundImage === 'none') {
-            return;
-          } else {
-            backgroundEl.style.backgroundImage = 'none';
-          }
-        });
       },
 
       render() {
@@ -73146,7 +73146,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       afterMessagesFetched() {
         this.insertIntoDOM();
         this.scrollDown();
-        this.content.addEventListener('scroll', this.markScrolled.bind(this));
+
+        if (this.content) {
+          this.content.addEventListener('scroll', this.markScrolled.bind(this));
+        }
 
         _converse.emit('afterMessagesFetched', this);
       },
@@ -73154,8 +73157,8 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
       fetchMessages() {
         this.model.messages.fetch({
           'add': true,
-          'success': this.afterMessagesFetched.bind(this),
-          'error': this.afterMessagesFetched.bind(this)
+          'success': () => this.afterMessagesFetched(),
+          'error': () => this.afterMessagesFetched()
         });
         return this;
       },
@@ -77487,6 +77490,14 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
 
       showRoom() {
         this.render().insertIntoDOM();
+
+        _.forEach(_converse.chatboxviews.views, view => {
+          if (view.el && !view.controlbox_pane) {
+            u.addClass('hidden', view.el);
+          }
+        });
+
+        this.show();
         this.hideOccupants();
 
         _converse.on('AllMessageAreLoaded', jid => {
@@ -79368,7 +79379,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
 
       _converse.chatboxes.on('add', item => {
         if (!that.get(item.get('id')) && item.get('type') === _converse.CHATROOMS_TYPE) {
-          console.log('add new room', item);
           item.silent = true;
           return that.add(item.get('id'), new _converse.ChatRoomView({
             'model': item
@@ -82850,6 +82860,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         _converse.emit('aChatRoomOpen');
 
         _converse.clearMsgCounter();
+
+        if (!ev) {
+          return;
+        }
 
         const name = ev.target.textContent;
         const jid = ev.delegateTarget.dataset.roomJid;
@@ -92730,11 +92744,17 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           } else if (_.isString(jids)) {
             const newChatRoom = _converse.api.rooms.create(jids, attrs);
 
+            console.log('newChatRoom');
+            console.log(newChatRoom);
+
             if (!silent) {
               newChatRoom.trigger('showRoom');
             }
 
-            newChatRoom.save('participants', participants);
+            if (participants) {
+              newChatRoom.save('participants', participants);
+            }
+
             return newChatRoom;
           } else {
             return _.map(jids, jid => _converse.api.rooms.create(jid, attrs).trigger('show'));
