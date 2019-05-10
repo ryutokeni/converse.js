@@ -20034,7 +20034,7 @@ utils.intFromLE = intFromLE;
 /*! exports provided: _args, _development, _from, _id, _inBundle, _integrity, _location, _phantomChildren, _requested, _requiredBy, _resolved, _spec, _where, author, bugs, dependencies, description, devDependencies, files, homepage, keywords, license, main, name, repository, scripts, version, default */
 /***/ (function(module) {
 
-module.exports = {"_args":[["elliptic@6.4.0","/Users/tltthuan/Desktop/pageme/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/tltthuan/Desktop/pageme/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
+module.exports = {"_args":[["elliptic@6.4.0","/Users/mrhai/Documents/Hai/Source/Pageme-desktop/pageme/src/libs/converse.js"]],"_development":true,"_from":"elliptic@6.4.0","_id":"elliptic@6.4.0","_inBundle":false,"_integrity":"sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=","_location":"/elliptic","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"elliptic@6.4.0","name":"elliptic","escapedName":"elliptic","rawSpec":"6.4.0","saveSpec":null,"fetchSpec":"6.4.0"},"_requiredBy":["/browserify-sign","/create-ecdh"],"_resolved":"https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz","_spec":"6.4.0","_where":"/Users/mrhai/Documents/Hai/Source/Pageme-desktop/pageme/src/libs/converse.js","author":{"name":"Fedor Indutny","email":"fedor@indutny.com"},"bugs":{"url":"https://github.com/indutny/elliptic/issues"},"dependencies":{"bn.js":"^4.4.0","brorand":"^1.0.1","hash.js":"^1.0.0","hmac-drbg":"^1.0.0","inherits":"^2.0.1","minimalistic-assert":"^1.0.0","minimalistic-crypto-utils":"^1.0.0"},"description":"EC cryptography","devDependencies":{"brfs":"^1.4.3","coveralls":"^2.11.3","grunt":"^0.4.5","grunt-browserify":"^5.0.0","grunt-cli":"^1.2.0","grunt-contrib-connect":"^1.0.0","grunt-contrib-copy":"^1.0.0","grunt-contrib-uglify":"^1.0.1","grunt-mocha-istanbul":"^3.0.1","grunt-saucelabs":"^8.6.2","istanbul":"^0.4.2","jscs":"^2.9.0","jshint":"^2.6.0","mocha":"^2.1.0"},"files":["lib"],"homepage":"https://github.com/indutny/elliptic","keywords":["EC","Elliptic","curve","Cryptography"],"license":"MIT","main":"lib/elliptic.js","name":"elliptic","repository":{"type":"git","url":"git+ssh://git@github.com/indutny/elliptic.git"},"scripts":{"jscs":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","jshint":"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js","lint":"npm run jscs && npm run jshint","test":"npm run lint && npm run unit","unit":"istanbul test _mocha --reporter=spec test/index.js","version":"grunt dist && git add dist/"},"version":"6.4.0"};
 
 /***/ }),
 
@@ -84376,6 +84376,8 @@ const initialize = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21_
       disabledNotification = _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].disabledNotification;
 
 _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].initialize = function (settings, callback) {
+  console.log("inside converse");
+
   if (_converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_21__["default"].env._.isArray(settings.whitelisted_plugins)) {
     settings.whitelisted_plugins = settings.whitelisted_plugins.concat(WHITELISTED_PLUGINS);
   } else {
@@ -87257,7 +87259,7 @@ _converse.default_settings = {
   expose_rid_and_sid: false,
   geouri_regex: /https:\/\/www.openstreetmap.org\/.*#map=[0-9]+\/([\-0-9.]+)\/([\-0-9.]+)\S*/g,
   geouri_replacement: 'https://www.openstreetmap.org/?mlat=$1&mlon=$2#map=18/$1/$2',
-  idle_presence_timeout: 300,
+  idle_presence_timeout: 0,
   // Seconds after which an idle presence is sent
   jid: undefined,
   keepalive: true,
@@ -87628,6 +87630,7 @@ _converse.initialize = function (settings, callback) {
     if (!_converse.connection.authenticated) {
       // We can't send out any stanzas when there's no authenticated connection.
       // This can happen when the connection reconnects.
+      console.log("not connect");
       return;
     }
 
@@ -87643,17 +87646,18 @@ _converse.initialize = function (settings, callback) {
       _converse.idle = true;
 
       _converse.xmppstatus.sendPresence();
-    }
+    } // if (_converse.auto_away > 0 &&
+    //         _converse.idle_seconds > _converse.auto_away &&
+    //         stat !== 'away' && stat !== 'xa' && stat !== 'dnd') {
+    //     _converse.auto_changed_status = true;
+    //     _converse.xmppstatus.set('status', 'away');
+    // } else if (_converse.auto_xa > 0 &&
+    //         _converse.idle_seconds > _converse.auto_xa &&
+    //         stat !== 'xa' && stat !== 'dnd') {
+    //     _converse.auto_changed_status = true;
+    //     _converse.xmppstatus.set('status', 'xa');
+    // }
 
-    if (_converse.auto_away > 0 && _converse.idle_seconds > _converse.auto_away && stat !== 'away' && stat !== 'xa' && stat !== 'dnd') {
-      _converse.auto_changed_status = true;
-
-      _converse.xmppstatus.set('status', 'away');
-    } else if (_converse.auto_xa > 0 && _converse.idle_seconds > _converse.auto_xa && stat !== 'xa' && stat !== 'dnd') {
-      _converse.auto_changed_status = true;
-
-      _converse.xmppstatus.set('status', 'xa');
-    }
   };
 
   this.registerIntervalHandler = function () {
@@ -87681,6 +87685,8 @@ _converse.initialize = function (settings, callback) {
   };
 
   this.setConnectionStatus = function (connection_status, message) {
+    console.log("connection status " + connection_status + " " + message);
+
     _converse.connfeedback.set({
       'connection_status': connection_status,
       'message': message
@@ -87708,6 +87714,8 @@ _converse.initialize = function (settings, callback) {
   };
 
   this.reconnect = _lodash_noconflict__WEBPACK_IMPORTED_MODULE_4___default.a.debounce(function () {
+    console.log("reconnecting ");
+
     _converse.log('RECONNECTING');
 
     _converse.log('The connection has dropped, attempting to reconnect.');
@@ -87743,6 +87751,7 @@ _converse.initialize = function (settings, callback) {
      * to reconnect.
      */
     const reason = _converse.disconnection_reason;
+    console.log("disconnect " + reason);
 
     if (_converse.disconnection_cause === strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].Status.AUTHFAIL) {
       if (_converse.credentials_url && _converse.auto_reconnect) {
@@ -87782,6 +87791,8 @@ _converse.initialize = function (settings, callback) {
      * through various states while establishing or tearing down a
      * connection.
      */
+    console.log(`Status changed to: ${_converse.CONNECTION_STATUS[status]}`);
+
     _converse.log(`Status changed to: ${_converse.CONNECTION_STATUS[status]}`);
 
     if (status === strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].Status.CONNECTED || status === strophe_js__WEBPACK_IMPORTED_MODULE_0__["Strophe"].Status.ATTACHED) {
@@ -88027,6 +88038,8 @@ _converse.initialize = function (settings, callback) {
 
   this.sendInitialPresence = function () {
     if (_converse.send_initial_presence) {
+      console.log("send_initial_presence");
+
       _converse.xmppstatus.sendPresence();
     }
   };
@@ -88060,7 +88073,6 @@ _converse.initialize = function (settings, callback) {
     /* Called as soon as a new connection has been established, either
      * by logging in or by attaching to an existing BOSH session.
      */
-    // this.sendPresence();
     check = !reconnecting ? true : false;
 
     _converse.connection.flush(); // Solves problem of returned PubSub BOSH response not received by browser
@@ -88074,6 +88086,8 @@ _converse.initialize = function (settings, callback) {
 
 
     _converse.initStatus(reconnecting);
+
+    _converse.xmppstatus.set('status', _converse.default_state);
   };
 
   this.ConnectionFeedback = Backbone.Model.extend({
@@ -88167,13 +88181,17 @@ _converse.initialize = function (settings, callback) {
       //     console.log('we return this cause it is not online status');
       //     return;
       // }
-      _converse.api.send(this.constructPresence(type, status_message));
+      console.log("presence status");
+      console.log(type);
+      console.log(status_message);
 
-      if (!type) {
-        if (check) {
-          _converse.emit('sendPresence');
-        }
-      }
+      _converse.api.send(Object(strophe_js__WEBPACK_IMPORTED_MODULE_0__["$pres"])()); // if (!type) {
+      //     if (check) {
+      //         _converse.emit('sendPresence');
+      //     }
+      //
+      // }
+
     }
 
   });
@@ -92743,9 +92761,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
             throw new TypeError(err_msg);
           } else if (_.isString(jids)) {
             const newChatRoom = _converse.api.rooms.create(jids, attrs);
-
-            console.log('newChatRoom');
-            console.log(newChatRoom);
 
             if (!silent) {
               newChatRoom.trigger('showRoom');

@@ -201,7 +201,7 @@ _converse.default_settings = {
     expose_rid_and_sid: false,
     geouri_regex: /https:\/\/www.openstreetmap.org\/.*#map=[0-9]+\/([\-0-9.]+)\/([\-0-9.]+)\S*/g,
     geouri_replacement: 'https://www.openstreetmap.org/?mlat=$1&mlon=$2#map=18/$1/$2',
-    idle_presence_timeout: 300, // Seconds after which an idle presence is sent
+    idle_presence_timeout: 0, // Seconds after which an idle presence is sent
     jid: undefined,
     keepalive: true,
     locales_url: 'locale/{{{locale}}}/LC_MESSAGES/converse.json',
@@ -568,17 +568,17 @@ _converse.initialize = function (settings, callback) {
             _converse.idle = true;
             _converse.xmppstatus.sendPresence();
         }
-        if (_converse.auto_away > 0 &&
-                _converse.idle_seconds > _converse.auto_away &&
-                stat !== 'away' && stat !== 'xa' && stat !== 'dnd') {
-            _converse.auto_changed_status = true;
-            _converse.xmppstatus.set('status', 'away');
-        } else if (_converse.auto_xa > 0 &&
-                _converse.idle_seconds > _converse.auto_xa &&
-                stat !== 'xa' && stat !== 'dnd') {
-            _converse.auto_changed_status = true;
-            _converse.xmppstatus.set('status', 'xa');
-        }
+        // if (_converse.auto_away > 0 &&
+        //         _converse.idle_seconds > _converse.auto_away &&
+        //         stat !== 'away' && stat !== 'xa' && stat !== 'dnd') {
+        //     _converse.auto_changed_status = true;
+        //     _converse.xmppstatus.set('status', 'away');
+        // } else if (_converse.auto_xa > 0 &&
+        //         _converse.idle_seconds > _converse.auto_xa &&
+        //         stat !== 'xa' && stat !== 'dnd') {
+        //     _converse.auto_changed_status = true;
+        //     _converse.xmppstatus.set('status', 'xa');
+        // }
     };
 
     this.registerIntervalHandler = function () {
@@ -601,6 +601,7 @@ _converse.initialize = function (settings, callback) {
     };
 
     this.setConnectionStatus = function (connection_status, message) {
+      console.log("connection status " + connection_status + " " + message);
         _converse.connfeedback.set({
             'connection_status': connection_status,
             'message': message
@@ -647,7 +648,7 @@ _converse.initialize = function (settings, callback) {
          * to reconnect.
          */
         const reason = _converse.disconnection_reason;
-
+        console.log("disconnect " + reason);
         if (_converse.disconnection_cause === Strophe.Status.AUTHFAIL) {
             if (_converse.credentials_url && _converse.auto_reconnect) {
                 /* In this case, we reconnect, because we might be receiving
@@ -923,7 +924,6 @@ _converse.initialize = function (settings, callback) {
         /* Called as soon as a new connection has been established, either
          * by logging in or by attaching to an existing BOSH session.
          */
-        // this.sendPresence();
         check = !reconnecting? true : false;
         _converse.connection.flush(); // Solves problem of returned PubSub BOSH response not received by browser
         _converse.setUserJID();
@@ -931,6 +931,7 @@ _converse.initialize = function (settings, callback) {
         _converse.enableCarbons();
         // _converse.sendInitialPresence();
         _converse.initStatus(reconnecting)
+        _converse.xmppstatus.set('status', _converse.default_state);
     };
 
 
@@ -1018,14 +1019,13 @@ _converse.initialize = function (settings, callback) {
             //     console.log('we return this cause it is not online status');
             //     return;
             // }
-
-            _converse.api.send(this.constructPresence(type, status_message));
-            if (!type) {
-                if (check) {
-                    _converse.emit('sendPresence');
-                }
-
-            }
+            _converse.api.send($pres());
+            // if (!type) {
+            //     if (check) {
+            //         _converse.emit('sendPresence');
+            //     }
+            //
+            // }
 
         }
     });
