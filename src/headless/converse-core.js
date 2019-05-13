@@ -1022,7 +1022,6 @@ _converse.initialize = function (settings, callback) {
             _converse.api.send($pres());
             // if (!type) {
             //     if (check) {
-            //         _converse.emit('sendPresence');
             //     }
             //
             // }
@@ -2031,7 +2030,7 @@ const converse = {
       pagemeMessages.forEach(msg => {
         if (msg.type !== 'text') {
             if (msg.stanza.getAttribute('type') === 'groupchat') {
-                return;
+                chatbox.onMessage(msg.stanza);
             }
             else {
                 if (msg.type === 'medical_request') {
@@ -2062,9 +2061,7 @@ const converse = {
           }
         }
         if (msg.stanza.getAttribute('type') === 'groupchat') {
-        //   _converse.chatboxes.onMessage(msg.stanza, {'silent': true});
-
-            return;
+          _converse.chatboxes.onMessage(msg.stanza);
         }
         else {
           _converse.chatboxes.onMessage(msg.stanza, {

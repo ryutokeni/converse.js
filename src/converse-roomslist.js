@@ -232,6 +232,10 @@ converse.plugins.add('converse-roomslist', {
                     'name': name || Strophe.unescapeNode(Strophe.getNodeFromJid(jid)) || jid
                 }
                 _converse.api.rooms.open(jid, data);
+                _converse.emit('chatOpenned', {
+                  jid: jid,
+                  messageType: 'groupchat'
+                });
             },
 
             closeRoom (ev) {

@@ -363,7 +363,7 @@ converse.plugins.add('converse-chatboxes', {
                     stanza.c('data', {'xmlns': 'pageMe.message.data'})
                     .c('sentDate').t(sentDate).up()
                     .c('timeToRead').t(timeToRead).up();
-                   
+
                     if (message.get('type') === 'groupchat') {
                          stanza.c('senderName').t(_converse.user_settings.fullname).up();
                         // console.log(_converse.user_settings.fullname);
@@ -615,7 +615,7 @@ converse.plugins.add('converse-chatboxes', {
                     'msgid': stanza.getAttribute('id'),
                     'time': delay ? delay.getAttribute('stamp') : sendDate,
                     'time_to_read': stanza.querySelector('timeToRead') ? stanza.querySelector('timeToRead').innerHTML : 84000,
-                    
+
                     'itemType': stanza.querySelector('itemType') ? stanza.querySelector('itemType').innerHTML : '',
                     'fileSize': stanza.querySelector('fileSize') ? stanza.querySelector('fileSize').innerHTML : '',
                     'sent': sendDate,
@@ -665,7 +665,7 @@ converse.plugins.add('converse-chatboxes', {
                     } else {
                         attrs.sender = _converse.user_settings.jid.split('@')[0] === attrs.nick ? 'me' : 'them'
                     }
-                    
+
                     // console.log(attrs);
                 } else {
                     attrs.from = Strophe.getBareJidFromJid(stanza.getAttribute('from'));
@@ -767,7 +767,7 @@ converse.plugins.add('converse-chatboxes', {
                 /* Given a newly received message, update the unread counter if
                  * necessary.
                  */
-                
+
                 if (!message) { return; }
                 if (message.get('itemType') === "medical_request") {
                     _converse.emit('MedicalRequestReceived', message.get('medialRequestKey'));
@@ -902,7 +902,6 @@ converse.plugins.add('converse-chatboxes', {
                  *    (XMLElement) stanza       - The incoming message stanza
                  *    (Object)     extraAttrs   - Extra params received from pageme app
                  */
-            
                 let to_jid = stanza.getAttribute('to');
                 const to_resource = Strophe.getResourceFromJid(to_jid);
 
@@ -924,6 +923,10 @@ converse.plugins.add('converse-chatboxes', {
                 }
 
                 let from_jid = stanza.getAttribute('from');
+                if (stanza.getAttribute('type') === 'groupchat') {
+                  const to_jid_traited = to_jid.replace("/pageme", "");
+                  from_jid = from_jid.replace(`/${to_jid_traited}`, '');
+                }
                 const forwarded = stanza.querySelector('forwarded'),
                       original_stanza = stanza;
 
@@ -1031,11 +1034,11 @@ converse.plugins.add('converse-chatboxes', {
                         // Only create the message when we're sure it's not a duplicate
                         chatbox.createMessage(stanza, original_stanza, extraAttrs)
                           .then(msg => {
-                             
+
                                 chatbox.incrementUnreadMsgCounter(msg);
                                 msg.set('senderFullName', senderFullName)
-                            //   } 
-                           
+                            //   }
+
                           })
                           .catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
                       } else {
@@ -1050,7 +1053,7 @@ converse.plugins.add('converse-chatboxes', {
                       'silent': (extraAttrs || {}).silent
                     });
                 }
-                
+
                 return true;
             },
 
@@ -1069,7 +1072,7 @@ converse.plugins.add('converse-chatboxes', {
                     jid = attrs.jid;
                 }
                 jid = Strophe.getBareJidFromJid(jid.toLowerCase());
-               
+
                 let  chatbox = this.get(Strophe.getBareJidFromJid(jid));
                 if (!chatbox && create) {
                     _.extend(attrs, {'jid': jid, 'id': jid});

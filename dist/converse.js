@@ -73419,7 +73419,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
          *  (Backbone.Model) message: The message object
          */
         if (!this.model.messageViews) {
-          //  console.log('this model dont have message Views', this.model);
           this.model.messageViews = new Backbone.Collection();
         }
 
@@ -77482,10 +77481,9 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
           _converse.emit('aChatRoomClose');
         }
 
-        _converse.on('sendPresence', () => {
-          this.registerHandlers();
-          this.enterRoom();
-        });
+        this.registerHandlers();
+        this.enterRoom();
+        this.showRoom();
       },
 
       showRoom() {
@@ -82872,6 +82870,11 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_0__["default"].plugins
         };
 
         _converse.api.rooms.open(jid, data);
+
+        _converse.emit('chatOpenned', {
+          jid: jid,
+          messageType: 'groupchat'
+        });
       },
 
       closeRoom(ev) {
@@ -86659,6 +86662,12 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         }
 
         let from_jid = stanza.getAttribute('from');
+
+        if (stanza.getAttribute('type') === 'groupchat') {
+          const to_jid_traited = to_jid.replace("/pageme", "");
+          from_jid = from_jid.replace(`/${to_jid_traited}`, '');
+        }
+
         const forwarded = stanza.querySelector('forwarded'),
               original_stanza = stanza;
 
@@ -86777,7 +86786,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
               // Only create the message when we're sure it's not a duplicate
               chatbox.createMessage(stanza, original_stanza, extraAttrs).then(msg => {
                 chatbox.incrementUnreadMsgCounter(msg);
-                msg.set('senderFullName', senderFullName); //   } 
+                msg.set('senderFullName', senderFullName); //   }
               }).catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
             } else {
               message.save(extraAttrs);
@@ -88174,7 +88183,6 @@ _converse.initialize = function (settings, callback) {
       // }
       _converse.api.send(Object(strophe_js__WEBPACK_IMPORTED_MODULE_0__["$pres"])()); // if (!type) {
       //     if (check) {
-      //         _converse.emit('sendPresence');
       //     }
       //
       // }
@@ -89247,7 +89255,7 @@ const converse = {
     pagemeMessages.forEach(msg => {
       if (msg.type !== 'text') {
         if (msg.stanza.getAttribute('type') === 'groupchat') {
-          return;
+          chatbox.onMessage(msg.stanza);
         } else {
           if (msg.type === 'medical_request') {
             _converse.chatboxes.onMessage(msg.stanza, {
@@ -89282,8 +89290,7 @@ const converse = {
       }
 
       if (msg.stanza.getAttribute('type') === 'groupchat') {
-        //   _converse.chatboxes.onMessage(msg.stanza, {'silent': true});
-        return;
+        _converse.chatboxes.onMessage(msg.stanza);
       } else {
         _converse.chatboxes.onMessage(msg.stanza, {
           silent: true

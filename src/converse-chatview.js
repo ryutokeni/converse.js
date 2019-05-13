@@ -938,7 +938,6 @@ converse.plugins.add('converse-chatview', {
                  *  (Backbone.Model) message: The message object
                  */
                  if (!this.model.messageViews) {
-                    //  console.log('this model dont have message Views', this.model);
                     this.model.messageViews = new Backbone.Collection;
                  }
                 const view = new _converse.MessageView({ 'model': message });

@@ -528,10 +528,9 @@ converse.plugins.add('converse-muc-views', {
                   _converse.emit('aChatRoomClose');
                 }
 
-                _converse.on('sendPresence', () => {
-                    this.registerHandlers();
-                    this.enterRoom();
-                })
+                this.registerHandlers();
+                this.enterRoom();
+                this.showRoom();
             },
 
             showRoom() {
