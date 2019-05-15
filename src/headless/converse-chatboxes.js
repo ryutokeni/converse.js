@@ -366,7 +366,6 @@ converse.plugins.add('converse-chatboxes', {
 
                     if (message.get('type') === 'groupchat') {
                          stanza.c('senderName').t(_converse.user_settings.fullname).up();
-                        // console.log(_converse.user_settings.fullname);
                         stanza.c('senderJid').t(_converse.connection.jid.split('@')[0]).up(); //we set the jid of sender to stanza so we can get it later to render avatar
                     }
                     if (type === 'file') {
@@ -654,7 +653,6 @@ converse.plugins.add('converse-chatboxes', {
                     attrs.nick = Strophe.unescapeNode(Strophe.getResourceFromJid(attrs.from));
                     if (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderName')) {
                         attrs.senderName = stanza.querySelector('data').querySelector('senderName').textContent;
-                        // console.log('the senderName we got from stanza: ', attrs.senderName);
                     }
                     if (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid')) {
                         //if it has senderId, create attrs SenderJid for load avatar in chatview
@@ -665,8 +663,6 @@ converse.plugins.add('converse-chatboxes', {
                     } else {
                         attrs.sender = _converse.user_settings.jid.split('@')[0] === attrs.nick ? 'me' : 'them'
                     }
-
-                    // console.log(attrs);
                 } else {
                     attrs.from = Strophe.getBareJidFromJid(stanza.getAttribute('from'));
                     if (attrs.from === _converse.bare_jid) {
@@ -684,7 +680,6 @@ converse.plugins.add('converse-chatboxes', {
                 if (spoiler) {
                     attrs.spoiler_hint = spoiler.textContent.length > 0 ? spoiler.textContent : '';
                 }
-                // console.log(attrs);
                 return attrs;
             },
 
@@ -737,11 +732,16 @@ converse.plugins.add('converse-chatboxes', {
                             that.save('latestMessageTime', new Date());
                           }
                         }
-                        return that.messages.create({
-                            ...attrs,
-                            'url' : ' '
+                        const oldMessage = that.messages.findWhere({
+                            'msgid' : attrs.msgid
                         });
-                        return that.messages.create(attrs)
+                        if (oldMessage) {
+                          return oldMessage.save(attrs);
+                        } else {
+                          return that.messages.create({
+                            ...attrs
+                          });
+                        }
                     }
                 }
                 const result = this.getMessageAttributesFromStanza(message, original_stanza, extraAttrs)
@@ -1015,7 +1015,6 @@ converse.plugins.add('converse-chatboxes', {
                                 'silent': (extraAttrs || {}).silent
                             });
                         } else {
-                            console.log('nothing here');
                         }
                     } else {
                         xhr.onerror();
@@ -1216,7 +1215,6 @@ converse.plugins.add('converse-chatboxes', {
                             _converse.api.waitUntil('rosterContactsFetched'),
                             _converse.api.waitUntil('chatBoxesFetched')
                         ]).then(() => {
-                            // console.log('we get in there');
                             if (_.isUndefined(jids)) {
                                 const err_msg = "chats.open: You need to provide at least one JID";
                                 _converse.log(err_msg, Strophe.LogLevel.ERROR);

@@ -73368,8 +73368,12 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
             return;
           }
 
-          previous_msg_el.insertAdjacentElement('afterend', view.el);
-          this.markFollowups(view.el);
+          const existed = !!this.content.querySelector(`[data-msgid="${view.model.get('msgid')}"]`);
+
+          if (!existed) {
+            previous_msg_el.insertAdjacentElement('afterend', view.el);
+            this.markFollowups(view.el);
+          }
         }
 
         return this.trigger('messageInserted', view.el);
@@ -77483,10 +77487,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
 
         this.registerHandlers();
         this.enterRoom();
-        this.showRoom();
-      },
-
-      showRoom() {
         this.render().insertIntoDOM();
 
         _.forEach(_converse.chatboxviews.views, view => {
@@ -77495,6 +77495,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
           }
         });
 
+        this.showRoom();
+      },
+
+      showRoom() {
         this.show();
         this.hideOccupants();
 
@@ -86052,8 +86056,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           }).c('sentDate').t(sentDate).up().c('timeToRead').t(timeToRead).up();
 
           if (message.get('type') === 'groupchat') {
-            stanza.c('senderName').t(_converse.user_settings.fullname).up(); // console.log(_converse.user_settings.fullname);
-
+            stanza.c('senderName').t(_converse.user_settings.fullname).up();
             stanza.c('senderJid').t(_converse.connection.jid.split('@')[0]).up(); //we set the jid of sender to stanza so we can get it later to render avatar
           }
 
@@ -86367,7 +86370,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
           attrs.nick = Strophe.unescapeNode(Strophe.getResourceFromJid(attrs.from));
 
           if (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderName')) {
-            attrs.senderName = stanza.querySelector('data').querySelector('senderName').textContent; // console.log('the senderName we got from stanza: ', attrs.senderName);
+            attrs.senderName = stanza.querySelector('data').querySelector('senderName').textContent;
           }
 
           if (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid')) {
@@ -86379,8 +86382,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
             attrs.sender = _converse.user_settings.jid.split('@')[0] === attrs.senderJid ? 'me' : 'them';
           } else {
             attrs.sender = _converse.user_settings.jid.split('@')[0] === attrs.nick ? 'me' : 'them';
-          } // console.log(attrs);
-
+          }
         } else {
           attrs.from = Strophe.getBareJidFromJid(stanza.getAttribute('from'));
 
@@ -86400,8 +86402,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
 
         if (spoiler) {
           attrs.spoiler_hint = spoiler.textContent.length > 0 ? spoiler.textContent : '';
-        } // console.log(attrs);
-
+        }
 
         return attrs;
       },
@@ -86456,10 +86457,15 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
               }
             }
 
-            return that.messages.create(_objectSpread({}, attrs, {
-              'url': ' '
-            }));
-            return that.messages.create(attrs);
+            const oldMessage = that.messages.findWhere({
+              'msgid': attrs.msgid
+            });
+
+            if (oldMessage) {
+              return oldMessage.save(attrs);
+            } else {
+              return that.messages.create(_objectSpread({}, attrs));
+            }
           }
         }
 
@@ -86763,9 +86769,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
                   'chatbox': chatbox,
                   'silent': (extraAttrs || {}).silent
                 });
-              } else {
-                console.log('nothing here');
-              }
+              } else {}
             } else {
               xhr.onerror();
             }
@@ -86980,7 +86984,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         'open'(jids, attrs) {
           return new Promise((resolve, reject) => {
             Promise.all([_converse.api.waitUntil('rosterContactsFetched'), _converse.api.waitUntil('chatBoxesFetched')]).then(() => {
-              // console.log('we get in there');
               if (_.isUndefined(jids)) {
                 const err_msg = "chats.open: You need to provide at least one JID";
 

@@ -530,16 +530,16 @@ converse.plugins.add('converse-muc-views', {
 
                 this.registerHandlers();
                 this.enterRoom();
+                this.render().insertIntoDOM();
+                _.forEach(_converse.chatboxviews.views, view => {
+                  if (view.el && !view. controlbox_pane) {
+                    u.addClass('hidden', view.el);
+                  }
+                });
                 this.showRoom();
             },
 
             showRoom() {
-              this.render().insertIntoDOM();
-              _.forEach(_converse.chatboxviews.views, view => {
-                if (view.el && !view. controlbox_pane) {
-                  u.addClass('hidden', view.el);
-                }
-              });
               this.show();
 
               this.hideOccupants();

@@ -885,8 +885,11 @@ converse.plugins.add('converse-chatview', {
                         // We don't show a duplicate error message
                         return;
                     }
-                    previous_msg_el.insertAdjacentElement('afterend', view.el);
-                    this.markFollowups(view.el);
+                    const existed = !!this.content.querySelector(`[data-msgid="${view.model.get('msgid')}"]`);
+                    if (!existed) {
+                      previous_msg_el.insertAdjacentElement('afterend', view.el);
+                      this.markFollowups(view.el);
+                    }
                 }
                 return this.trigger('messageInserted', view.el);
             },
