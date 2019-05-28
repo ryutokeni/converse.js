@@ -1392,7 +1392,7 @@ converse.plugins.add('converse-chatview', {
                     // Immediately sending the chat state, because the
                     // model is going to be destroyed afterwards.
                     this.setChatState(_converse.INACTIVE);
-                    this.model.sendChatState();
+                    // this.model.sendChatState();
                 }
                 try {
                     this.model.destroy();
@@ -1522,7 +1522,7 @@ converse.plugins.add('converse-chatview', {
                     }
                 } else if (state === 'hidden') {
                     this.setChatState(_converse.INACTIVE, {'silent': true});
-                    this.model.sendChatState();
+                    // this.model.sendChatState();
                     _converse.connection.flush();
                 }
             },

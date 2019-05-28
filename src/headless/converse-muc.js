@@ -131,6 +131,7 @@ converse.plugins.add('converse-muc', {
              * "chatroom".
              */
             // this.clearUnreadMsgCounter();
+            console.log("try open ", settings);
             settings.type = _converse.CHATROOMS_TYPE;
             settings.id = jid;
             settings.box_id = b64_sha1(jid)
@@ -282,7 +283,8 @@ converse.plugins.add('converse-muc', {
                  *  (String) password: Optional password, if required by
                  *      the groupchat.
                  */
-                nick = nick ? nick : this.get('nick');
+                // nick = nick ? nick : this.get('nick');
+                nick = Strophe.unescapeNode(Strophe.getNodeFromJid(_converse.bare_jid));
                 if (!nick) {
                     throw new TypeError('join: You need to provide a valid nickname');
                 }
@@ -296,8 +298,8 @@ converse.plugins.add('converse-muc', {
                     'from': _converse.connection.jid,
                     // 'to': `${this.get('jid')}/${_converse.connection.jid.split('/')[0]}`
                     'to': this.getRoomJIDAndNick(nick)
-                }).c("x", {'xmlns': Strophe.NS.MUC})
-                  .c("history", {'maxstanzas': this.get('mam_enabled') ? 0 : _converse.muc_history_max_stanzas}).up();
+                }).c("x", {'xmlns': Strophe.NS.MUC});
+                  // .c("history", {'maxstanzas': this.get('mam_enabled') ? 0 : _converse.muc_history_max_stanzas}).up();
                 if (password) {
                     stanza.cnode(Strophe.xmlElement("password", [], password));
                 }
@@ -408,9 +410,10 @@ converse.plugins.add('converse-muc', {
                 const is_spoiler = this.get('composing_spoiler');
                 var references;
                 [text, references] = this.parseTextForReferences(text);
-                // console.log('this model: ', this);
+                const senderJID = _converse.connection.jid.replace('/pageme','');
+                console.log('this model: ',senderJID);
                 return {
-                    'from': `${this.get('jid')}/${this.get('nick')}`,
+                    'from': `${this.get('jid')}/${_converse.connection.jid}`,
                     'fullname': this.get('nick'),
                     'is_spoiler': is_spoiler,
                     'message': text ? u.httpToGeoUri(u.shortnameToUnicode(text), _converse) : undefined,
@@ -483,7 +486,7 @@ converse.plugins.add('converse-muc', {
                     );
                 }
                 const attrs = {
-                    'xmlns': 'jabber:x:conference',
+                    'xmlns': 'http://jabber.org/protocol/muc#user',
                     'jid': this.get('jid')
                 };
                 const subject = (this.get('subject') || {}).text || '';
@@ -493,20 +496,20 @@ converse.plugins.add('converse-muc', {
                 const pageMeInvitation = $msg({
                     // 'from': _converse.connection.jid,
                     'to': attrs.jid,
-                    'id': _converse.connection.getUniqueId()
+                    // 'id': _converse.connection.getUniqueId()
                 }).c('x', attrs).c('invite', {
                   'to': recipient
                 })
-                const converseInvitation = $msg({
-                    'from': _converse.connection.jid,
-                    'to': recipient,
-                    'id': _converse.connection.getUniqueId()
-                })
-                .c('x', attrs)
-                .c('field', { 'var': 'muc#roominfo_subject'})
-                .c('value').t(subject);
+                // const converseInvitation = $msg({
+                //     'from': _converse.connection.jid,
+                //     'to': recipient,
+                //     'id': _converse.connection.getUniqueId()
+                // })
+                // .c('x', attrs)
+                // .c('field', { 'var': 'muc#roominfo_subject'})
+                // .c('value').t(subject);
                 _converse.api.send(pageMeInvitation);
-                _converse.api.send(converseInvitation);
+                // _converse.api.send(converseInvitation);
                 _converse.api.emit('roomInviteSent', {
                     'room': this,
                     'recipient': recipient,
@@ -993,6 +996,7 @@ converse.plugins.add('converse-muc', {
                  * Parameters:
                  *  (XMLElement) stanza: The message stanza.
                  */
+                 console.log("fucking group message",stanza);
                 this.fetchFeaturesIfConfigurationChanged(stanza);
 
                 const original_stanza = stanza,
@@ -1002,14 +1006,24 @@ converse.plugins.add('converse-muc', {
                     stanza = forwarded.querySelector('message');
                 }
                 if (this.isDuplicate(stanza)) {
-                    // console.log('it duplicate???');
                     return;
                 }
                 // const jid = stanza.getAttribute('from'),
                 const jid = (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid')) ? stanza.querySelector('data').querySelector('senderJid').innerHTML : stanza.getAttribute('from'),
                       resource = (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderJid')) ? jid : Strophe.getResourceFromJid(jid),
                       sender = (stanza.querySelector('data') && stanza.querySelector('data').querySelector('senderName').textContent)  ? stanza.querySelector('data').querySelector('senderName').textContent : '';
-                    // console.log(jid, resource, sender);
+                    if (this.get('subject') === undefined || !this.get('subject').text || this.get('subject').text === undefined){
+                      const subject_el = stanza.querySelector('subject');
+                      if (subject_el) {
+                          const subject = _.propertyOf(subject_el)('textContent') || '';
+                          u.safeSave(this, {'subject': {'author': sender, 'text': subject}});
+
+                          if (!this.get('subject').text){
+                              u.safeSave(this, {'subject': {'author': sender, 'text': subject}});
+                          }
+                      }
+                    }
+
                 if (!this.handleMessageCorrection(stanza)) {
                     if (sender === '') {
                         return;
@@ -1017,6 +1031,8 @@ converse.plugins.add('converse-muc', {
                     const subject_el = stanza.querySelector('subject');
                     if (subject_el) {
                         const subject = _.propertyOf(subject_el)('textContent') || '';
+                        u.safeSave(this, {'subject': {'author': sender, 'text': subject}});
+
                         if (!this.get('subject').text){
                             u.safeSave(this, {'subject': {'author': sender, 'text': subject}});
                         }
@@ -1539,9 +1555,7 @@ converse.plugins.add('converse-muc', {
                     if (_.isUndefined(attrs.maximize)) {
                         attrs.maximize = false;
                     }
-                    if (!attrs.nick && _converse.muc_nickname_from_jid) {
-                        attrs.nick = Strophe.getNodeFromJid(_converse.bare_jid);
-                    }
+                    attrs.nick = Strophe.getNodeFromJid(_converse.bare_jid);
                     if (_.isUndefined(jids)) {
                         throw new TypeError('rooms.create: You need to provide at least one JID');
                     } else if (_.isString(jids)) {

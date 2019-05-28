@@ -688,6 +688,7 @@ _converse.initialize = function (settings, callback) {
          * through various states while establishing or tearing down a
          * connection.
          */
+         console.log(`Status changed to: ${_converse.CONNECTION_STATUS[status]}`);
         _converse.log(`Status changed to: ${_converse.CONNECTION_STATUS[status]}`);
         if (status === Strophe.Status.CONNECTED || status === Strophe.Status.ATTACHED) {
             _converse.setConnectionStatus(status);
@@ -931,7 +932,12 @@ _converse.initialize = function (settings, callback) {
         _converse.enableCarbons();
         // _converse.sendInitialPresence();
         _converse.initStatus(reconnecting)
-        _converse.xmppstatus.set('status', _converse.default_state);
+        console.log("converse connected " +  _converse.default_state);
+        this.timeouthandler = setTimeout(function(){
+          console.log("timeout please send status");
+          // _converse.xmppstatus.set('status', _converse.default_state);
+          _converse.xmppstatus.sendPresence();
+        }, 1000);
     };
 
 
@@ -1019,7 +1025,9 @@ _converse.initialize = function (settings, callback) {
             //     console.log('we return this cause it is not online status');
             //     return;
             // }
-            _converse.api.send($pres());
+            console.log("send presence");
+            let presence = this.constructPresence('online','');
+            _converse.api.send(presence);
             // if (!type) {
             //     if (check) {
             //     }
@@ -1668,6 +1676,7 @@ _converse.api = {
      * _converse.api.send(msg);
      */
     'send' (stanza) {
+        console.log("outgoing stanza",stanza.toString());
         _converse.connection.send(stanza);
         _converse.emit('send', stanza);
     },
