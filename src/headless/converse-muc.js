@@ -964,10 +964,9 @@ converse.plugins.add('converse-muc', {
             isDuplicate (message) {
                 const msgid = message.getAttribute('id'),
                       jid = message.getAttribute('from');
-
                 if (msgid) {
-                    const msg = this.messages.findWhere({'msgid': msgid, 'from': jid});
-                    if (msg && msg.get('sender') === 'me' && !msg.get('received')) {
+                    const msg = this.messages.findWhere({'msgid': msgid, 'sender': 'me'});
+                    if (msg && !msg.get('received')) {
                         msg.save({'received': moment().format()});
                     }
                     return msg;
@@ -1006,6 +1005,7 @@ converse.plugins.add('converse-muc', {
                     stanza = forwarded.querySelector('message');
                 }
                 if (this.isDuplicate(stanza)) {
+                  console.log("duplicating");
                     return;
                 }
                 // const jid = stanza.getAttribute('from'),
