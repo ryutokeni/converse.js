@@ -1676,7 +1676,7 @@ _converse.api = {
      * _converse.api.send(msg);
      */
     'send' (stanza) {
-        console.log("outgoing stanza",stanza.toString());
+        // console.log("outgoing stanza",stanza.toString());
         _converse.connection.send(stanza);
         _converse.emit('send', stanza);
     },

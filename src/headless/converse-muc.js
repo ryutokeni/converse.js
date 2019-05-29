@@ -995,7 +995,7 @@ converse.plugins.add('converse-muc', {
                  * Parameters:
                  *  (XMLElement) stanza: The message stanza.
                  */
-                 console.log("fucking group message",stanza);
+                 // console.log("fucking group message",stanza);
                 this.fetchFeaturesIfConfigurationChanged(stanza);
 
                 const original_stanza = stanza,
