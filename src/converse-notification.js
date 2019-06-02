@@ -32,7 +32,7 @@ converse.plugins.add('converse-notification', {
             // ^ a list of JIDs to ignore concerning chat state notifications
             play_sounds: true,
             sounds_path: 'sounds/',
-            notification_icon: 'logo/conversejs-filled.svg',
+            notification_icon: 'logo/appIcon.icns',
             notification_delay: 5000
         });
 
@@ -146,7 +146,15 @@ converse.plugins.add('converse-notification', {
                 // workaround for Prosody which doesn't give type "headline"
                 title = __("Notification from %1$s", from_jid);
             } else if (message.getAttribute('type') === 'groupchat') {
+              if (
+                message.getElementsByTagName('senderName') &&
+                message.getElementsByTagName('senderName')[0] &&
+                message.getElementsByTagName('senderName')[0].firstChild
+              ) {
+                title = __("%1$s says", message.getElementsByTagName('senderName')[0].firstChild.nodeValue);
+              }else{
                 title = __("%1$s says", Strophe.getResourceFromJid(full_from_jid));
+              }
             } else {
                 if (_.isUndefined(_converse.roster)) {
                     _converse.log(
@@ -267,7 +275,7 @@ converse.plugins.add('converse-notification', {
             /* Event handler for the on('message') event. Will call methods
              * to play sounds and show HTML5 notifications.
              */
-            
+
             if (state) {
                 return;
             }
