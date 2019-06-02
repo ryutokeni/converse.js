@@ -164,7 +164,12 @@ converse.plugins.add('pageme-recent-messages-view', {
       
               const chatbox = _converse.chatboxes.findWhere({'jid': jid});
               if (!!chatbox) {
-                chatbox.trigger('showRoom');
+                const isChatroom =  this.model.get('type') === 'chatroom';
+                if (isChatroom) {
+                  chatbox.trigger('showRoom');
+                } else {
+                  chatbox.trigger('show');
+                }
               }
             },
 
