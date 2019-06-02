@@ -366,6 +366,9 @@ converse.plugins.add('converse-rosterview', {
                 this.model.presence.on("change:show", this.render, this);
                 this.model.vcard.on('change:fullname', this.render, this);
                 this.on('changed:group', this.render, this);
+                this.model.save({
+                    lastSynced: null
+                });
             },
 
             render () {
@@ -481,6 +484,16 @@ converse.plugins.add('converse-rosterview', {
                  _converse.emit('aChatRoomOpen');
                 const attrs = this.model.attributes;
                 _converse.api.chats.open(attrs.jid, attrs);
+                const lastSynced = this.model.get('lastSynced');
+                if (!lastSynced) {
+                    this.model.save({
+                        lastSynced: (new Date()).getTime()
+                    });
+                    _converse.emit('chatOpenned', {
+                        jid: this.model.get('jid'),
+                        messageType: 'chat'
+                    });
+                }
             },
 
             async removeContact (ev) {

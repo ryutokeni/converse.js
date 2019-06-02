@@ -542,10 +542,10 @@ converse.plugins.add('converse-muc-views', {
             },
 
             showRoom() {
-              this.show();
-              this.hideOccupants();
-              const lastSynced = this.model.get('lastSynced');
-                    if (!lastSynced) {
+                this.show();
+                this.hideOccupants();
+                const lastSynced = this.model.get('lastSynced');
+                if (!lastSynced) {
                     this.model.save({
                         lastSynced: (new Date()).getTime()
                     });
@@ -554,7 +554,7 @@ converse.plugins.add('converse-muc-views', {
                         messageType: 'groupchat'
                     });
                 }
-              _converse.on('AllMessageAreLoaded', (jid) => {
+                _converse.on('AllMessageAreLoaded', (jid) => {
                   if (jid === this.model.get('jid')) {
                       u.hideElement(this.el.querySelector('button.load-more-messages'));
                       u.hideElement(this.el.querySelector('.loading-more-spin'));
@@ -562,13 +562,13 @@ converse.plugins.add('converse-muc-views', {
                           isAllLoaded: true
                       })
                   }
-              })
-              _converse.on('UnDisabledButtonLoadmore', () => {
-                      u.hideElement(this.el.querySelector('.loading-more-spin'));
-                      this.model.save({
-                          loadingMore: false
-                      })
-              })
+                })
+                _converse.on('UnDisabledButtonLoadmore', () => {
+                        u.hideElement(this.el.querySelector('.loading-more-spin'));
+                        this.model.save({
+                            loadingMore: false
+                        })
+                })
             },
 
             enterRoom (ev) {
