@@ -152,14 +152,20 @@ converse.plugins.add('pageme-recent-messages-view', {
             },
 
             openChatbox (ev) {
-                ev.preventDefault();
-                _converse.emit('aChatRoomOpen');
-                const name = ev.target.textContent;
-                const jid = ev.delegateTarget.dataset.jid;
-                const data = {
-                    'name': name || Strophe.unescapeNode(Strophe.getNodeFromJid(jid)) || jid
-                }
-                _converse.api.chats.open(jid, data);
+              ev.preventDefault();
+      
+              _converse.emit('aChatRoomOpen');
+      
+              const name = ev.target.textContent;
+              const jid = ev.delegateTarget.dataset.jid;
+              const data = {
+                'name': name || Strophe.unescapeNode(Strophe.getNodeFromJid(jid)) || jid
+              };
+      
+              const chatbox = _converse.chatboxes.findWhere({'jid': jid});
+              if (!!chatbox) {
+                chatbox.trigger('showRoom');
+              }
             },
 
             showOrHide (item) {

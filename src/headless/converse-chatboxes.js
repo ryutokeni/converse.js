@@ -249,10 +249,6 @@ converse.plugins.add('converse-chatboxes', {
                 _converse.api.waitUntil('rosterContactsFetched').then(() => {
                     this.addRelatedContact(_converse.roster.findWhere({'jid': this.get('jid')}));
                 });
-                _converse.emit('chatOpenned', {
-                  jid: this.get('jid'),
-                  messageType: this.get('message_type')
-                });
                 this.messages = new _converse.Messages();
                 const storage = _converse.config.get('storage');
                 this.messages.browserStorage = new Backbone.BrowserStorage[storage](

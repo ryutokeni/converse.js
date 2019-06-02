@@ -536,13 +536,24 @@ converse.plugins.add('converse-muc-views', {
                     u.addClass('hidden', view.el);
                   }
                 });
-                this.showRoom();
+                this.model.save({
+                    lastSynced: null
+                });
             },
 
             showRoom() {
               this.show();
-
               this.hideOccupants();
+              const lastSynced = this.model.get('lastSynced');
+                    if (!lastSynced) {
+                    this.model.save({
+                        lastSynced: (new Date()).getTime()
+                    });
+                    _converse.emit('chatOpenned', {
+                        jid: this.model.get('jid'),
+                        messageType: 'groupchat'
+                    });
+                }
               _converse.on('AllMessageAreLoaded', (jid) => {
                   if (jid === this.model.get('jid')) {
                       u.hideElement(this.el.querySelector('button.load-more-messages'));
