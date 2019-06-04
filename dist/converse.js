@@ -72880,7 +72880,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         this.initDebounced();
         this.model.messages.on('add', this.onMessageAdded, this);
         this.model.messages.on('rendered', this.scrollDown, this);
-        this.model.on('show', this.show, this);
+        this.model.on('show', this.showChat, this);
         this.model.on('destroy', this.remove, this); // this.model.on('change:num_unread', this.render, this)
 
         this.model.presence.on('change:show', this.onPresenceChanged, this); // this.el.querySelector('.load-more-messages').on('change', this.render, this)
@@ -72942,6 +72942,25 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
             _converse_headless_utils_emoji__WEBPACK_IMPORTED_MODULE_21__["default"].hideElement(this.el.querySelector('button.load-more-messages'));
           }
         });
+        this.model.save({
+          lastSynced: null
+        });
+      },
+
+      showChat() {
+        this.show();
+        const lastSynced = this.model.get('lastSynced');
+
+        if (!lastSynced) {
+          this.model.save({
+            lastSynced: new Date().getTime()
+          });
+
+          _converse.emit('chatOpenned', {
+            jid: this.model.get('jid'),
+            messageType: 'chat'
+          });
+        }
       },
 
       initDebounced() {
@@ -83436,9 +83455,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         this.model.presence.on("change:show", this.render, this);
         this.model.vcard.on('change:fullname', this.render, this);
         this.on('changed:group', this.render, this);
-        this.model.save({
-          lastSynced: null
-        });
       },
 
       render() {
@@ -83559,19 +83575,6 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         const attrs = this.model.attributes;
 
         _converse.api.chats.open(attrs.jid, attrs);
-
-        const lastSynced = this.model.get('lastSynced');
-
-        if (!lastSynced) {
-          this.model.save({
-            lastSynced: new Date().getTime()
-          });
-
-          _converse.emit('chatOpenned', {
-            jid: this.model.get('jid'),
-            messageType: 'chat'
-          });
-        }
       },
 
       async removeContact(ev) {
@@ -88994,7 +88997,6 @@ const converse = {
           const msg = chatbox.messages.where({
             'msgid': group.latestMsgId
           });
-          console.log(msg)
 
           if (!!msg) {
             unreadMsg = 1;
@@ -89011,8 +89013,7 @@ const converse = {
           nick: group.nick,
           num_unread_general: unreadMsg
         });
-      } 
-      chatbox.join(group.nick);
+      } // chatbox.join(group.nick);
 
     });
   },
@@ -91142,16 +91143,13 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
        * are correct, for example that the "type" is set to
        * "chatroom".
        */
-      // this.clearUnreadMsgCounter();
-      console.log("try open ", settings);
       settings.type = _converse.CHATROOMS_TYPE;
       settings.id = jid;
       settings.box_id = b64_sha1(jid);
 
       const chatbox = _converse.chatboxes.getChatBox(jid, settings, true);
 
-      chatbox.trigger('show', true); // console.log('chatbox show?', chatbox);
-      console.log(chatbox.messages)
+      chatbox.trigger('show', true);
       return chatbox;
     };
 
@@ -118437,11 +118435,11 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
 
         if (!!chatbox) {
           const isChatroom = chatbox.get('type') === 'chatroom';
-          console.log('isChatroom', isChatroom, chatbox)
+
           if (isChatroom) {
             chatbox.trigger('showRoom');
           } else {
-            chatbox.trigger('open');
+            chatbox.trigger('show');
           }
         }
       },

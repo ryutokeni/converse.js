@@ -495,9 +495,9 @@ converse.plugins.add('converse-chatboxes', {
                 }
                 const time = attrs.time || attrs.sent;
                 if (time) {
-                    that.save('latestMessageTime', new Date(time));
+                    message.save('latestMessageTime', new Date(time));
                 } else {
-                    that.save('latestMessageTime', null);
+                    message.save('latestMessageTime', null);
                 }
                 return this.sendMessageStanza(this.createMessageStanza(message, type, body || mediaId || medialRequestKey));
             },
