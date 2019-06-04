@@ -493,7 +493,12 @@ converse.plugins.add('converse-chatboxes', {
                 if (medialRequestKey) {
                   type = 'medical_request';
                 }
-                this.save('latestMessageTime', new Date());
+                const time = attrs.time || attrs.sent;
+                if (time) {
+                    that.save('latestMessageTime', new Date(time));
+                } else {
+                    that.save('latestMessageTime', null);
+                }
                 return this.sendMessageStanza(this.createMessageStanza(message, type, body || mediaId || medialRequestKey));
             },
 
@@ -725,7 +730,12 @@ converse.plugins.add('converse-chatboxes', {
                           const receipt = sizzle(`received[xmlns="${Strophe.NS.RECEIPTS}"]`, original_stanza).pop();
                           if (receipt) {
                           } else if (!extraAttrs || !extraAttrs.silent) {
-                            that.save('latestMessageTime', new Date());
+                            const time = attrs.time || attrs.sent;
+                            if (time) {
+                                that.save('latestMessageTime', new Date(time));
+                            } else {
+                                that.save('latestMessageTime', null);
+                            }
                           }
                         }
                         const oldMessage = that.messages.findWhere({

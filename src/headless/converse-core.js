@@ -1752,14 +1752,22 @@ const converse = {
           nick: group.nick
         }, null, true);
         if (chatbox) {
+            let unreadMsg = 0;
+            if (group.latestMsgId) {
+                const msg = chatbox.messages.where({'msgid': group.latestMsgId});
+                if (!!msg) {
+                unreadMsg = 1;
+                }
+            }
             chatbox.save({
-              users: group.users,
-              latestMessageTime: group.latestMessageTime,
-              subject: {
+                users: group.users,
+                latestMessageTime: group.latestMessageTime,
+                subject: {
                 text: group.groupName
-              },
-              name: group.groupName,
-              nick: group.nick
+                },
+                name: group.groupName,
+                nick: group.nick,
+                num_unread_general: unreadMsg
             });
         }
         // chatbox.join(group.nick);

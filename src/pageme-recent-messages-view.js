@@ -81,8 +81,15 @@ converse.plugins.add('pageme-recent-messages-view', {
             showOrHide () {
               const jid = this.model.get('jid');
               if (jid && jid !== _converse.bare_jid) {
-                if (this.model.get('latestMessageTime')) {
-                  this.show();
+                const latestMessageTime = this.model.get('latestMessageTime');
+                if (latestMessageTime) {
+                  const fromNow = (new Date()).getTime() - (new Date(latestMessageTime)).getTime();
+                  const withIn24h = fromNow < (60 * 60 * 24 * 1000);
+                  if (withIn24h) {
+                    this.show();
+                  } else {
+                    this.hide();
+                  }
                   return;
                 }
               }
@@ -98,12 +105,15 @@ converse.plugins.add('pageme-recent-messages-view', {
             },
 
             hide () {
+              setTimeout(() => {
                 u.hideElement(this.el);
+              }, 0);
             },
 
             show () {
+              setTimeout(() => {
                 u.fadeIn(this.el);
-
+              }, 0);
             },
 
             highlight () {
@@ -176,9 +186,15 @@ converse.plugins.add('pageme-recent-messages-view', {
             showOrHide (item) {
               const jid = item.get('jid');
               if (jid && jid !== _converse.bare_jid) {
-                if (item.get('latestMessageTime')) {
-                 
-                  item.trigger('addToRecent');
+                const latestMessageTime = item.get('latestMessageTime');
+                if (latestMessageTime) {
+                  const fromNow = (new Date()).getTime() - (new Date(latestMessageTime)).getTime();
+                  const withIn24h = fromNow < (60 * 60 * 24 * 1000);
+                  if (withIn24h) {
+                    item.trigger('addToRecent');
+                  } else {
+                    item.trigger('hideToRecent');
+                  }
                   return;
                 }
               }
@@ -186,9 +202,9 @@ converse.plugins.add('pageme-recent-messages-view', {
             },
 
             render () {
-                this.el.innerHTML = tpl_recent_messages({});
-                _converse.emit('recentMessageViewsInitialized');
-                return this;
+              this.el.innerHTML = tpl_recent_messages({});
+              _converse.emit('recentMessageViewsInitialized');
+              return this;
             },
         });
 
