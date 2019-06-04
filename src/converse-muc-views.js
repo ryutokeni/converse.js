@@ -531,14 +531,16 @@ converse.plugins.add('converse-muc-views', {
                 this.registerHandlers();
                 this.enterRoom();
                 this.render().insertIntoDOM();
-                _.forEach(_converse.chatboxviews.views, view => {
-                  if (view.el && !view. controlbox_pane) {
-                    u.addClass('hidden', view.el);
-                  }
-                });
                 this.model.save({
                     lastSynced: null
                 });
+                setTimeout(() =>{
+                    _.forEach(_converse.chatboxviews.views, view => {
+                        if (view.el && !view.controlbox_pane) {
+                        u.addClass('hidden', view.el);
+                        }
+                    });
+                }, 0);
             },
 
             showRoom() {
@@ -777,6 +779,7 @@ converse.plugins.add('converse-muc-views', {
             },
 
             show () {
+                
                 if (u.isVisible(this.el)) {
                     this.focus();
                     return;
