@@ -422,7 +422,7 @@ converse.plugins.add('converse-chatview', {
                 this.model.messages.on('add', this.onMessageAdded, this);
                 this.model.messages.on('rendered', this.scrollDown, this);
 
-                this.model.on('show', this.show, this);
+                this.model.on('show', this.showChat, this);
                 this.model.on('destroy', this.remove, this);
                 // this.model.on('change:num_unread', this.render, this)
                 this.model.presence.on('change:show', this.onPresenceChanged, this);
@@ -444,43 +444,60 @@ converse.plugins.add('converse-chatview', {
                 //  this.model.set('num_unread', 0)
                 //  this.model.set('num_unread_general', 0)
 
-                   _converse.on('AllMessageAreLoaded', (jid) => {
-                     if (jid === this.model.get('jid')) {
-                       u.hideElement(this.el.querySelector('button.load-more-messages'));
-                       u.hideElement(this.el.querySelector('.fa-spinner'));
-                       this.model.save({
-                         isAllLoaded: true
-                       })
-                     }
+                _converse.on('AllMessageAreLoaded', (jid) => {
+                    if (jid === this.model.get('jid')) {
+                    u.hideElement(this.el.querySelector('button.load-more-messages'));
+                    u.hideElement(this.el.querySelector('.fa-spinner'));
+                    this.model.save({
+                        isAllLoaded: true
+                    })
+                    }
 
-                   })
-                   _converse.on('UnDisabledButtonLoadmore', () => {
-                     //    this.hideSpinner();
-                     u.hideElement(this.el.querySelector('.fa-spinner'));
-                     this.model.save({
-                       loadingMore: false
-                     })
-                   })
-                   $('.chat-content').on('scroll', () => {
-                     var x = this.el.querySelector('.chat-content').scrollTop;
-                     if (x === 0) {
-                       // console.log('we scroll on top');
-                       if (this.model.get('isAllLoaded')) {
-                         this.model.save({
-                           loadingMore: false
-                         })
-                         u.hideElement(this.el.querySelector('button.load-more-messages'))
-                       } else {
-                         u.showElement(this.el.querySelector('.fa-spinner'));
-                         if (!this.model.get('loadingMore')) {
-                           this.loadMoreMessages();
-                         }
-                         // u.showElement(this.el.querySelector('button.load-more-messages'))
-                       }
-                     } else {
-                       u.hideElement(this.el.querySelector('button.load-more-messages'))
-                     }
-                   })
+                })
+                _converse.on('UnDisabledButtonLoadmore', () => {
+                    //    this.hideSpinner();
+                    u.hideElement(this.el.querySelector('.fa-spinner'));
+                    this.model.save({
+                    loadingMore: false
+                    })
+                })
+                $('.chat-content').on('scroll', () => {
+                    var x = this.el.querySelector('.chat-content').scrollTop;
+                    if (x === 0) {
+                    // console.log('we scroll on top');
+                    if (this.model.get('isAllLoaded')) {
+                        this.model.save({
+                        loadingMore: false
+                        })
+                        u.hideElement(this.el.querySelector('button.load-more-messages'))
+                    } else {
+                        u.showElement(this.el.querySelector('.fa-spinner'));
+                        if (!this.model.get('loadingMore')) {
+                        this.loadMoreMessages();
+                        }
+                        // u.showElement(this.el.querySelector('button.load-more-messages'))
+                    }
+                    } else {
+                    u.hideElement(this.el.querySelector('button.load-more-messages'))
+                    }
+                })
+                this.model.save({
+                    lastSynced: null
+                });
+            },
+
+            showChat () {
+                this.show();
+                const lastSynced = this.model.get('lastSynced');
+                if (!lastSynced) {
+                    this.model.save({
+                        lastSynced: (new Date()).getTime()
+                    });
+                    _converse.emit('chatOpenned', {
+                        jid: this.model.get('jid'),
+                        messageType: 'chat'
+                    });
+                }
             },
 
             initDebounced () {

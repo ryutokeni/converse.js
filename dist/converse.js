@@ -86233,9 +86233,9 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
         const time = attrs.time || attrs.sent;
 
         if (time) {
-          that.save('latestMessageTime', new Date(time));
+          message.save('latestMessageTime', new Date(time));
         } else {
-          that.save('latestMessageTime', null);
+          message.save('latestMessageTime', null);
         }
 
         return this.sendMessageStanza(this.createMessageStanza(message, type, body || mediaId || medialRequestKey));
@@ -88994,6 +88994,7 @@ const converse = {
           const msg = chatbox.messages.where({
             'msgid': group.latestMsgId
           });
+          console.log(msg)
 
           if (!!msg) {
             unreadMsg = 1;
@@ -89010,7 +89011,8 @@ const converse = {
           nick: group.nick,
           num_unread_general: unreadMsg
         });
-      } // chatbox.join(group.nick);
+      } 
+      chatbox.join(group.nick);
 
     });
   },
@@ -91149,7 +91151,7 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
       const chatbox = _converse.chatboxes.getChatBox(jid, settings, true);
 
       chatbox.trigger('show', true); // console.log('chatbox show?', chatbox);
-
+      console.log(chatbox.messages)
       return chatbox;
     };
 
@@ -118434,12 +118436,12 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         });
 
         if (!!chatbox) {
-          const isChatroom = this.model.get('type') === 'chatroom';
-
+          const isChatroom = chatbox.get('type') === 'chatroom';
+          console.log('isChatroom', isChatroom, chatbox)
           if (isChatroom) {
             chatbox.trigger('showRoom');
           } else {
-            chatbox.trigger('show');
+            chatbox.trigger('open');
           }
         }
       },

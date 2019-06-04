@@ -130,14 +130,11 @@ converse.plugins.add('converse-muc', {
              * are correct, for example that the "type" is set to
              * "chatroom".
              */
-            // this.clearUnreadMsgCounter();
-            console.log("try open ", settings);
             settings.type = _converse.CHATROOMS_TYPE;
             settings.id = jid;
             settings.box_id = b64_sha1(jid)
             const chatbox = _converse.chatboxes.getChatBox(jid, settings, true);
             chatbox.trigger('show', true);
-            // console.log('chatbox show?', chatbox);
             return chatbox;
         }
 
