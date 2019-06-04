@@ -86959,8 +86959,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
          * @param {object} attrs An object containing configuration attributes.
          */
         'create'(jids, attrs) {
-          console.log("chat box", attrs);
-
           if (_.isUndefined(jids)) {
             _converse.log("chats.create: You need to provide at least one JID", Strophe.LogLevel.ERROR);
 
@@ -86985,7 +86983,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
 
           return _.map(jids, jid => {
             attrs.fullname = _.get(_converse.api.contacts.get(jid), 'attributes.fullname');
-            console.log("chat box again", attrs);
             return _converse.chatboxes.getChatBox(jid, attrs, true).trigger('show');
           });
         },
@@ -88994,11 +88991,17 @@ const converse = {
         let unreadMsg = 0;
 
         if (group.latestMsgId) {
-          const msg = chatbox.messages.where({
+          const msgs = chatbox.messages.where({
             'msgid': group.latestMsgId
           });
 
-          if (!!msg) {
+          if (!!msgs && msgs.length) {
+            const read = msgs[0].get('read');
+
+            if (!read) {
+              unreadMsg = 1;
+            }
+          } else {
             unreadMsg = 1;
           }
         }
@@ -91466,7 +91469,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           'references': references,
           'sender': 'me',
           'spoiler_hint': is_spoiler ? spoiler_hint : undefined,
-          'type': 'groupchat'
+          'type': 'groupchat',
+          'read': true
         };
       },
 
@@ -92362,6 +92366,8 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
         const body = message.get('message'); // if (_.isNil(body)) { return; }
 
+        console.log(message, this, this.isHidden());
+
         if (_utils_form__WEBPACK_IMPORTED_MODULE_7__["default"].isNewMessage(message) && this.isHidden()) {
           const settings = {
             'num_unread_general': this.get('num_unread_general') + 1
@@ -92374,6 +92380,9 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           }
 
           this.save(settings);
+        } else {
+          console.log('mark as read');
+          message.save('read', true);
         }
       },
 

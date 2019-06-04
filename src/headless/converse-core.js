@@ -1754,9 +1754,14 @@ const converse = {
         if (chatbox) {
             let unreadMsg = 0;
             if (group.latestMsgId) {
-                const msg = chatbox.messages.where({'msgid': group.latestMsgId});
-                if (!!msg) {
-                unreadMsg = 1;
+                const msgs = chatbox.messages.where({'msgid': group.latestMsgId});
+                if (!!msgs && msgs.length) {
+                    const read = msgs[0].get('read');
+                    if (!read) {
+                      unreadMsg = 1;
+                    }
+                } else {
+                  unreadMsg = 1;
                 }
             }
             chatbox.save({

@@ -1158,7 +1158,6 @@ converse.plugins.add('converse-chatboxes', {
                  * @param {object} attrs An object containing configuration attributes.
                  */
                 'create' (jids, attrs) {
-                  console.log("chat box",attrs);
                     if (_.isUndefined(jids)) {
                         _converse.log(
                             "chats.create: You need to provide at least one JID",
@@ -1179,8 +1178,6 @@ converse.plugins.add('converse-chatboxes', {
                     }
                     return _.map(jids, (jid) => {
                         attrs.fullname = _.get(_converse.api.contacts.get(jid), 'attributes.fullname');
-                        console.log("chat box again",attrs);
-
                         return _converse.chatboxes.getChatBox(jid, attrs, true).trigger('show');
                     });
                 },

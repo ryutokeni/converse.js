@@ -418,7 +418,8 @@ converse.plugins.add('converse-muc', {
                     'references': references,
                     'sender': 'me',
                     'spoiler_hint': is_spoiler ? spoiler_hint : undefined,
-                    'type': 'groupchat'
+                    'type': 'groupchat',
+                    'read': true
                 };
             },
 
@@ -1186,6 +1187,7 @@ converse.plugins.add('converse-muc', {
                 if (!message) { return; }
                 const body = message.get('message');
                 // if (_.isNil(body)) { return; }
+                console.log(message, this, this.isHidden());
                 if (u.isNewMessage(message) && this.isHidden()) {
                     const settings = {'num_unread_general': this.get('num_unread_general') + 1};
                     if (this.isUserMentioned(message)) {
@@ -1193,6 +1195,9 @@ converse.plugins.add('converse-muc', {
                         _converse.incrementMsgCounter();
                     }
                     this.save(settings);
+                } else {
+                  console.log('mark as read');
+                  message.save('read', true);
                 }
             },
 
