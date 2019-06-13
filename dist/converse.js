@@ -77511,6 +77511,7 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
         setTimeout(() => {
           _.forEach(_converse.chatboxviews.views, view => {
             if (view.el && !view.controlbox_pane) {
+              view.model.set('hidden', true);
               u.addClass('hidden', view.el);
             }
           });
@@ -88996,7 +88997,7 @@ const converse = {
           });
 
           if (!!msgs && msgs.length) {
-            const read = msgs[0].get('read');
+            'read';
 
             if (!read) {
               unreadMsg = 1;
@@ -91311,7 +91312,9 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
           'to': this.getRoomJIDAndNick(nick)
         }).c("x", {
           'xmlns': Strophe.NS.MUC
-        }); // .c("history", {'maxstanzas': this.get('mam_enabled') ? 0 : _converse.muc_history_max_stanzas}).up();
+        }).c("history", {
+          'maxstanzas': 0
+        }).up();
 
         if (password) {
           stanza.cnode(Strophe.xmlElement("password", [], password));

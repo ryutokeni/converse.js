@@ -537,7 +537,8 @@ converse.plugins.add('converse-muc-views', {
                 setTimeout(() =>{
                     _.forEach(_converse.chatboxviews.views, view => {
                         if (view.el && !view.controlbox_pane) {
-                        u.addClass('hidden', view.el);
+                          view.model.set('hidden', true);
+                          u.addClass('hidden', view.el);
                         }
                     });
                 }, 0);
@@ -779,7 +780,7 @@ converse.plugins.add('converse-muc-views', {
             },
 
             show () {
-                
+
                 if (u.isVisible(this.el)) {
                     this.focus();
                     return;

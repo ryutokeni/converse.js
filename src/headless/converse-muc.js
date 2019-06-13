@@ -295,8 +295,8 @@ converse.plugins.add('converse-muc', {
                     'from': _converse.connection.jid,
                     // 'to': `${this.get('jid')}/${_converse.connection.jid.split('/')[0]}`
                     'to': this.getRoomJIDAndNick(nick)
-                }).c("x", {'xmlns': Strophe.NS.MUC});
-                  // .c("history", {'maxstanzas': this.get('mam_enabled') ? 0 : _converse.muc_history_max_stanzas}).up();
+                }).c("x", {'xmlns': Strophe.NS.MUC})
+                  .c("history", {'maxstanzas': 0}).up();
                 if (password) {
                     stanza.cnode(Strophe.xmlElement("password", [], password));
                 }

@@ -1755,8 +1755,7 @@ const converse = {
             let unreadMsg = 0;
             if (group.latestMsgId) {
                 const msgs = chatbox.messages.where({'msgid': group.latestMsgId});
-                if (!!msgs && msgs.length) {
-                    const read = msgs[0].get('read');
+                if (!!msgs && msgs.length) {('read');
                     if (!read) {
                       unreadMsg = 1;
                     }
