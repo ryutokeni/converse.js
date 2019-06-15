@@ -120446,7 +120446,7 @@ __p += '\n            ';
 __p += '\n            <div class="chat-msg__actions">\n                <!-- <button class="chat-msg__action chat-msg__action-edit fa fa-pencil-alt" title="' +
 __e(o.__('Edit this message')) +
 '">&nbsp;</button> -->\n                ';
- if (o.received) { ;
+ if (o.received || o.type == 'groupchat') { ;
 __p += '\n                  <span class="chat-msg__checked received">&nbsp;</span>\n                ';
  } else if (o.sent) { ;
 __p += '\n                  <span class="chat-msg__checked sent">&nbsp;</span>\n                ';
