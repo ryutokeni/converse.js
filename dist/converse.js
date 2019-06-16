@@ -87124,6 +87124,14 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 // Converse.js
 // https://conversejs.org
 //
@@ -88996,14 +89004,32 @@ const converse = {
             'msgid': group.latestMsgId
           });
 
-          if (!!msgs && msgs.length) {
-            'read';
+          if (!msgs || !msgs.length) {
+            const localLatestMsg = localStorage.getItem(`latestMsg-${_converse.user_settings.jid}-${group.jid}`);
+
+            if (localLatestMsg) {
+              const _localLatestMsg$split = localLatestMsg.split('##status##'),
+                    _localLatestMsg$split2 = _slicedToArray(_localLatestMsg$split, 2),
+                    localLatestMsgId = _localLatestMsg$split2[0],
+                    read = _localLatestMsg$split2[1];
+
+              if (group.latestMsgId !== localLatestMsgId) {
+                localStorage.setItem(`latestMsg-${_converse.user_settings.jid}-${group.jid}`, `${group.latestMsgId}##status##false`);
+                unreadMsg = 1;
+              } else {
+                if (read === 'false') {
+                  unreadMsg = 1;
+                }
+              }
+            } else {
+              localStorage.setItem(`latestMsg-${_converse.user_settings.jid}-${group.jid}`, `${group.latestMsgId}##status##false`);
+            }
+          } else {
+            const read = msgs[0].get('read');
 
             if (!read) {
               unreadMsg = 1;
             }
-          } else {
-            unreadMsg = 1;
           }
         }
 
@@ -92369,8 +92395,6 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
         const body = message.get('message'); // if (_.isNil(body)) { return; }
 
-        console.log(message, this, this.isHidden());
-
         if (_utils_form__WEBPACK_IMPORTED_MODULE_7__["default"].isNewMessage(message) && this.isHidden()) {
           const settings = {
             'num_unread_general': this.get('num_unread_general') + 1
@@ -92384,12 +92408,13 @@ _converse_core__WEBPACK_IMPORTED_MODULE_6__["default"].plugins.add('converse-muc
 
           this.save(settings);
         } else {
-          console.log('mark as read');
           message.save('read', true);
         }
       },
 
       clearUnreadMsgCounter() {
+        const latestMsg = localStorage.getItem(`latestMsg-${_converse.user_settings.jid}-${this.get('jid')}`);
+        localStorage.setItem(`latestMsg-${_converse.user_settings.jid}-${this.get('jid')}`, latestMsg.replace('##status##false', '##status##true'));
         _utils_form__WEBPACK_IMPORTED_MODULE_7__["default"].safeSave(this, {
           'num_unread': 0,
           'num_unread_general': 0

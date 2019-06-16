@@ -1755,12 +1755,26 @@ const converse = {
             let unreadMsg = 0;
             if (group.latestMsgId) {
                 const msgs = chatbox.messages.where({'msgid': group.latestMsgId});
-                if (!!msgs && msgs.length) {('read');
-                    if (!read) {
+                if (!msgs || !msgs.length) {
+                  const localLatestMsg = localStorage.getItem(`latestMsg-${_converse.user_settings.jid}-${group.jid}`);
+                  if (localLatestMsg) {
+                    const [localLatestMsgId, read] = localLatestMsg.split('##status##');
+                    if (group.latestMsgId !== localLatestMsgId) {
+                      localStorage.setItem(`latestMsg-${_converse.user_settings.jid}-${group.jid}`, `${group.latestMsgId}##status##false`);
                       unreadMsg = 1;
+                    } else {
+                      if (read === 'false') {
+                        unreadMsg = 1;
+                      }
                     }
+                  } else {
+                    localStorage.setItem(`latestMsg-${_converse.user_settings.jid}-${group.jid}`, `${group.latestMsgId}##status##false`);
+                  }
                 } else {
-                  unreadMsg = 1;
+                  const read = msgs[0].get('read');
+                  if (!read) {
+                    unreadMsg = 1;
+                  }
                 }
             }
             chatbox.save({

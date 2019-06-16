@@ -1187,7 +1187,6 @@ converse.plugins.add('converse-muc', {
                 if (!message) { return; }
                 const body = message.get('message');
                 // if (_.isNil(body)) { return; }
-                console.log(message, this, this.isHidden());
                 if (u.isNewMessage(message) && this.isHidden()) {
                     const settings = {'num_unread_general': this.get('num_unread_general') + 1};
                     if (this.isUserMentioned(message)) {
@@ -1196,12 +1195,13 @@ converse.plugins.add('converse-muc', {
                     }
                     this.save(settings);
                 } else {
-                  console.log('mark as read');
                   message.save('read', true);
                 }
             },
 
             clearUnreadMsgCounter() {
+                const latestMsg = localStorage.getItem(`latestMsg-${_converse.user_settings.jid}-${this.get('jid')}`);
+                localStorage.setItem(`latestMsg-${_converse.user_settings.jid}-${this.get('jid')}`, latestMsg.replace('##status##false', '##status##true'));
                 u.safeSave(this, {
                     'num_unread': 0,
                     'num_unread_general': 0,
