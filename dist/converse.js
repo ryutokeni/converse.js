@@ -88996,54 +88996,56 @@ const converse = {
         nick: group.nick
       }, null, true);
 
-      if (chatbox) {
-        let unreadMsg = 0;
+      _converse.on('afterMessagesFetched', () => {
+        if (chatbox) {
+          let unreadMsg = 0;
 
-        if (group.latestMsgId) {
-          const msgs = chatbox.messages.where({
-            'msgid': group.latestMsgId
-          });
+          if (group.latestMsgId) {
+            const msgs = chatbox.messages.where({
+              'msgid': group.latestMsgId
+            });
 
-          if (!msgs || !msgs.length) {
-            const localLatestMsg = localStorage.getItem(`latestMsg-${_converse.user_settings.jid}-${group.jid}`);
+            if (!msgs || !msgs.length) {
+              const localLatestMsg = localStorage.getItem(`latestMsg-${_converse.user_settings.jid}-${group.jid}`);
 
-            if (localLatestMsg) {
-              const _localLatestMsg$split = localLatestMsg.split('##status##'),
-                    _localLatestMsg$split2 = _slicedToArray(_localLatestMsg$split, 2),
-                    localLatestMsgId = _localLatestMsg$split2[0],
-                    read = _localLatestMsg$split2[1];
+              if (localLatestMsg) {
+                const _localLatestMsg$split = localLatestMsg.split('##status##'),
+                      _localLatestMsg$split2 = _slicedToArray(_localLatestMsg$split, 2),
+                      localLatestMsgId = _localLatestMsg$split2[0],
+                      read = _localLatestMsg$split2[1];
 
-              if (group.latestMsgId !== localLatestMsgId) {
-                localStorage.setItem(`latestMsg-${_converse.user_settings.jid}-${group.jid}`, `${group.latestMsgId}##status##false`);
-                unreadMsg = 1;
-              } else {
-                if (read === 'false') {
+                if (group.latestMsgId !== localLatestMsgId) {
+                  localStorage.setItem(`latestMsg-${_converse.user_settings.jid}-${group.jid}`, `${group.latestMsgId}##status##false`);
                   unreadMsg = 1;
+                } else {
+                  if (read === 'false') {
+                    unreadMsg = 1;
+                  }
                 }
+              } else {
+                localStorage.setItem(`latestMsg-${_converse.user_settings.jid}-${group.jid}`, `${group.latestMsgId}##status##false`);
               }
             } else {
-              localStorage.setItem(`latestMsg-${_converse.user_settings.jid}-${group.jid}`, `${group.latestMsgId}##status##false`);
-            }
-          } else {
-            const read = msgs[0].get('read');
+              const read = msgs[0].get('read');
 
-            if (!read) {
-              unreadMsg = 1;
+              if (!read) {
+                unreadMsg = 1;
+              }
             }
           }
-        }
 
-        chatbox.save({
-          users: group.users,
-          latestMessageTime: group.latestMessageTime,
-          subject: {
-            text: group.groupName
-          },
-          name: group.groupName,
-          nick: group.nick,
-          num_unread_general: unreadMsg
-        });
-      } // chatbox.join(group.nick);
+          chatbox.save({
+            users: group.users,
+            latestMessageTime: group.latestMessageTime,
+            subject: {
+              text: group.groupName
+            },
+            name: group.groupName,
+            nick: group.nick,
+            num_unread_general: unreadMsg
+          });
+        }
+      }, 10000); // chatbox.join(group.nick);
 
     });
   },
