@@ -72923,8 +72923,10 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
         $('.chat-content').on('scroll', () => {
           var x = this.el.querySelector('.chat-content').scrollTop;
 
-          if (x === 0) {
-            // console.log('we scroll on top');
+          if (!this.model.isHidden() && x === 0) {
+            console.log('really top');
+            console.log('all Loaded', this.model.get('isAllLoaded'));
+
             if (this.model.get('isAllLoaded')) {
               this.model.save({
                 loadingMore: false
@@ -77549,6 +77551,31 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_3__["default"].plugins
           this.model.save({
             loadingMore: false
           });
+        });
+
+        $('.chat-content').on('scroll', () => {
+          var x = this.el.querySelector('.chat-content').scrollTop;
+
+          if (!this.model.isHidden() && x === 0) {
+            console.log('really top');
+            console.log('all Loaded', this.model.get('isAllLoaded'));
+
+            if (this.model.get('isAllLoaded')) {
+              this.model.save({
+                loadingMore: false
+              });
+              u.hideElement(this.el.querySelector('button.load-more-messages'));
+            } else {
+              u.showElement(this.el.querySelector('.fa-spinner'));
+
+              if (!this.model.get('loadingMore')) {
+                this.loadMoreMessages();
+              } // u.showElement(this.el.querySelector('button.load-more-messages'))
+
+            }
+          } else {
+            u.hideElement(this.el.querySelector('button.load-more-messages'));
+          }
         });
       },
 
@@ -86765,56 +86792,34 @@ _converse_core__WEBPACK_IMPORTED_MODULE_2__["default"].plugins.add('converse-cha
             userName: `${contact_jid.split('@')[0]}`
           };
           var json = JSON.stringify(ping);
-          var url = `${_converse.user_settings.baseUrl}/userProfile`;
-          var xhr = new XMLHttpRequest();
-          xhr.open("POST", url, false);
-          xhr.setRequestHeader("securityToken", _converse.user_settings.password);
-          xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+          const has_body = sizzle(`body, encrypted[xmlns="${Strophe.NS.OMEMO}"]`).length > 0;
+          const chatbox = that.getChatBox(contact_jid, attrs, has_body);
 
-          xhr.onload = function () {
-            // Call a function when the state changes.
-            if (xhr.status >= 200 && xhr.status < 400) {
-              // Request finished. Do processing here.
-              const res = JSON.parse(xhr.responseText);
+          if (chatbox && !chatbox.handleMessageCorrection(stanza) && !chatbox.handleReceipt(stanza)) {
+            const msgid = stanza.getAttribute('id'),
+                  message = msgid && chatbox.messages.findWhere({
+              'msgid': msgid
+            });
 
-              if (res.response) {
-                attrs.fullname = res.response.fullName;
-                senderFullName = res.response.fullName;
-                const has_body = sizzle(`body, encrypted[xmlns="${Strophe.NS.OMEMO}"]`).length > 0;
-                const chatbox = that.getChatBox(contact_jid, attrs, has_body);
-
-                if (chatbox && !chatbox.handleMessageCorrection(stanza) && !chatbox.handleReceipt(stanza)) {
-                  const msgid = stanza.getAttribute('id'),
-                        message = msgid && chatbox.messages.findWhere({
-                    'msgid': msgid
-                  });
-
-                  if (!message) {
-                    // Only create the message when we're sure it's not a duplicate
-                    chatbox.createMessage(stanza, original_stanza, extraAttrs).then(msg => {
-                      chatbox.incrementUnreadMsgCounter(msg);
-                      msg.set('senderFullName', senderFullName);
-                    }).catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
-                  } else {
-                    message.save(extraAttrs);
-                    message.set('senderFullName', senderFullName);
-
-                    _converse.emit('rerenderMessage');
-                  }
-                }
-
-                _converse.emit('message', {
-                  'stanza': original_stanza,
-                  'chatbox': chatbox,
-                  'silent': (extraAttrs || {}).silent
-                });
-              } else {}
+            if (!message) {
+              // Only create the message when we're sure it's not a duplicate
+              chatbox.createMessage(stanza, original_stanza, extraAttrs).then(msg => {
+                chatbox.incrementUnreadMsgCounter(msg);
+                msg.set('senderFullName', senderFullName);
+              }).catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
             } else {
-              xhr.onerror();
-            }
-          };
+              message.save(extraAttrs);
+              message.set('senderFullName', senderFullName);
 
-          xhr.send(json);
+              _converse.emit('rerenderMessage');
+            }
+          }
+
+          _converse.emit('message', {
+            'stanza': original_stanza,
+            'chatbox': chatbox,
+            'silent': (extraAttrs || {}).silent
+          });
         } else {
           const has_body = sizzle(`body, encrypted[xmlns="${Strophe.NS.OMEMO}"]`).length > 0;
           const chatbox = this.getChatBox(contact_jid, attrs, has_body);
@@ -118533,36 +118538,32 @@ _converse_headless_converse_core__WEBPACK_IMPORTED_MODULE_5__["default"].plugins
               'jid': data.chatbox.get('jid')
             });
 
-            if (chatbox) {
-              if (!data.chatbox.get('name')) {
-                var ping = {
-                  userName: `${chatbox.get('jid').split('@')[0]}`
-                };
-                var json = JSON.stringify(ping);
-                var url = `${_converse.user_settings.baseUrl}/userProfile`;
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", url, false);
-                xhr.setRequestHeader("securityToken", _converse.user_settings.password);
-                xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-
-                xhr.onload = function () {
-                  // Call a function when the state changes.
-                  if (xhr.status >= 200 && xhr.status < 400) {
-                    // Request finished. Do processing here.
-                    const res = JSON.parse(xhr.responseText);
-
-                    if (res.response) {
-                      chatbox.set('name', res.response.fullName);
-                    } else {
-                      console.log('nothing here');
-                    }
-                  } else {
-                    xhr.onerror();
-                  }
-                };
-
-                xhr.send(json);
-              }
+            if (chatbox) {// if (!data.chatbox.get('name')) {
+              //   var ping = {
+              //     userName: `${chatbox.get('jid').split('@')[0]}`
+              //   };
+              //   var json = JSON.stringify(ping);
+              //   var url = `${_converse.user_settings.baseUrl}/userProfile`
+              //   var xhr = new XMLHttpRequest();
+              //   xhr.open("POST", url, false);
+              //   xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+              //   xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+              //   xhr.onload = function () { // Call a function when the state changes.
+              //     if (xhr.status >= 200 && xhr.status < 400) {
+              //       // Request finished. Do processing here.
+              //       const res = JSON.parse(xhr.responseText);
+              //       if (res.response) {
+              //         chatbox.set('name', res.response.fullName)
+              //       }
+              //       else {
+              //         console.log('nothing here');
+              //       }
+              //     } else {
+              //       xhr.onerror();
+              //     }
+              //   }
+              //   xhr.send(json);
+              // }
             } else {
               // let name;
               // data.chatbox.get('jid').includes('conference') ? name = data.chatbox.get('subject').text : name = data.chatbox.get('name') || 'PARIS'
@@ -118888,13 +118889,13 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/chatarea.html -->\n<div class="chat-area col-md-9 col-8">\n    <div class="text-center">\n        <!-- <i class="fas  fa-spinner "></i> -->\n        <span class="spinner fa fa-spinner loading-more-spin centered hidden" />\n        <button  class="btn btn-primary hidden load-more-messages ' +
+__p += '<!-- src/templates/chatarea.html -->\n<div class="chat-area col-md-9 col-8">\n    <div class="text-center">\n        <!-- <i class="fas  fa-spinner "></i> -->\n        <span class="spinner fa fa-spinner loading-more-spin centered hidden"></span>\n        <button  class="btn btn-primary hidden load-more-messages ' +
 __e(o.user_id) +
 '">Load more...</button>\n    </div>\n    <div class="chat-content ';
  if (o.show_send_button) { ;
 __p += 'chat-content-sendbutton';
  } ;
-__p += '">\n      \n    </div>\n    <div class="message-form-container message-form-container-wrap"/>\n</div>\n';
+__p += '">\n    </div>\n    <div class="message-form-container message-form-container-wrap"/>\n</div>\n';
 return __p
 };
 
@@ -118911,7 +118912,7 @@ var _ = {escape:__webpack_require__(/*! ./node_modules/lodash/escape.js */ "./no
 module.exports = function(o) {
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
-__p += '<!-- src/templates/chatbox.html -->\n<div style="width: calc(var(--fullpage-chat-width)/1.03);margin-left: 40px;" class="flyout box-flyout">\n    <div class="chat-body">\n        \n      <div class="text-center">\n            <i class="fas hidden fa-spinner"></i>\n            <button class="btn btn-primary hidden load-more-messages ' +
+__p += '<!-- src/templates/chatbox.html -->\n<div style="width: calc(var(--fullpage-chat-width)/1.03);margin-left: 40px;" class="flyout box-flyout">\n    <div class="chat-body">\n\n      <div class="text-center">\n            <i class="fas hidden fa-spinner"></i>\n            <button class="btn btn-primary hidden load-more-messages ' +
 __e(o.user_id) +
 '">Load more...</button>\n      </div>\n        <div  class="chat-content ';
  if (o.show_send_button) { ;

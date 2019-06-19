@@ -54,11 +54,11 @@ converse.plugins.add('pageme-recent-messages-view', {
                           this.model.set('name', this.getDisplayName(_converse.user_settings.imported_contacts));
                         }
                       }
-                     
+
                     })
                   }
                 // }
-                
+
             },
 
             render () {
@@ -163,15 +163,15 @@ converse.plugins.add('pageme-recent-messages-view', {
 
             openChatbox (ev) {
               ev.preventDefault();
-      
+
               _converse.emit('aChatRoomOpen');
-      
+
               const name = ev.target.textContent;
               const jid = ev.delegateTarget.dataset.jid;
               const data = {
                 'name': name || Strophe.unescapeNode(Strophe.getNodeFromJid(jid)) || jid
               };
-      
+
               const chatbox = _converse.chatboxes.findWhere({'jid': jid});
               if (!!chatbox) {
                 const isChatroom =  chatbox.get('type') === 'chatroom';
@@ -210,7 +210,7 @@ converse.plugins.add('pageme-recent-messages-view', {
 
 
         /************************ BEGIN Event Handlers ************************/
-        
+
 
         _converse.api.listen.on('chatBoxesInitialized', () => {
             if (_converse.authentication === _converse.ANONYMOUS) {
@@ -228,32 +228,32 @@ converse.plugins.add('pageme-recent-messages-view', {
                   'jid':data.chatbox.get('jid')
                 })
                 if (chatbox) {
-                    if (!data.chatbox.get('name')) {
-                      var ping = {
-                        userName: `${chatbox.get('jid').split('@')[0]}`
-                      };
-                      var json = JSON.stringify(ping);
-                      var url = `${_converse.user_settings.baseUrl}/userProfile`
-                      var xhr = new XMLHttpRequest();
-                      xhr.open("POST", url, false);
-                      xhr.setRequestHeader("securityToken", _converse.user_settings.password);
-                      xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-                      xhr.onload = function () { // Call a function when the state changes.
-                        if (xhr.status >= 200 && xhr.status < 400) {
-                          // Request finished. Do processing here.
-                          const res = JSON.parse(xhr.responseText);
-                          if (res.response) {
-                            chatbox.set('name', res.response.fullName)
-                          }
-                          else {
-                            console.log('nothing here');
-                          }
-                        } else {
-                          xhr.onerror();
-                        }
-                      }
-                      xhr.send(json);
-                    } 
+                    // if (!data.chatbox.get('name')) {
+                    //   var ping = {
+                    //     userName: `${chatbox.get('jid').split('@')[0]}`
+                    //   };
+                    //   var json = JSON.stringify(ping);
+                    //   var url = `${_converse.user_settings.baseUrl}/userProfile`
+                    //   var xhr = new XMLHttpRequest();
+                    //   xhr.open("POST", url, false);
+                    //   xhr.setRequestHeader("securityToken", _converse.user_settings.password);
+                    //   xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
+                    //   xhr.onload = function () { // Call a function when the state changes.
+                    //     if (xhr.status >= 200 && xhr.status < 400) {
+                    //       // Request finished. Do processing here.
+                    //       const res = JSON.parse(xhr.responseText);
+                    //       if (res.response) {
+                    //         chatbox.set('name', res.response.fullName)
+                    //       }
+                    //       else {
+                    //         console.log('nothing here');
+                    //       }
+                    //     } else {
+                    //       xhr.onerror();
+                    //     }
+                    //   }
+                    //   xhr.send(json);
+                    // }
                   } else {
                     // let name;
                     // data.chatbox.get('jid').includes('conference') ? name = data.chatbox.get('subject').text : name = data.chatbox.get('name') || 'PARIS'

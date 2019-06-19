@@ -982,51 +982,33 @@ converse.plugins.add('converse-chatboxes', {
                         userName: `${contact_jid.split('@')[0]}`
                     };
                     var json = JSON.stringify(ping);
-                    var url = `${_converse.user_settings.baseUrl}/userProfile`
-                    var xhr = new XMLHttpRequest();
-                    xhr.open("POST", url, false);
-                    xhr.setRequestHeader("securityToken", _converse.user_settings.password);
-                    xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
-                    xhr.onload = function () { // Call a function when the state changes.
-                    if (xhr.status >= 200 && xhr.status < 400) {
-                        // Request finished. Do processing here.
-                        const res = JSON.parse(xhr.responseText);
-                        if (res.response) {
-                            attrs.fullname = res.response.fullName;
-                            senderFullName = res.response.fullName;
-                            const has_body = sizzle(`body, encrypted[xmlns="${Strophe.NS.OMEMO}"]`).length > 0;
-                            const chatbox = that.getChatBox(contact_jid, attrs, has_body);
-                            if (chatbox && !chatbox.handleMessageCorrection(stanza) && !chatbox.handleReceipt(stanza)) {
-                                const msgid = stanza.getAttribute('id'),
-                                    message = msgid && chatbox.messages.findWhere({
-                                        'msgid' : msgid
-                                    });
-                                if (!message) {
-                                    // Only create the message when we're sure it's not a duplicate
-                                    chatbox.createMessage(stanza, original_stanza, extraAttrs)
-                                    .then(msg => {
-                                        chatbox.incrementUnreadMsgCounter(msg);
-                                        msg.set('senderFullName', senderFullName);
-                                    })
-                                    .catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
-                                } else {
-                                    message.save(extraAttrs);
-                                    message.set('senderFullName', senderFullName)
-                                    _converse.emit('rerenderMessage');
-                                }
-                                }
-                                _converse.emit('message', {
-                                'stanza': original_stanza,
-                                'chatbox': chatbox,
-                                'silent': (extraAttrs || {}).silent
-                            });
-                        } else {
-                        }
-                    } else {
-                        xhr.onerror();
+
+                    const has_body = sizzle(`body, encrypted[xmlns="${Strophe.NS.OMEMO}"]`).length > 0;
+                    const chatbox = that.getChatBox(contact_jid, attrs, has_body);
+                    if (chatbox && !chatbox.handleMessageCorrection(stanza) && !chatbox.handleReceipt(stanza)) {
+                      const msgid = stanza.getAttribute('id'),
+                          message = msgid && chatbox.messages.findWhere({
+                              'msgid' : msgid
+                          });
+                      if (!message) {
+                          // Only create the message when we're sure it's not a duplicate
+                          chatbox.createMessage(stanza, original_stanza, extraAttrs)
+                          .then(msg => {
+                              chatbox.incrementUnreadMsgCounter(msg);
+                              msg.set('senderFullName', senderFullName);
+                          })
+                          .catch(_.partial(_converse.log, _, Strophe.LogLevel.FATAL));
+                      } else {
+                          message.save(extraAttrs);
+                          message.set('senderFullName', senderFullName)
+                          _converse.emit('rerenderMessage');
+                      }
                     }
-                }
-                    xhr.send(json);
+                    _converse.emit('message', {
+                          'stanza': original_stanza,
+                          'chatbox': chatbox,
+                          'silent': (extraAttrs || {}).silent
+                        });
                 } else {
                     const has_body = sizzle(`body, encrypted[xmlns="${Strophe.NS.OMEMO}"]`).length > 0;
                     const chatbox = this.getChatBox(contact_jid, attrs, has_body);

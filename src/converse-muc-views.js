@@ -572,6 +572,27 @@ converse.plugins.add('converse-muc-views', {
                             loadingMore: false
                         })
                 })
+                $('.chat-content').on('scroll', () => {
+                    var x = this.el.querySelector('.chat-content').scrollTop;
+                    if (!this.model.isHidden() && x === 0) {
+                      console.log('really top')
+                      console.log('all Loaded', this.model.get('isAllLoaded'));
+                      if (this.model.get('isAllLoaded')) {
+                          this.model.save({
+                            loadingMore: false
+                          })
+                          u.hideElement(this.el.querySelector('button.load-more-messages'))
+                      } else {
+                          u.showElement(this.el.querySelector('.fa-spinner'));
+                          if (!this.model.get('loadingMore')) {
+                            this.loadMoreMessages();
+                          }
+                          // u.showElement(this.el.querySelector('button.load-more-messages'))
+                      }
+                    } else {
+                    u.hideElement(this.el.querySelector('button.load-more-messages'))
+                    }
+                })
             },
 
             enterRoom (ev) {
