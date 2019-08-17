@@ -651,7 +651,9 @@ converse.plugins.add('converse-roster', {
                 } else {
                   _converse.user_settings.imported_contacts = contacts;
                 }
-                _converse.emit('load-done', group);
+                _converse.api.waitUntil('rosterViewInitialized').then(() => {
+                    _converse.emit('load-done', group);
+                });
               }
               if (sync) {
                 if (group === 'My Organization') {

@@ -980,7 +980,6 @@ converse.plugins.add('converse-rosterview', {
             // })
             _converse.emit('justShowbackground');
             _converse.rosterview.render();
-            _converse.emit('rosterViewInitialized');
             _converse.on('load-done', (labelName) => {
                 if (labelName === 'Address Book') {
                     u.hideElement(_converse.rosterview.loading_contact);
@@ -989,6 +988,7 @@ converse.plugins.add('converse-rosterview', {
                     u.hideElement(_converse.rosterview.loading_org);
                 }
             })
+            _converse.emit('rosterViewInitialized');
         }
 
         _converse.api.listen.on('rosterInitialized', initRoster);
