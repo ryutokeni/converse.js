@@ -1277,6 +1277,12 @@ _converse.initialize = function (settings, callback) {
  * @memberOf _converse
  */
 _converse.api = {
+  'setRecentChat' (jid, time){
+    localStorage.setItem(`recentChat-${jid}`, time);
+  },
+  'getRecentChat' (jid){
+    return localStorage.getItem(`recentChat-${jid}`);
+  },
     /**
      * This grouping collects API functions related to the XMPP connection.
      *
@@ -1362,6 +1368,16 @@ _converse.api = {
          */
         'logout' () {
             _converse.logOut();
+        },
+        'recentChat': {
+          'get' (jid) {
+            return localStorage.getItem(`recentChat-${jid}`);
+          },
+
+          'set' (jid, time) {
+            console.log(jid, time);
+            localStorage.setItem(`recentChat-${jid}`, time);
+          },
         },
         /**
          * Set and get the user's chat status, also called their *availability*.
@@ -1742,6 +1758,13 @@ const converse = {
       return _converse.api.listen.on('rosterContactsFetched', () => {
         _converse.roster.compareContacts(contacts, group, true);
       });
+    },
+    'setRecentChat' (jid, time){
+      console.log(jid, time);
+      localStorage.setItem(`recentChat-${jid}`, time);
+    },
+    'getRecentChat' (jid){
+      return localStorage.getItem(`recentChat-${jid}`);
     },
     'updateGroups' (groups) {
       groups.forEach(async (group) => {

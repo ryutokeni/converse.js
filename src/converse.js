@@ -57,6 +57,8 @@ const WHITELISTED_PLUGINS = [
 const {
   initialize,
   updateContacts,
+  setRecentChat,
+  getRecentChat,
   updateGroups,
   updateMessageStatus,
   numberRequestChange,
@@ -109,6 +111,12 @@ converse.playSound = function () {
 }
 converse.updateContacts = function (contacts, group) {
   return updateContacts(contacts, group);
+}
+converse.setRecentChat = function (jid, time) {
+  return setRecentChat(jid, time);
+}
+converse.getRecentChat = function (jid) {
+  return getRecentChat(jid);
 }
 converse.disabledNotification = function (state) {
   return disabledNotification(state);

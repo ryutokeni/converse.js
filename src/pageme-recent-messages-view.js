@@ -74,6 +74,7 @@ converse.plugins.add('pageme-recent-messages-view', {
             tryToGetDisplayName () {
                const contacts = (_converse.user_settings.my_organization || []).concat(_converse.user_settings.imported_contacts || []);
               let name = this.getDisplayName(contacts);
+              console.log("get label",name);
               this.model.set('name', name);
               return !!name;
             },
@@ -163,7 +164,6 @@ converse.plugins.add('pageme-recent-messages-view', {
 
             openChatbox (ev) {
               ev.preventDefault();
-
               _converse.emit('aChatRoomOpen');
 
               const name = ev.target.textContent;
@@ -184,6 +184,9 @@ converse.plugins.add('pageme-recent-messages-view', {
             },
 
             showOrHide (item) {
+              // console.log("show or hide", item);
+              // item.trigger('addToRecent');
+              // return;
               const jid = item.get('jid');
               if (jid && jid !== _converse.bare_jid) {
                 const latestMessageTime = item.get('latestMessageTime');
@@ -213,6 +216,7 @@ converse.plugins.add('pageme-recent-messages-view', {
 
 
         _converse.api.listen.on('chatBoxesInitialized', () => {
+            console.log("chat box init");
             if (_converse.authentication === _converse.ANONYMOUS) {
                 return;
             }
@@ -220,6 +224,8 @@ converse.plugins.add('pageme-recent-messages-view', {
               'model': _converse.chatboxes
             });
           _converse.api.listen.on('messageAdded', data => {
+            _converse.api.setRecentChat(data.chatbox.get('jid'), new Date());
+            /*
             if (data.message.get('sender') !== 'me'  && !data.message.get('received')) {
               if (data.chatbox.get('jid').includes('conference')) {
               }
@@ -262,7 +268,7 @@ converse.plugins.add('pageme-recent-messages-view', {
                     })
                     console.log('some thing handle later');
                   }
-              }}
+              }}*/
             })
             _converse.chatboxes.on('change:hidden', (chatbox) => {
                 const contact = _converse.roster.findWhere({'jid': chatbox.get('jid')});

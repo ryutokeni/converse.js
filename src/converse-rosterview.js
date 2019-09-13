@@ -22,6 +22,7 @@ import tpl_search_contact from "templates/search_contact.html";
 const { Backbone, Strophe, $iq, b64_sha1, sizzle, _ } = converse.env;
 const u = converse.env.utils;
 
+var createdChatBoxes = [];
 
 converse.plugins.add('converse-rosterview', {
 
@@ -62,6 +63,7 @@ converse.plugins.add('converse-rosterview', {
         /* The initialize function gets called as soon as the plugin is
          * loaded by converse.js's plugin machinery.
          */
+        createdChatBoxes = [];
         const { _converse } = this,
               { __ } = _converse;
 
@@ -452,6 +454,21 @@ converse.plugins.add('converse-rosterview', {
                         'num_unread': item.get('num_unread') || 0
                     })
                 );
+                if (!createdChatBoxes.includes(item.get('jid'))) {
+                  var time = _converse.api.getRecentChat(item.get('jid'));
+                  if (time) {
+                    const fromNow = (new Date()).getTime() - (new Date(time)).getTime();
+                    const withIn24h = fromNow < (60 * 60 * 24 * 1000);
+                    if (withIn24h) {
+                      const attrs = this.model.attributes;
+                      attrs["latestMessageTime"] = new Date();
+                      _converse.api.chats.create(attrs.jid, attrs);
+                    }else {
+                      _converse.api.setRecentChat(item.get('jid'), null);
+                    }
+                    createdChatBoxes.push(item.get('jid'));
+                  }
+                }
                 return this;
             },
 

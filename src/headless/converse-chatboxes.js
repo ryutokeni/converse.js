@@ -76,6 +76,7 @@ converse.plugins.add('converse-chatboxes', {
                 if (this.isOnlyChatStateNotification()) {
                     window.setTimeout(this.destroy.bind(this), 20000);
                 }
+                console.log("initialize converse chatboxes");
             },
 
             getVCardForChatroomOccupant () {
@@ -254,6 +255,7 @@ converse.plugins.add('converse-chatboxes', {
                 this.messages.browserStorage = new Backbone.BrowserStorage[storage](
                     b64_sha1(`converse.messages${this.get('jid')}${_converse.bare_jid}`));
                 this.messages.chatbox = this;
+                console.log("chatbox vcard", this);
                 this.messages.on('change:upload', (message) => {
                     if (message.get('upload') === _converse.SUCCESS) {
                         this.sendMessageStanza(this.createMessageStanza(message, 'text', message.get('message')));
@@ -828,6 +830,7 @@ converse.plugins.add('converse-chatboxes', {
             onChatBoxesFetched (collection) {
                 /* Show chat boxes upon receiving them from sessionStorage */
                 collection.each((chatbox) => {
+                  console.log("chatbox",chatbox);
                     if (this.chatBoxMayBeShown(chatbox)) {
                         chatbox.trigger('show');
                     }
@@ -1104,6 +1107,7 @@ converse.plugins.add('converse-chatboxes', {
                  */
                 const chatbox = _converse.chatboxes.findWhere({'jid': contact.get('jid')});
                 if (chatbox) {
+                    console.log("add releate chatbox", chatbox);
                     chatbox.addRelatedContact(contact);
                 }
             });
@@ -1152,6 +1156,9 @@ converse.plugins.add('converse-chatboxes', {
                             attrs.fullname = _.get(_converse.api.contacts.get(jids), 'attributes.fullname');
                         }
                         const chatbox = _converse.chatboxes.getChatBox(jids, attrs, true);
+                        console.log("create chat",jids);
+                        console.log("create chat",attrs);
+
                         if (_.isNil(chatbox)) {
                             _converse.log("Could not open chatbox for JID: "+jids, Strophe.LogLevel.ERROR);
                             return;
@@ -1241,6 +1248,7 @@ converse.plugins.add('converse-chatboxes', {
                         _converse.chatboxes.each(function (chatbox) {
                             // FIXME: Leaky abstraction from MUC. We need to add a
                             // base type for chat boxes, and check for that.
+                            console.log("get chatboxes", chatbox);
                             if (chatbox.get('type') !== _converse.CHATROOMS_TYPE) {
                                 result.push(chatbox);
                             }
