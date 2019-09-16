@@ -169,7 +169,9 @@ converse.plugins.add('converse-chatview', {
                 this.model.vcard.on('change', this.render, this);
                 this.getPageMeStatus();
                 _converse.on('StatusChatChanged', data => {
-                    this.model.set('pageMeStatus', data.status)
+                    if (this.model.get('user_id') === data.user) {
+                      this.model.set('pageMeStatus', data.status)
+                    }
                 })
             },
             showProfileMember(ev) {
@@ -283,6 +285,7 @@ converse.plugins.add('converse-chatview', {
               if (result) {
                 this.model.set('pageMeStatus', result.pageMeStatus)
               }
+              console.log("status result", result);
             },
 
             onStatusMessageChanged (item) {
