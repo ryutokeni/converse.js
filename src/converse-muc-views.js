@@ -575,8 +575,6 @@ converse.plugins.add('converse-muc-views', {
                 $('.chat-content').on('scroll', () => {
                     var x = this.el.querySelector('.chat-content').scrollTop;
                     if (!this.model.isHidden() && x === 0) {
-                      console.log('really top')
-                      console.log('all Loaded', this.model.get('isAllLoaded'));
                       if (this.model.get('isAllLoaded')) {
                           this.model.save({
                             loadingMore: false

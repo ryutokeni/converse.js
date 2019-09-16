@@ -790,6 +790,10 @@ _converse.initialize = function (settings, callback) {
         _converse.session.browserStorage = new Backbone.BrowserStorage.session(id);
         _converse.session.fetch();
         _converse.emit('sessionInitialized');
+        _converse.on('updateProfile', data => {
+            console.log("chan lam roi 4", data);
+
+        });
     };
 
     this.clearSession = function () {
@@ -1281,6 +1285,7 @@ _converse.api = {
     localStorage.setItem(`recentChat-${jid}`, time);
   },
   'getRecentChat' (jid){
+    console.log("localstorage ",localStorage.getItem('Pageme-current-user'));
     return localStorage.getItem(`recentChat-${jid}`);
   },
     /**
@@ -2189,6 +2194,7 @@ const converse = {
       })
     },
     'updateProfile' (data) {
+      console.log("profile data", data);
       _converse.api.waitUntil('statusInitialized').then(() => {
           _converse.emit('updateProfile', data);
         //   const vcard = _converse.vcards.

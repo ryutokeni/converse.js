@@ -42,6 +42,7 @@ converse.plugins.add('converse-profile', {
                 'submit .profile-form': 'onFormSubmitted'
             },
 
+
             initialize () {
                 this.model.on('change', this.render, this);
                 this.model.set({'specialities': [
@@ -110,7 +111,7 @@ converse.plugins.add('converse-profile', {
                 }).c("list", {
                     "name": "Block"
                 });
-              
+
                 _converse.api.sendIQ(iq)
                 .then(
                     result => {
@@ -136,7 +137,7 @@ converse.plugins.add('converse-profile', {
                                             arrayJID.push(item.getAttribute('value'));
                                         }
                                     }
-                                   
+
                                 })
                             }
                             if (arrayJID.length > 0) {
@@ -253,7 +254,7 @@ converse.plugins.add('converse-profile', {
                     },
                     err => console.log(err)
                 )
-               
+
             },
             afterRender () {
                 this.tabs = _.map(this.el.querySelectorAll('.nav-item'), (tab) => new bootstrap.Tab(tab));
@@ -284,7 +285,7 @@ converse.plugins.add('converse-profile', {
                     if (findMain) {
                         findMain.subs.forEach((subSpeciality, i) => {
                             var findSubSpecIndex = findMain.subs.findIndex(subSpeciality => this.model.get('title') && this.model.get('title').includes(findMain.main + '+' + subSpeciality));
-                            
+
                             var opt = document.createElement('option');
                             opt.textContent = subSpeciality;
                             opt.value = i;
@@ -297,7 +298,7 @@ converse.plugins.add('converse-profile', {
 
             openFileSelection (ev) {
                 if (this.model.get('isMemberProfile')) return;
-                
+
                 ev.preventDefault();
                 this.el.querySelector('input[type="file"]').click();
             },
@@ -347,7 +348,7 @@ converse.plugins.add('converse-profile', {
 
                 _converse.emit('editUserProfile', data, image_file,  () => {
                     _converse.emit('editUserProfileCompleted', data.avatarUrl)
-                    
+
                     this.model.set(data);
                     _converse.user_settings.userProfile.avatarUrl = this.model.get('avatarUrl');
                     // _converse.xmppstatusview.image = this.model.get('avatarUrl');
@@ -414,6 +415,9 @@ converse.plugins.add('converse-profile', {
                     'statusMessage': data.get('status_message'),
                     'pageMeStatus': data.get('chat_status')
                 });
+                const key = `${_converse.user_settings.jid.split('@')[0]}-status-cached`;
+                localStorage.setItem(key,null);
+
                 this.modal.hide();
                 _converse.emit('statusFormSubmitted', {
                   status: data.get('chat_status'),
@@ -458,6 +462,16 @@ converse.plugins.add('converse-profile', {
             },
 
             initialize () {
+                const key = `${_converse.user_settings.jid.split('@')[0]}-status-cached`;
+
+                const initStatus = localStorage.getItem(key);
+                if (initStatus !== null) {
+                  const data = JSON.parse(initStatus);
+                  this.model.save({
+                      'statusMessage': data.statusMessage,
+                      'pageMeStatus': data.status
+                  });
+                }
                 this.model.on("change", this.render, this);
                 this.model.vcard.on("change", this.render, this);
                 this.model.on("change:avatarUrl", this.afterRender, this);
@@ -530,6 +544,7 @@ converse.plugins.add('converse-profile', {
                 }
                 this.status_modal = new _converse.ChatStatusModal({model: this.model});
                 this.status_modal.show(ev);
+
             },
 
             showClientInfoModal(ev) {

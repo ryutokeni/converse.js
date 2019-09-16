@@ -74,7 +74,6 @@ converse.plugins.add('pageme-recent-messages-view', {
             tryToGetDisplayName () {
                const contacts = (_converse.user_settings.my_organization || []).concat(_converse.user_settings.imported_contacts || []);
               let name = this.getDisplayName(contacts);
-              console.log("get label",name);
               this.model.set('name', name);
               return !!name;
             },
@@ -216,7 +215,6 @@ converse.plugins.add('pageme-recent-messages-view', {
 
 
         _converse.api.listen.on('chatBoxesInitialized', () => {
-            console.log("chat box init");
             if (_converse.authentication === _converse.ANONYMOUS) {
                 return;
             }
