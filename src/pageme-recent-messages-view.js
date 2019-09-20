@@ -223,6 +223,7 @@ converse.plugins.add('pageme-recent-messages-view', {
             });
           _converse.api.listen.on('messageAdded', data => {
             _converse.api.setRecentChat(data.chatbox.get('jid'), new Date());
+            data.chatbox.trigger('addToRecent');
             /*
             if (data.message.get('sender') !== 'me'  && !data.message.get('received')) {
               if (data.chatbox.get('jid').includes('conference')) {

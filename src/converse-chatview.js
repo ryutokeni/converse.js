@@ -285,7 +285,6 @@ converse.plugins.add('converse-chatview', {
               if (result) {
                 this.model.set('pageMeStatus', result.pageMeStatus)
               }
-              console.log("status result", result);
             },
 
             onStatusMessageChanged (item) {

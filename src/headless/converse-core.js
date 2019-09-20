@@ -601,7 +601,6 @@ _converse.initialize = function (settings, callback) {
     };
 
     this.setConnectionStatus = function (connection_status, message) {
-      console.log("connection status " + connection_status + " " + message);
         _converse.connfeedback.set({
             'connection_status': connection_status,
             'message': message
@@ -648,7 +647,6 @@ _converse.initialize = function (settings, callback) {
          * to reconnect.
          */
         const reason = _converse.disconnection_reason;
-        console.log("disconnect " + reason);
         if (_converse.disconnection_cause === Strophe.Status.AUTHFAIL) {
             if (_converse.credentials_url && _converse.auto_reconnect) {
                 /* In this case, we reconnect, because we might be receiving
@@ -688,7 +686,6 @@ _converse.initialize = function (settings, callback) {
          * through various states while establishing or tearing down a
          * connection.
          */
-         console.log(`Status changed to: ${_converse.CONNECTION_STATUS[status]}`);
         _converse.log(`Status changed to: ${_converse.CONNECTION_STATUS[status]}`);
         if (status === Strophe.Status.CONNECTED || status === Strophe.Status.ATTACHED) {
             _converse.setConnectionStatus(status);
@@ -791,7 +788,6 @@ _converse.initialize = function (settings, callback) {
         _converse.session.fetch();
         _converse.emit('sessionInitialized');
         _converse.on('updateProfile', data => {
-            console.log("chan lam roi 4", data);
 
         });
     };
@@ -936,9 +932,7 @@ _converse.initialize = function (settings, callback) {
         _converse.enableCarbons();
         // _converse.sendInitialPresence();
         _converse.initStatus(reconnecting)
-        console.log("converse connected " +  _converse.default_state);
         this.timeouthandler = setTimeout(function(){
-          console.log("timeout please send status");
           // _converse.xmppstatus.set('status', _converse.default_state);
           _converse.xmppstatus.sendPresence();
         }, 1000);
@@ -1029,7 +1023,6 @@ _converse.initialize = function (settings, callback) {
             //     console.log('we return this cause it is not online status');
             //     return;
             // }
-            console.log("send presence");
             let presence = this.constructPresence('online','');
             _converse.api.send(presence);
             // if (!type) {
@@ -1285,7 +1278,6 @@ _converse.api = {
     localStorage.setItem(`recentChat-${jid}`, time);
   },
   'getRecentChat' (jid){
-    console.log("localstorage ",localStorage.getItem('Pageme-current-user'));
     return localStorage.getItem(`recentChat-${jid}`);
   },
     /**
@@ -1380,7 +1372,6 @@ _converse.api = {
           },
 
           'set' (jid, time) {
-            console.log(jid, time);
             localStorage.setItem(`recentChat-${jid}`, time);
           },
         },
@@ -1765,7 +1756,6 @@ const converse = {
       });
     },
     'setRecentChat' (jid, time){
-      console.log(jid, time);
       localStorage.setItem(`recentChat-${jid}`, time);
     },
     'getRecentChat' (jid){
@@ -2161,7 +2151,6 @@ const converse = {
     'allMessageAreLoaded'(jid) {
         const chatbox = _converse.chatboxes.findWhere({'jid': jid});
         if (!chatbox) {
-            console.log('some thing wrong');
             return;
         }
         _converse.emit('AllMessageAreLoaded', jid)
@@ -2194,7 +2183,6 @@ const converse = {
       })
     },
     'updateProfile' (data) {
-      console.log("profile data", data);
       _converse.api.waitUntil('statusInitialized').then(() => {
           _converse.emit('updateProfile', data);
         //   const vcard = _converse.vcards.
